@@ -1,4 +1,5 @@
 plugins {
+    @Suppress("DSL_SCOPE_VIOLATION")
     alias(libs.plugins.ktlint)
 }
 
@@ -19,9 +20,6 @@ version = libs.versions.project.version.get()
 
 allprojects {
     apply(plugin = rootProject.libs.plugins.ktlint.get().pluginId)
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        disabledRules.set(setOf("no-wildcard-imports"))
-    }
     repositories {
         google()
         mavenCentral()
@@ -34,3 +32,4 @@ allprojects {
         }
     }
 }
+

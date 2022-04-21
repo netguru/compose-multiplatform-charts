@@ -1,4 +1,9 @@
 build/
+charts/build/
+example-app/android/build/
+example-app/application/build/
+example-app/common/build/
+example-app/desktop/build/
 modules.xml
 local.properties
 .gradle
