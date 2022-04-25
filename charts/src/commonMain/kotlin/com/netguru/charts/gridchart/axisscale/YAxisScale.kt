@@ -5,10 +5,10 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-class NiceTicksAxisScale(min: Float, max: Float, maxTickCount: Int) : AxisScale {
-    override val tick: Float
-    override val min: Float
-    override val max: Float
+class YAxisScale(min: Float, max: Float, maxTickCount: Int) {
+    val tick: Float
+    val min: Float
+    val max: Float
 
     init {
         val range = niceNum(max - min, false)

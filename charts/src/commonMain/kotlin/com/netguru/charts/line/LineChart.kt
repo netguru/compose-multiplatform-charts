@@ -2,24 +2,11 @@ package com.netguru.charts.line
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.Typography
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
@@ -27,15 +14,13 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netguru.charts.gridchart.AXIS_FONT_SIZE
-import com.netguru.charts.gridchart.LineParameters
-import com.netguru.charts.gridchart.YAxisLabels
-import com.netguru.charts.gridchart.axisscale.NiceTicksAxisScale
-import com.netguru.charts.gridchart.determineGridLinesPositions
-import com.netguru.charts.gridchart.drawChartGrid
+import com.netguru.charts.gridchart.*
+import com.netguru.charts.gridchart.axisscale.TimestampXAxisScale
+import com.netguru.charts.gridchart.axisscale.YAxisScale
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
@@ -98,13 +83,14 @@ fun LineChart(
                     .fillMaxWidth()
                     .weight(1f)
                     .drawBehind {
-                        val lines = determineGridLinesPositions(
-                            xAxisScale = NiceTicksAxisScale(
-                                min = lineChartData.minX.toFloat(),
-                                max = lineChartData.maxX.toFloat(),
-                                maxTickCount = maxVerticalLines - 1
+                        val lines = measureChartGrid(
+                            xAxisScale = TimestampXAxisScale(
+                                min = lineChartData.minX,
+                                max = lineChartData.maxX,
+                                maxTicksCount = maxVerticalLines - 1
+
                             ),
-                            yAxisScale = NiceTicksAxisScale(
+                            yAxisScale = YAxisScale(
                                 min = lineChartData.minY,
                                 max = lineChartData.maxY,
                                 maxTickCount = maxHorizontalLines - 1
@@ -133,7 +119,12 @@ fun LineChart(
                 OverlayInformation(
                     lineChartData = lineChartData,
                     pointerEvent = touchEvent,
-                    containerSize = with(LocalDensity.current) { Size(maxWidth.toPx(), maxHeight.toPx()) },
+                    containerSize = with(LocalDensity.current) {
+                        Size(
+                            maxWidth.toPx(),
+                            maxHeight.toPx()
+                        )
+                    },
                     chartColors = chartColors,
                     timeFormatter = timeFormatter,
                     typography = typography,
@@ -145,10 +136,13 @@ fun LineChart(
                 for (gridLine in verticalGridLines) {
                     val labelXOffset = with(LocalDensity.current) { (gridLine.position).toDp() }
                     Text(
-                        modifier = Modifier.offset(labelXOffset, 0.dp),
+                        modifier = Modifier
+                            .width(100.dp)
+                            .offset(labelXOffset - 50.dp, 0.dp),
                         fontSize = AXIS_FONT_SIZE.sp,
-                        color = chartColors.surface,
-                        text = xAxisValueFormatter(gridLine.value.toLong())
+                        color = chartColors.labels,
+                        text = xAxisValueFormatter(gridLine.value.toLong()),
+                        textAlign = TextAlign.Center
                     )
                 }
             }

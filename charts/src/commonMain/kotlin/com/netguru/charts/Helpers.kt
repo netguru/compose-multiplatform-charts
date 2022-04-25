@@ -1,6 +1,5 @@
 package com.netguru.charts
 
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -25,11 +24,17 @@ fun Long.mapValueToDifferentRange(
     outMax: Long
 ) = (this - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
-data class PointF(val x: Float, val y: Float)
+fun Long.mapValueToDifferentRange(
+    inMin: Long,
+    inMax: Long,
+    outMin: Float,
+    outMax: Float
+) = (this - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
 fun Float.round(decimals: Int = 2): String {
-    val integerDigits = this.toInt()
-    var floatDigits = ((this - integerDigits) * 10f.pow(decimals))
-    if (floatDigits.isNaN()) floatDigits = 0f
-    return "$integerDigits.${abs(floatDigits.roundToInt())}"
+    return try {
+        ((this * 10.0.pow(decimals)).roundToInt() / 10.0.pow(decimals)).toString()
+    } catch (e: IllegalArgumentException) {
+        "-"
+    }
 }
