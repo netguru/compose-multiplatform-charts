@@ -32,7 +32,9 @@ internal fun YAxisLabels(
             .padding(end = 8.dp)
     ) {
         horizontalGridLines.forEach { horizontalLine ->
-            val labelYOffset = with(LocalDensity.current) { (horizontalLine.position).toDp() }
+            val labelYOffset = with(LocalDensity.current) {
+                horizontalLine.position.toDp()
+            }
             Text(
                 modifier = Modifier
                     .offset(0.dp, labelYOffset - (AXIS_FONT_SIZE / 2).dp)
@@ -47,5 +49,7 @@ internal fun YAxisLabels(
     }
 }
 
-private fun Float.formatForYLabel(decimalPlaces: Int): String =
-    if (this == 0f) "0" else "%.${decimalPlaces}f".format(this)
+private fun Number.formatForYLabel(decimalPlaces: Int) = when (this) {
+    is Float -> if (this == 0f) "0" else "%.${decimalPlaces}f".format(this)
+    else -> this.toString()
+}

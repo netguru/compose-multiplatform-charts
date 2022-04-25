@@ -14,7 +14,7 @@ data class BarChartData(
         get() = if (categories.isEmpty()) {
             1
         } else {
-            categories.size * 2.toLong() + 1
+            categories.size * 2.toLong()
         }
 
     override val minY: Float

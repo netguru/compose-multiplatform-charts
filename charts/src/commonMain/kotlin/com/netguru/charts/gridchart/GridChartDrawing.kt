@@ -4,7 +4,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
-import com.netguru.charts.gridchart.axisscale.AxisScale
+import com.netguru.charts.gridchart.axisscale.XAxisScale
+import com.netguru.charts.gridchart.axisscale.YAxisScale
 import com.netguru.charts.mapValueToDifferentRange
 
 fun DrawScope.drawChartGrid(grid: ChartGrid, color: Color) {
@@ -26,19 +27,19 @@ fun DrawScope.drawChartGrid(grid: ChartGrid, color: Color) {
     }
 }
 
-fun DrawScope.determineGridLinesPositions(
-    xAxisScale: AxisScale,
-    yAxisScale: AxisScale,
+fun DrawScope.measureChartGrid(
+    xAxisScale: XAxisScale,
+    yAxisScale: YAxisScale,
     horizontalLinesOffset: Dp
 ): ChartGrid {
 
-    val horizontalLines = determineLinesPositions(
+    val horizontalLines = measureHorizontalLines(
         axisScale = yAxisScale,
         startPosition = size.height - horizontalLinesOffset.toPx(),
         endPosition = horizontalLinesOffset.toPx()
     )
 
-    val verticalLines = determineLinesPositions(
+    val verticalLines = measureVerticalLines(
         axisScale = xAxisScale,
         startPosition = 0f,
         endPosition = size.width
@@ -50,8 +51,8 @@ fun DrawScope.determineGridLinesPositions(
     )
 }
 
-private fun determineLinesPositions(
-    axisScale: AxisScale,
+private fun measureHorizontalLines(
+    axisScale: YAxisScale,
     startPosition: Float,
     endPosition: Float
 ): List<LineParameters> {
@@ -59,6 +60,33 @@ private fun determineLinesPositions(
 
     val valueStep = axisScale.tick
     var currentValue = axisScale.min
+
+    while (currentValue in axisScale.min..axisScale.max) {
+        val currentPosition = currentValue.mapValueToDifferentRange(
+            axisScale.min,
+            axisScale.max,
+            startPosition,
+            endPosition
+        )
+        verticalLines.add(
+            LineParameters(
+                position = currentPosition,
+                value = currentValue
+            )
+        )
+        currentValue += valueStep
+    }
+    return verticalLines
+}
+
+private fun measureVerticalLines(
+    axisScale: XAxisScale,
+    startPosition: Float,
+    endPosition: Float
+): List<LineParameters> {
+    val verticalLines = mutableListOf<LineParameters>()
+    val valueStep = axisScale.tick
+    var currentValue = axisScale.start
 
     while (currentValue in axisScale.min..axisScale.max) {
         val currentPosition = currentValue.mapValueToDifferentRange(
