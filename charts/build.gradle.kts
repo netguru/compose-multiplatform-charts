@@ -1,5 +1,6 @@
 import com.netguru.extensions.baseAndroidSetup
 import com.netguru.extensions.commonMain
+import com.netguru.extensions.commonTest
 import com.netguru.extensions.kotlin
 import com.netguru.extensions.sourceSets
 import org.jetbrains.compose.compose
@@ -24,6 +25,11 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api(compose.materialIconsExtended)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
             }
         }
     }

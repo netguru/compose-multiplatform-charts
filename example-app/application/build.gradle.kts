@@ -22,7 +22,6 @@ kotlin {
         commonMain {
             dependencies {
                 api(project(":example-app:common"))
-                api(project(":charts"))
             }
         }
         androidMain {
