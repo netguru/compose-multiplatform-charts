@@ -1,7 +1,18 @@
 package com.netguru.charts.line
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.Typography
@@ -14,8 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,32 +38,27 @@ private val OVERLAY_WIDTH = 200.dp
 @Composable
 internal fun OverlayInformation(
     lineChartData: LineChartData,
-    pointerEvent: PointerEvent,
+    positionX: Float,
     containerSize: Size,
     chartColors: ChartColors,
     timeFormatter: (Long) -> String,
     typography: Typography,
 ) {
-    if (
-        pointerEvent.changes.isEmpty() ||
-        pointerEvent.type != PointerEventType.Move ||
-        pointerEvent.changes[0].position.x < 0 ||
-        pointerEvent.changes[0].position.x > containerSize.width ||
-        pointerEvent.changes[0].position.y < 0 ||
-        pointerEvent.changes[0].position.y > containerSize.height
-    ) return
+    if (positionX < 0) return
 
     BoxWithConstraints(
         modifier = Modifier
             .offset(
-                with(LocalDensity.current) {
-                    pointerEvent.changes[0].position.x.toDp() +
-                        // change offset based on cursor position to avoid out of screen drawing on the right
-                        if (pointerEvent.changes[0].position.x.toDp() > (containerSize.width / 2).toDp())
-                            -OVERLAY_WIDTH - TOUCH_OFFSET
-                        else TOUCH_OFFSET
+                x = with(LocalDensity.current) {
+                    positionX.toDp() +
+                            // change offset based on cursor position to avoid out of screen drawing on the right
+                            if (positionX.toDp() > (containerSize.width / 2).toDp()) {
+                                -OVERLAY_WIDTH - TOUCH_OFFSET
+                            } else {
+                                TOUCH_OFFSET
+                            }
                 },
-                TOUCH_OFFSET
+                y = TOUCH_OFFSET
             )
             .width(OVERLAY_WIDTH)
             .alpha(0.9f)
@@ -65,7 +69,7 @@ internal fun OverlayInformation(
 
         Column {
             val timestampCursor = getTimestampFromCursor(
-                xCursorPosition = pointerEvent.changes[0].position.x,
+                xCursorPosition = positionX,
                 lineChartData = lineChartData,
                 containerSize = containerSize
             )
@@ -115,7 +119,7 @@ internal fun OverlayInformation(
     Spacer(
         Modifier
             .offset(
-                with(LocalDensity.current) { pointerEvent.changes[0].position.x.toDp() }, 0.dp
+                with(LocalDensity.current) { positionX.toDp() }, 0.dp
             )
             .width(1.dp)
             .fillMaxHeight()
@@ -137,7 +141,7 @@ private fun getTimestampFromCursor(
 
 private fun retrieveData(
     lineChartData: LineChartData,
-    timestampCursor: Long
+    timestampCursor: Long,
 ): List<SeriesAndInterpolatedValue> {
     // find time value from position of the cursor
 
@@ -181,5 +185,5 @@ private fun interpolateBetweenValues(v0: Float, v1: Float, t: Float): Float {
 @Immutable
 private data class SeriesAndInterpolatedValue(
     val lineChartSeries: LineChartSeries,
-    val interpolatedValue: Float
+    val interpolatedValue: Float,
 )
