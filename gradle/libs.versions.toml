@@ -7,7 +7,7 @@ versionCode = "1"
 versionName = "0.1"
 applicationId = "com.netguru.charts"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-optInFlags = "-Xopt-in=kotlin.RequiresOptIn"
+optInFlags = "-opt-in=kotlin.RequiresOptIn"
 
 #kotlin
 jvmTarget = "11"
@@ -26,12 +26,10 @@ core-ktx = "1.7.0"
 junit = "4.13.2"
 window = "1.0.0"
 coroutines-test = "1.6.0"
-koin_version = "3.1.5"
 voyager = "1.0.0-beta16"
 turbine = "0.7.0"
 klock = "2.4.13"
 kotlin-poet = "1.10.2"
-json = "20180813"
 mockk = "1.12.3"
 
 # Project
@@ -41,10 +39,10 @@ project-name = "Compose Multiplatform Charts"
 
 
 [libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-gradle-plugin" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 plugin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet"}
-plugin-json = { module = "org.json:json", version.ref = "json"}
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 androidx-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -53,9 +51,6 @@ androidx-window = { module = "androidx.window:window", version.ref = "window" }
 test-junit = { module = "junit:junit", version.ref = "junit" }
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
 test-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin_version" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin_version" }
-koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin_version" }
 time-klock = { module = "com.soywiz.korlibs.klock:klock", version.ref = "klock" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-agentJvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }

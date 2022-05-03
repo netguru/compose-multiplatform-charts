@@ -2,7 +2,6 @@ package com.netguru.charts.line
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,7 +17,7 @@ fun LineChartWithLegend(
     xAxisValueFormatter: (Long) -> String,
     timeFormatter: (Long) -> String,
     chartColors: ChartColors = ChartDefaults.chartColors(),
-    typography: Typography = MaterialTheme.typography,
+    typography: androidx.compose.material.Typography = MaterialTheme.typography,
 ) {
     Column(modifier = modifier) {
         LineChart(

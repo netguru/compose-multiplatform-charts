@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">Charts examples</string>
+    <string name="navigation_panel_logo">Navigation panel logo</string>
+    <string name="navigation_menu">Navigation menu</string>
+</resources>
