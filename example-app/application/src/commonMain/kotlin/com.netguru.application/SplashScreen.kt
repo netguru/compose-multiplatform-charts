@@ -19,7 +19,7 @@ fun SplashScreen() {
             contentAlignment = Alignment.Center,
             modifier = Modifier.background(AppTheme.colors.surface).fillMaxSize()
         ) {
-            Image(painter = imageResources(drawables.logo_dark), contentDescription = null)
+            Image(painter = imageResources(drawables.netguru_logo_dark), contentDescription = null)
         }
     }
 }
