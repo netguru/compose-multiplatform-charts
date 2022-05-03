@@ -180,7 +180,7 @@ private class HomeDrawerShape : Shape {
 
 @Composable
 private fun TopBar(
-    title: @Composable () -> Unit = { Text(strings.memeza) },
+    title: @Composable () -> Unit = { Text(strings.app_name) },
     onNavButtonClicked: () -> Unit,
 ) {
     TopAppBar(
@@ -236,13 +236,12 @@ private fun TopHomeDrawer(state: NavigationState, dispatch: (AppAction) -> Unit)
                     bottom = AppTheme.dimens.grid_1
                 ),
             painter = if (isSystemInDarkTheme()) {
-                imageResources(drawables.logo_dark)
+                imageResources(drawables.netguru_logo_dark)
             } else {
-                imageResources(drawables.logo)
+                imageResources(drawables.netguru_logo_light)
             },
             contentDescription = strings.navigation_panel_logo,
-
-            )
+        )
         Spacer(modifier = Modifier.height(AppTheme.dimens.grid_1_5))
         arrayOf(
             NavigationState.Tab.BAR,

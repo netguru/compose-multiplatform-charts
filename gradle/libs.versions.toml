@@ -7,7 +7,7 @@ versionCode = "1"
 versionName = "0.1"
 applicationId = "com.netguru.charts"
 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-optInFlags = "-Xopt-in=kotlin.RequiresOptIn"
+optInFlags = "-opt-in=kotlin.RequiresOptIn"
 
 #kotlin
 jvmTarget = "11"
@@ -39,6 +39,7 @@ project-name = "Compose Multiplatform Charts"
 
 
 [libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-gradle-plugin" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 plugin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet"}

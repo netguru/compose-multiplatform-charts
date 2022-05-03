@@ -28,7 +28,7 @@ kotlin {
                 api(compose.material)
                 api(compose.materialIconsExtended)
                 api(libs.time.klock)
-                implementation(project(":charts"))
+                api(project(":charts"))
             }
         }
         androidMain {
