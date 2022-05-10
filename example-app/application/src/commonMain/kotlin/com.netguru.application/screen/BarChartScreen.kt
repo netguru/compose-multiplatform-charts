@@ -79,7 +79,7 @@ fun BarChartScreen() {
                     ),
                 )
             ),
-        )
+        ),
     )
 
     SpacedColumn {
@@ -87,10 +87,8 @@ fun BarChartScreen() {
         TitleText(text = "Bar chart")
         BarChart(
             data = data,
-            unit = "data unit",
             modifier = Modifier
                 .height(300.dp),
-            animate = true
         )
 
         HorizontalDivider()
@@ -98,7 +96,6 @@ fun BarChartScreen() {
         TitleText(text = "Bar chart with legend")
         BarChartWithLegend(
             data = data,
-            unit = "data unit",
             modifier = Modifier
                 .height(300.dp)
         )

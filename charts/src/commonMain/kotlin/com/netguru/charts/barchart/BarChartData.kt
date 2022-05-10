@@ -7,7 +7,7 @@ import com.netguru.charts.line.SymbolShape
 
 @Immutable
 data class BarChartData(
-    val categories: List<BarChartCategory>
+    val categories: List<BarChartCategory>,
 ) : GridChartData {
     override val minX: Long = 0
     override val maxX: Long

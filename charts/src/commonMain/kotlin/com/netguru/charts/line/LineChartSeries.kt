@@ -7,7 +7,10 @@ import androidx.compose.ui.unit.dp
 import com.netguru.charts.gridchart.GridChartData
 
 @Immutable
-data class LineChartPoint(val timestamp: Long, val value: Float)
+data class LineChartPoint(
+    val xValue: Long,
+    val yValue: Float,
+)
 
 @Immutable
 data class LineChartSeries(
@@ -16,7 +19,7 @@ data class LineChartSeries(
     val lineColor: Color,
     val fillColor: Color = lineColor,
     val dashedLine: Boolean = false,
-    val listOfPoints: List<LineChartPoint> = emptyList()
+    val listOfPoints: List<LineChartPoint> = emptyList(),
 ) {
     val minValue: Float
     val maxValue: Float
@@ -42,21 +45,23 @@ data class LineChartSeries(
     }
 
     private fun getMinMaxTimestamp(): Pair<Long, Long> {
-        val sortedTimestamp = listOfPoints.sortedBy { it.timestamp }
-        return Pair(sortedTimestamp.first().timestamp, sortedTimestamp.last().timestamp)
+        val sortedTimestamp = listOfPoints.sortedBy { it.xValue }
+        return Pair(sortedTimestamp.first().xValue, sortedTimestamp.last().xValue)
     }
 
     private fun getMinMaxValue(): Pair<Float, Float> {
-        val sortedValue = listOfPoints.sortedBy { it.value }
-        return Pair(sortedValue.first().value, sortedValue.last().value)
+        val sortedValue = listOfPoints.sortedBy { it.yValue }
+        return Pair(sortedValue.first().yValue, sortedValue.last().yValue)
     }
 }
 
 @Immutable
-data class LineChartData(val series: List<LineChartSeries>, val units: String = "") :
+data class LineChartData(
+    val data: List<LineChartSeries>,
+) :
     GridChartData {
     override val legendData: List<LegendItemData>
-        get() = series.map {
+        get() = data.map {
             LegendItemData(
                 name = it.dataName,
                 symbolShape = SymbolShape.LINE,
@@ -71,10 +76,10 @@ data class LineChartData(val series: List<LineChartSeries>, val units: String = 
     override val maxY: Float
 
     init {
-        // find max and mins in all data
+        // find max and min in all data
         val timeStamps = mutableListOf<Long>()
         val values = mutableListOf<Float>()
-        series.forEach {
+        data.forEach {
             timeStamps.add(it.minTimestamp)
             timeStamps.add(it.maxTimeStamp)
             values.add(it.minValue)

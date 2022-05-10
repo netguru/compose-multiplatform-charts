@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -26,10 +24,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.mapValueToDifferentRange
-import com.netguru.charts.round
 import com.netguru.charts.theme.ChartColors
 
 private val TOUCH_OFFSET = 20.dp
@@ -41,8 +37,8 @@ internal fun OverlayInformation(
     positionX: Float,
     containerSize: Size,
     chartColors: ChartColors,
-    timeFormatter: (Long) -> String,
-    typography: Typography,
+    overlayHeaderLayout: @Composable (value: Long) -> Unit,
+    overlayDataEntryLayout: @Composable (dataName: String, value: Float) -> Unit,
 ) {
     if (positionX < 0) return
 
@@ -67,7 +63,9 @@ internal fun OverlayInformation(
             .padding(8.dp)
     ) {
 
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             val timestampCursor = getTimestampFromCursor(
                 xCursorPosition = positionX,
                 lineChartData = lineChartData,
@@ -75,12 +73,7 @@ internal fun OverlayInformation(
             )
             val listOfValues = retrieveData(lineChartData, timestampCursor)
 
-            Text(
-                text = timeFormatter(timestampCursor),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = typography.overline
-            )
+            overlayHeaderLayout(timestampCursor)
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -104,12 +97,8 @@ internal fun OverlayInformation(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     val dataName = seriesAndInterpolatedValue.lineChartSeries.dataName
-                    val roundedValue = seriesAndInterpolatedValue.interpolatedValue.round()
-                    Text(
-                        modifier = Modifier,
-                        text = "$dataName: $roundedValue ${lineChartData.units}",
-                        color = chartColors.labels
-                    )
+                    val roundedValue = seriesAndInterpolatedValue.interpolatedValue
+                    overlayDataEntryLayout(dataName, roundedValue)
                 }
             }
         }
@@ -146,26 +135,26 @@ private fun retrieveData(
     // find time value from position of the cursor
 
     val outputList: MutableList<SeriesAndInterpolatedValue> = mutableListOf()
-    lineChartData.series.forEach { series ->
+    lineChartData.data.forEach { series ->
         // find the point with greater and smaller timestamp
         val v0 = series.listOfPoints
-            .filter { it.timestamp >= timestampCursor }
-            .minByOrNull { it.timestamp }
+            .filter { it.xValue >= timestampCursor }
+            .minByOrNull { it.xValue }
         val v1 = series.listOfPoints
-            .filter { it.timestamp <= timestampCursor }
-            .maxByOrNull { it.timestamp }
+            .filter { it.xValue <= timestampCursor }
+            .maxByOrNull { it.xValue }
 
         if (v0 != null && v1 != null) {
             val interpolatedValue =
                 interpolateBetweenValues(
-                    v0.value,
-                    v1.value,
+                    v0.yValue,
+                    v1.yValue,
                     // (time - v0.timestamp) to bring down the value and avoid Float overflow
-                    (timestampCursor - v0.timestamp).toFloat()
+                    (timestampCursor - v0.xValue).toFloat()
                         // t value has to be between 0 and 1
                         .mapValueToDifferentRange(
                             0f,
-                            (v1.timestamp - v0.timestamp).toFloat(), // to avoid Float overflow
+                            (v1.xValue - v0.xValue).toFloat(), // to avoid Float overflow
                             0f,
                             1f
                         )
