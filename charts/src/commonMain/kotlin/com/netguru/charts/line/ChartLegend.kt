@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.gridchart.GridDefaults
 
 private const val DEFAULT_ANIMATION_DURATION_MS = 300
 private const val DEFAULT_ANIMATION_DELAY_MS = 100
@@ -37,11 +37,11 @@ private const val ALPHA_MIN = 0f
 @Composable
 fun ChartLegend(
     legendData: List<LegendItemData>,
-    textColor: Color,
     modifier: Modifier = Modifier,
     animate: Boolean = true,
     animationDuration: Int = DEFAULT_ANIMATION_DURATION_MS,
     animationDelay: Int = DEFAULT_ANIMATION_DELAY_MS,
+    legendItemLabel: @Composable (String) -> Unit = GridDefaults.DefaultLegendItemLabel,
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -60,7 +60,7 @@ fun ChartLegend(
                 animate = animate,
                 animationDuration = animationDuration,
                 animationDelay = animationDelay,
-                textColor = textColor,
+                legendItemLabel = legendItemLabel,
             )
         }
     }
@@ -73,7 +73,7 @@ private fun LegendItem(
     animate: Boolean,
     animationDuration: Int,
     animationDelay: Int,
-    textColor: Color,
+    legendItemLabel: @Composable (String) -> Unit,
 ) {
     var animationPlayed by remember(animate) {
         mutableStateOf(!animate)
@@ -107,10 +107,7 @@ private fun LegendItem(
         )
 
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = data.name,
-            color = textColor,
-        )
+        legendItemLabel(data.name)
     }
 }
 

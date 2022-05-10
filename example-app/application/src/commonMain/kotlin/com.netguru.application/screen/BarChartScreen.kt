@@ -12,6 +12,7 @@ import com.netguru.charts.barchart.BarChartCategory
 import com.netguru.charts.barchart.BarChartData
 import com.netguru.charts.barchart.BarChartEntry
 import com.netguru.charts.barchart.BarChartWithLegend
+import com.netguru.charts.round
 import com.netguru.common.HorizontalDivider
 
 @Composable
@@ -79,7 +80,7 @@ fun BarChartScreen() {
                     ),
                 )
             ),
-        )
+        ),
     )
 
     SpacedColumn {
@@ -87,9 +88,8 @@ fun BarChartScreen() {
         TitleText(text = "Bar chart")
         BarChart(
             data = data,
-            unit = "data unit",
             modifier = Modifier
-                .height(300.dp)
+                .height(300.dp),
         )
 
         HorizontalDivider()
@@ -97,7 +97,6 @@ fun BarChartScreen() {
         TitleText(text = "Bar chart with legend")
         BarChartWithLegend(
             data = data,
-            unit = "data unit",
             modifier = Modifier
                 .height(300.dp)
         )

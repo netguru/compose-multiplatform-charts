@@ -18,7 +18,7 @@ internal fun DrawScope.drawLineChart(
 ) {
     // calculate path
     val path = Path()
-    lineChartData.series.forEach { data ->
+    lineChartData.data.forEach { data ->
 
         val mappedPoints =
             mapDataToPixels(
@@ -83,13 +83,13 @@ private fun mapDataToPixels(
     graphBottomPadding: Float
 ): List<PointF> {
     val mappedPoints = currentSeries.listOfPoints.map {
-        val x = it.timestamp.mapValueToDifferentRange(
+        val x = it.xValue.mapValueToDifferentRange(
             lineChartData.minX,
             lineChartData.maxX,
             0L,
             canvasSize.width.toLong()
         ).toFloat()
-        val y = it.value.mapValueToDifferentRange(
+        val y = it.yValue.mapValueToDifferentRange(
             lineChartData.minY,
             lineChartData.maxY,
             canvasSize.height - graphBottomPadding,

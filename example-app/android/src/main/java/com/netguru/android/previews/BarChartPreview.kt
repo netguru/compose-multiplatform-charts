@@ -20,7 +20,6 @@ fun BarChartPreview() {
     AppTheme(windowSize = WindowSize.EXPANDED) {
         BarChartWithLegend(
             data = barChartSampleData(),
-            unit = "kg",
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth()
@@ -82,6 +81,6 @@ fun barChartSampleData(): BarChartData {
                     BarChartEntry("Forecasted usage", 12f, AppTheme.colors.chart5)
                 )
             ),
-        )
+        ),
     )
 }
