@@ -3,40 +3,47 @@ package com.netguru.charts.barchart
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.unit.Dp
+import kotlin.math.abs
 
 const val BAR_MAX_WIDTH = 20f
 const val BAR_MAX_HORIZONTAL_SPACING = 10f
 
 internal fun DrawScope.drawBarChart(
     data: BarChartData,
-    barsInCategoryMaxWidth: Float,
-    verticalPadding: Dp,
+    yAxisUpperValue: Float,
+    yAxisLowerValue: Float,
+    verticalPadding: Float,
     valueScale: Float
 ) {
     val canvasHeight = size.height
-    val verticalPaddingInPx = verticalPadding.toPx()
 
-    val barsInACategoryCount = data.categories.maxOfOrNull { it.entries.size } ?: return
-    val barWidth = (barsInCategoryMaxWidth / barsInACategoryCount)
-        .coerceAtMost(BAR_MAX_WIDTH)
+    val xAxisTickWidth = size.width / (data.categories.size * 2)
+    val maxBarsCountInACluster = data.categories.maxOfOrNull { it.entries.size } ?: return
+    val barWidth = (xAxisTickWidth / maxBarsCountInACluster).coerceAtMost(BAR_MAX_WIDTH)
+    val barsHorizontalSpacing = BAR_MAX_HORIZONTAL_SPACING / maxBarsCountInACluster
+
+    val gridHeight = canvasHeight - 2 * verticalPadding
+    val yAxisZeroPosition = verticalPadding +
+        yAxisUpperValue / (yAxisUpperValue - yAxisLowerValue) * gridHeight
+
+    val clusterHeight = gridHeight * valueScale
 
     data.categories.forEachIndexed { categoryIndex, category ->
-        val barsInCategoryCount = category.entries.size
-        val barsHorizontalSpacing = BAR_MAX_HORIZONTAL_SPACING / barsInACategoryCount
-        val barsInCategoryWidth = barsInCategoryCount * barWidth +
-            (barsInCategoryCount - 1) * barsHorizontalSpacing
+        val clusterWidth = category.entries.size * barWidth +
+            (category.entries.size - 1) * barsHorizontalSpacing
+        val clusterXOffset = (categoryIndex * 2 + 1) * xAxisTickWidth - clusterWidth / 2
 
         category.entries.forEachIndexed { entryIndex, entry ->
-            val barHeight = (entry.y / data.maxY * (canvasHeight - 2 * verticalPaddingInPx) * valueScale)
-                .coerceAtLeast(0f)
+            val barHeight = abs(entry.y) / (yAxisUpperValue - yAxisLowerValue) * clusterHeight
             drawRect(
                 color = entry.color,
                 topLeft = Offset(
-                    x = (categoryIndex * 2 + 1) * barsInCategoryMaxWidth +
-                        entryIndex * (barWidth + barsHorizontalSpacing) -
-                        barsInCategoryWidth / 2,
-                    y = canvasHeight - verticalPaddingInPx - barHeight
+                    x = clusterXOffset + entryIndex * (barWidth + barsHorizontalSpacing),
+                    y = if (entry.y >= 0) {
+                        yAxisZeroPosition - barHeight
+                    } else {
+                        yAxisZeroPosition
+                    }
                 ),
                 size = Size(
                     width = barWidth,

@@ -79,8 +79,9 @@ fun BarChart(
                 drawChartGrid(grid, gridColor)
                 drawBarChart(
                     data = data,
-                    barsInCategoryMaxWidth = grid.distanceBetweenVerticalLines,
-                    verticalPadding = horizontalLinesOffset,
+                    yAxisUpperValue = grid.horizontalLines.last().value as Float,
+                    yAxisLowerValue = grid.horizontalLines.first().value as Float,
+                    verticalPadding = horizontalLinesOffset.toPx(),
                     valueScale = animationProgress
                 )
             }

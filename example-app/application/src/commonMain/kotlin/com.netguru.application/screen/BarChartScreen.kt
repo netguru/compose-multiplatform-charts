@@ -64,17 +64,17 @@ fun BarChartScreen() {
                 entries = listOf(
                     BarChartEntry(
                         x = "primary",
-                        y = 20f,
+                        y = -5f,
                         color = Color.Red,
                     ),
                     BarChartEntry(
                         x = "secondary",
-                        y = 30f,
+                        y = -15f,
                         color = Color.Green,
                     ),
                     BarChartEntry(
                         x = "tertiary",
-                        y = 25f,
+                        y = -10f,
                         color = Color.Blue,
                     ),
                 )
@@ -89,7 +89,8 @@ fun BarChartScreen() {
             data = data,
             unit = "data unit",
             modifier = Modifier
-                .height(300.dp)
+                .height(300.dp),
+            animate = true
         )
 
         HorizontalDivider()
