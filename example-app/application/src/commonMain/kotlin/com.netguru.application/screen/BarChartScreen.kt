@@ -12,6 +12,7 @@ import com.netguru.charts.barchart.BarChartCategory
 import com.netguru.charts.barchart.BarChartData
 import com.netguru.charts.barchart.BarChartEntry
 import com.netguru.charts.barchart.BarChartWithLegend
+import com.netguru.charts.round
 import com.netguru.common.HorizontalDivider
 
 @Composable
