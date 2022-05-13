@@ -18,7 +18,11 @@ data class BarChartData(
         }
 
     override val minY: Float
-        get() = 0f
+        get() = if (categories.isEmpty()) {
+            0f
+        } else {
+            categories.minOf { it.minY }.coerceAtMost(0f)
+        }
 
     override val maxY: Float
         get() = if (categories.isEmpty()) {
