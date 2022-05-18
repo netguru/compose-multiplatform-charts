@@ -13,7 +13,7 @@ internal object GridDefaults {
     val HORIZONTAL_LINES_OFFSET = 10.dp
     const val NUMBER_OF_GRID_LINES = 5
 
-    val DefaultYAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
+    val YAxisLabel: @Composable (value: Any) -> Unit = { value ->
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -24,7 +24,7 @@ internal object GridDefaults {
         )
     }
 
-    val DefaultOverlayHeaderLayout: @Composable (value: Any) -> Unit = { value ->
+    val OverlayHeaderLabel: @Composable (value: Any) -> Unit = { value ->
         Text(
             text = value.toString(),
             modifier = Modifier.fillMaxWidth(),
@@ -33,14 +33,13 @@ internal object GridDefaults {
         )
     }
 
-    val DefaultOverlayDataEntryLayout: @Composable (dataName: String, value: Any) -> Unit =
-        { dataName, value ->
-            Text(
-                text = "$dataName: $value"
-            )
-        }
+    val OverlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = { dataName, value ->
+        Text(
+            text = "$dataName: $value"
+        )
+    }
 
-    val DefaultXAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
+    val XAxisLabel: @Composable (value: Any) -> Unit = { value ->
         Text(
             fontSize = 12.sp,
             text = value.toString(),
@@ -48,7 +47,7 @@ internal object GridDefaults {
         )
     }
 
-    val DefaultLegendItemLabel: @Composable (String) -> Unit = {
+    val LegendItemLabel: @Composable (String) -> Unit = {
         Text(
             text = it,
         )

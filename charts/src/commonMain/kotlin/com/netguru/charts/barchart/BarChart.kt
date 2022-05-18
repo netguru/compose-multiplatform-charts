@@ -1,7 +1,6 @@
 package com.netguru.charts.barchart
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.gridchart.GridDefaults
 import com.netguru.charts.gridchart.LineParameters
 import com.netguru.charts.gridchart.YAxisLabels
@@ -34,20 +33,19 @@ import com.netguru.charts.theme.ChartDefaults
 fun BarChart(
     data: BarChartData,
     modifier: Modifier = Modifier,
-    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET,
-    animate: Boolean = false,
     chartColors: ChartColors = ChartDefaults.chartColors(),
-    xAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.DefaultXAxisMarkerLayout,
-    yAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.DefaultYAxisMarkerLayout,
+    xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
+    yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
+    animation: ChartAnimation = ChartAnimation.Disabled,
+    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
+    val horizontalLinesOffset =
+        GridDefaults.HORIZONTAL_LINES_OFFSET // TODO check why y-axis-labels get the other way around with large values for offset
 
-    var animationPlayed by remember { mutableStateOf(!animate) }
-    val animationProgress by animateFloatAsState(
-        targetValue = if (animationPlayed) 1f else 0f,
-        animationSpec = tween(durationMillis = 600, delayMillis = 200)
-    )
+    var animationPlayed by remember(data) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
+    }
     LaunchedEffect(Unit) {
         animationPlayed = true
     }
@@ -55,10 +53,26 @@ fun BarChart(
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
 
+    val valueScale = when (animation) {
+        ChartAnimation.Disabled -> data.categories.first().entries.indices.map { 1f }
+        is ChartAnimation.Sequenced -> data.categories.first().entries.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec(it)
+            ).value
+        }
+        is ChartAnimation.Simultaneous -> data.categories.first().entries.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
+    }
+
     Row(modifier = modifier) {
         YAxisLabels(
             horizontalGridLines = horizontalGridLines,
-            yAxisMarkerLayout = yAxisMarkerLayout,
+            yAxisMarkerLayout = yAxisLabel,
         )
 
         Spacer(modifier = Modifier.size(width = 4.dp, height = 0.dp))
@@ -92,14 +106,14 @@ fun BarChart(
                     yAxisUpperValue = grid.horizontalLines.last().value.toFloat(),
                     yAxisLowerValue = grid.horizontalLines.first().value.toFloat(),
                     verticalPadding = horizontalLinesOffset.toPx(),
-                    valueScale = animationProgress
+                    valueScale = valueScale,
                 )
             }
 
             XAxisLabels(
                 labels = data.categories.map { it.name },
                 verticalGridLines = verticalGridLines,
-                xAxisMarkerLayout = xAxisMarkerLayout,
+                xAxisMarkerLayout = xAxisLabel,
             )
         }
     }

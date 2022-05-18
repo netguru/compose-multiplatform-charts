@@ -1,7 +1,6 @@
 package com.netguru.charts.line
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -29,6 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.gridchart.GridDefaults
 import com.netguru.charts.gridchart.LineParameters
 import com.netguru.charts.gridchart.YAxisLabels
@@ -42,50 +42,52 @@ import com.netguru.charts.theme.ChartDefaults
 
 val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
 
-private const val DEFAULT_ANIMATION_DURATION_MS = 300
-private const val DEFAULT_ANIMATION_DELAY_MS = 100
-private const val ALPHA_MAX = 1f
-private const val ALPHA_MIN = 0f
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LineChart(
     lineChartData: LineChartData,
     modifier: Modifier = Modifier,
-    horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET,
+    chartColors: ChartColors = ChartDefaults.chartColors(),
+    xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
+    yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
+    overlayHeaderLabel: @Composable (value: Any) -> Unit = GridDefaults.OverlayHeaderLabel,
+    overlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
+    animation: ChartAnimation = ChartAnimation.Disabled,
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    animate: Boolean = true,
-    chartColors: ChartColors = ChartDefaults.chartColors(),
-    xAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.DefaultXAxisMarkerLayout,
-    yAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.DefaultYAxisMarkerLayout,
-    overlayHeaderLayout: @Composable (value: Any) -> Unit = GridDefaults.DefaultOverlayHeaderLayout,
-    overlayDataEntryLayout: @Composable (dataName: String, value: Any) -> Unit = GridDefaults.DefaultOverlayDataEntryLayout,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
+    val horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET
 
-    var animationPlayed by remember(animate) {
-        mutableStateOf(!animate)
+    var animationPlayed by remember(lineChartData) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
     }
-    val alpha by animateFloatAsState(
-        targetValue = if (animationPlayed) ALPHA_MAX else ALPHA_MIN,
-        animationSpec = tween(
-            durationMillis = DEFAULT_ANIMATION_DURATION_MS,
-            delayMillis = DEFAULT_ANIMATION_DELAY_MS
-        )
-    )
-    val gridColor = chartColors.grid
+    LaunchedEffect(Unit) {
+        animationPlayed = true
+    }
 
-    LaunchedEffect(key1 = true) {
-        animationPlayed = true // to play animation only once
+    val alpha = when (animation) {
+        ChartAnimation.Disabled -> lineChartData.series.indices.map { 1f }
+        is ChartAnimation.Sequenced -> lineChartData.series.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec(it)
+            ).value
+        }
+        is ChartAnimation.Simultaneous -> lineChartData.series.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
     }
 
     Row(modifier = modifier) {
         YAxisLabels(
             horizontalGridLines = horizontalGridLines,
-            yAxisMarkerLayout = yAxisMarkerLayout,
+            yAxisMarkerLayout = yAxisLabel,
         )
 
         Spacer(modifier = Modifier.size(4.dp, 0.dp))
@@ -113,12 +115,13 @@ fun LineChart(
                         )
                         verticalGridLines = lines.verticalLines
                         horizontalGridLines = lines.horizontalLines
-                        drawChartGrid(lines, gridColor)
+                        drawChartGrid(lines, chartColors.grid)
 
                         drawLineChart(
                             lineChartData = lineChartData,
                             graphTopPadding = horizontalLinesOffset,
-                            graphBottomPadding = horizontalLinesOffset, alpha
+                            graphBottomPadding = horizontalLinesOffset,
+                            alpha = alpha,
                         )
                     }
                     // Touch input
@@ -157,8 +160,8 @@ fun LineChart(
                         )
                     },
                     chartColors = chartColors,
-                    overlayHeaderLayout = overlayHeaderLayout,
-                    overlayDataEntryLayout = overlayDataEntryLayout,
+                    overlayHeaderLayout = overlayHeaderLabel,
+                    overlayDataEntryLayout = overlayDataEntryLabel,
                 )
             }
 
@@ -168,7 +171,7 @@ fun LineChart(
                         modifier = Modifier
                             .alignCenterToOffsetHorizontal(gridLine.position)
                     ) {
-                        xAxisMarkerLayout(gridLine.value.toLong())
+                        xAxisLabel(gridLine.value.toLong())
                     }
                 }
             }

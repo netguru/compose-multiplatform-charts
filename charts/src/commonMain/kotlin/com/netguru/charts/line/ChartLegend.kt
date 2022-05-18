@@ -1,7 +1,6 @@
 package com.netguru.charts.line
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,22 +25,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.gridchart.GridDefaults
-
-private const val DEFAULT_ANIMATION_DURATION_MS = 300
-private const val DEFAULT_ANIMATION_DELAY_MS = 100
-private const val ALPHA_MAX = 1f
-private const val ALPHA_MIN = 0f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChartLegend(
     legendData: List<LegendItemData>,
     modifier: Modifier = Modifier,
-    animate: Boolean = true,
-    animationDuration: Int = DEFAULT_ANIMATION_DURATION_MS,
-    animationDelay: Int = DEFAULT_ANIMATION_DELAY_MS,
-    legendItemLabel: @Composable (String) -> Unit = GridDefaults.DefaultLegendItemLabel,
+    animation: ChartAnimation = ChartAnimation.Disabled,
+    legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -57,9 +50,7 @@ fun ChartLegend(
             LegendItem(
                 data = legendData[index],
                 index = index,
-                animate = animate,
-                animationDuration = animationDuration,
-                animationDelay = animationDelay,
+                animation = animation,
                 legendItemLabel = legendItemLabel,
             )
         }
@@ -70,26 +61,28 @@ fun ChartLegend(
 private fun LegendItem(
     data: LegendItemData,
     index: Int,
-    animate: Boolean,
-    animationDuration: Int,
-    animationDelay: Int,
+    animation: ChartAnimation,
     legendItemLabel: @Composable (String) -> Unit,
 ) {
-    var animationPlayed by remember(animate) {
-        mutableStateOf(!animate)
+    var animationPlayed by remember(animation) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
     }
 
     LaunchedEffect(key1 = true) {
         animationPlayed = true // to play animation only once
     }
 
-    val alpha by animateFloatAsState(
-        targetValue = if (animationPlayed) ALPHA_MAX else ALPHA_MIN,
-        animationSpec = tween(
-            durationMillis = animationDuration,
-            delayMillis = index * animationDelay
-        )
-    )
+    val alpha = when (animation) {
+        ChartAnimation.Disabled -> 1f
+        is ChartAnimation.Sequenced -> animateFloatAsState(
+            targetValue = if (animationPlayed) 1f else 0f,
+            animationSpec = animation.animationSpec(index),
+        ).value
+        is ChartAnimation.Simultaneous -> animateFloatAsState(
+            targetValue = if (animationPlayed) 1f else 0f,
+            animationSpec = animation.animationSpec(),
+        ).value
+    }
 
     Row(modifier = Modifier.alpha(alpha), verticalAlignment = Alignment.CenterVertically) {
         Box(

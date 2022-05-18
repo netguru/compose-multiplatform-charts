@@ -13,7 +13,7 @@ internal fun DrawScope.drawBarChart(
     yAxisUpperValue: Float,
     yAxisLowerValue: Float,
     verticalPadding: Float,
-    valueScale: Float
+    valueScale: List<Float>,
 ) {
     val canvasHeight = size.height
 
@@ -26,14 +26,13 @@ internal fun DrawScope.drawBarChart(
     val yAxisZeroPosition = verticalPadding +
         yAxisUpperValue / (yAxisUpperValue - yAxisLowerValue) * gridHeight
 
-    val clusterHeight = gridHeight * valueScale
-
     data.categories.forEachIndexed { categoryIndex, category ->
         val clusterWidth = category.entries.size * barWidth +
             (category.entries.size - 1) * barsHorizontalSpacing
         val clusterXOffset = (categoryIndex * 2 + 1) * xAxisTickWidth - clusterWidth / 2
 
         category.entries.forEachIndexed { entryIndex, entry ->
+            val clusterHeight = gridHeight * valueScale[entryIndex]
             val barHeight = abs(entry.y) / (yAxisUpperValue - yAxisLowerValue) * clusterHeight
             drawRect(
                 color = entry.color,

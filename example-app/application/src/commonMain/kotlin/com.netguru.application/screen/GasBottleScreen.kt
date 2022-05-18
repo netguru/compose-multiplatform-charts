@@ -24,7 +24,7 @@ fun GasBottleChartScreen() {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Percentage: ${percentage}%")
+                Text("Percentage: $percentage%")
                 GasBottle(
                     percentage = percentage,
                     modifier = gasBottleModifier,

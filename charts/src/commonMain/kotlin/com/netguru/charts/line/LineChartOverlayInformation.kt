@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
@@ -47,12 +46,12 @@ internal fun OverlayInformation(
             .offset(
                 x = with(LocalDensity.current) {
                     positionX.toDp() +
-                            // change offset based on cursor position to avoid out of screen drawing on the right
-                            if (positionX.toDp() > (containerSize.width / 2).toDp()) {
-                                -OVERLAY_WIDTH - TOUCH_OFFSET
-                            } else {
-                                TOUCH_OFFSET
-                            }
+                        // change offset based on cursor position to avoid out of screen drawing on the right
+                        if (positionX.toDp() > (containerSize.width / 2).toDp()) {
+                            -OVERLAY_WIDTH - TOUCH_OFFSET
+                        } else {
+                            TOUCH_OFFSET
+                        }
                 },
                 y = TOUCH_OFFSET
             )
@@ -97,8 +96,8 @@ internal fun OverlayInformation(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     val dataName = seriesAndInterpolatedValue.lineChartSeries.dataName
-                    val roundedValue = seriesAndInterpolatedValue.interpolatedValue
-                    overlayDataEntryLayout(dataName, roundedValue)
+                    val interpolatedValue = seriesAndInterpolatedValue.interpolatedValue
+                    overlayDataEntryLayout(dataName, interpolatedValue)
                 }
             }
         }
@@ -135,26 +134,26 @@ private fun retrieveData(
     // find time value from position of the cursor
 
     val outputList: MutableList<SeriesAndInterpolatedValue> = mutableListOf()
-    lineChartData.data.forEach { series ->
+    lineChartData.series.forEach { series ->
         // find the point with greater and smaller timestamp
         val v0 = series.listOfPoints
-            .filter { it.xValue >= timestampCursor }
-            .minByOrNull { it.xValue }
+            .filter { it.x >= timestampCursor }
+            .minByOrNull { it.x }
         val v1 = series.listOfPoints
-            .filter { it.xValue <= timestampCursor }
-            .maxByOrNull { it.xValue }
+            .filter { it.x <= timestampCursor }
+            .maxByOrNull { it.x }
 
         if (v0 != null && v1 != null) {
             val interpolatedValue =
                 interpolateBetweenValues(
-                    v0.yValue,
-                    v1.yValue,
+                    v0.y,
+                    v1.y,
                     // (time - v0.timestamp) to bring down the value and avoid Float overflow
-                    (timestampCursor - v0.xValue).toFloat()
+                    (timestampCursor - v0.x).toFloat()
                         // t value has to be between 0 and 1
                         .mapValueToDifferentRange(
                             0f,
-                            (v1.xValue - v0.xValue).toFloat(), // to avoid Float overflow
+                            (v1.x - v0.x).toFloat(), // to avoid Float overflow
                             0f,
                             1f
                         )

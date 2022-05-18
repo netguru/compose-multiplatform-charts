@@ -8,8 +8,8 @@ import com.netguru.charts.gridchart.GridChartData
 
 @Immutable
 data class LineChartPoint(
-    val xValue: Long,
-    val yValue: Float,
+    val x: Long,
+    val y: Float,
 )
 
 @Immutable
@@ -45,23 +45,22 @@ data class LineChartSeries(
     }
 
     private fun getMinMaxTimestamp(): Pair<Long, Long> {
-        val sortedTimestamp = listOfPoints.sortedBy { it.xValue }
-        return Pair(sortedTimestamp.first().xValue, sortedTimestamp.last().xValue)
+        val sortedTimestamp = listOfPoints.sortedBy { it.x }
+        return Pair(sortedTimestamp.first().x, sortedTimestamp.last().x)
     }
 
     private fun getMinMaxValue(): Pair<Float, Float> {
-        val sortedValue = listOfPoints.sortedBy { it.yValue }
-        return Pair(sortedValue.first().yValue, sortedValue.last().yValue)
+        val sortedValue = listOfPoints.sortedBy { it.y }
+        return Pair(sortedValue.first().y, sortedValue.last().y)
     }
 }
 
 @Immutable
 data class LineChartData(
-    val data: List<LineChartSeries>,
-) :
-    GridChartData {
+    val series: List<LineChartSeries>,
+) : GridChartData {
     override val legendData: List<LegendItemData>
-        get() = data.map {
+        get() = series.map {
             LegendItemData(
                 name = it.dataName,
                 symbolShape = SymbolShape.LINE,
@@ -79,7 +78,7 @@ data class LineChartData(
         // find max and min in all data
         val timeStamps = mutableListOf<Long>()
         val values = mutableListOf<Float>()
-        data.forEach {
+        series.forEach {
             timeStamps.add(it.minTimestamp)
             timeStamps.add(it.maxTimeStamp)
             values.add(it.minValue)

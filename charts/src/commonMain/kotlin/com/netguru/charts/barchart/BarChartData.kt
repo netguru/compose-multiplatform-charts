@@ -9,6 +9,7 @@ import com.netguru.charts.line.SymbolShape
 data class BarChartData(
     val categories: List<BarChartCategory>,
 ) : GridChartData {
+    // TODO hide those values from the user
     override val minX: Long = 0
     override val maxX: Long
         get() = if (categories.isEmpty()) {
