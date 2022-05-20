@@ -70,16 +70,16 @@ fun LineChart(
 
     val alpha = when (animation) {
         ChartAnimation.Disabled -> lineChartData.series.indices.map { 1f }
+        is ChartAnimation.Simple -> lineChartData.series.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
         is ChartAnimation.Sequenced -> lineChartData.series.indices.map {
             animateFloatAsState(
                 targetValue = if (animationPlayed) 1f else 0f,
                 animationSpec = animation.animationSpec(it)
-            ).value
-        }
-        is ChartAnimation.Simultaneous -> lineChartData.series.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec()
             ).value
         }
     }

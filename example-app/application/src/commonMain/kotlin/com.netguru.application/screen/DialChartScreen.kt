@@ -26,7 +26,7 @@ fun DialChartScreen() {
             percentage = 69,
             modifier = Modifier
                 .size(300.dp),
-            animation = ChartAnimation.Simultaneous {
+            animation = ChartAnimation.Simple {
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
@@ -50,7 +50,7 @@ fun DialChartScreen() {
             value = 17,
             minValue = -20,
             maxValue = 50,
-            animation = ChartAnimation.Simultaneous {
+            animation = ChartAnimation.Simple {
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow

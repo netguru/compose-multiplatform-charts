@@ -43,7 +43,7 @@ fun Dial(
     minValue: Int,
     maxValue: Int,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simultaneous(),
+    animation: ChartAnimation = ChartAnimation.Simple(),
     chartColors: ChartColors = ChartDefaults.chartColors(),
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
@@ -55,18 +55,17 @@ fun Dial(
         animationPlayed = true
     }
     val animatedScale = when (animation) {
-        ChartAnimation.Disabled -> 1f
-        is ChartAnimation.Sequenced -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec(0)
-            ).value
+        ChartAnimation.Disabled -> {
+            1f
         }
-        is ChartAnimation.Simultaneous -> {
+        is ChartAnimation.Simple -> {
             animateFloatAsState(
                 targetValue = if (animationPlayed) 1f else 0f,
                 animationSpec = animation.animationSpec()
             ).value
+        }
+        is ChartAnimation.Sequenced -> {
+            throw UnsupportedOperationException("As Dial chart only shows one value, ChartAnimation.Sequenced is not supported!")
         }
     }
 

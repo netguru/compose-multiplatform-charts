@@ -10,7 +10,7 @@ import com.netguru.charts.theme.ChartDefaults
 fun PercentageDial(
     percentage: Int,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simultaneous(),
+    animation: ChartAnimation = ChartAnimation.Simple(),
     chartColors: ChartColors = ChartDefaults.chartColors(),
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,

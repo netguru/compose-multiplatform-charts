@@ -74,13 +74,13 @@ private fun LegendItem(
 
     val alpha = when (animation) {
         ChartAnimation.Disabled -> 1f
+        is ChartAnimation.Simple -> animateFloatAsState(
+            targetValue = if (animationPlayed) 1f else 0f,
+            animationSpec = animation.animationSpec(),
+        ).value
         is ChartAnimation.Sequenced -> animateFloatAsState(
             targetValue = if (animationPlayed) 1f else 0f,
             animationSpec = animation.animationSpec(index),
-        ).value
-        is ChartAnimation.Simultaneous -> animateFloatAsState(
-            targetValue = if (animationPlayed) 1f else 0f,
-            animationSpec = animation.animationSpec(),
         ).value
     }
 

@@ -55,16 +55,16 @@ fun BarChart(
 
     val valueScale = when (animation) {
         ChartAnimation.Disabled -> data.categories.first().entries.indices.map { 1f }
+        is ChartAnimation.Simple -> data.categories.first().entries.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
         is ChartAnimation.Sequenced -> data.categories.first().entries.indices.map {
             animateFloatAsState(
                 targetValue = if (animationPlayed) 1f else 0f,
                 animationSpec = animation.animationSpec(it)
-            ).value
-        }
-        is ChartAnimation.Simultaneous -> data.categories.first().entries.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec()
             ).value
         }
     }
