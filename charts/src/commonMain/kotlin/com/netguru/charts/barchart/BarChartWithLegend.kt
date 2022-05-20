@@ -14,7 +14,7 @@ fun BarChartWithLegend(
     data: BarChartData,
     modifier: Modifier = Modifier,
     maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    animation: ChartAnimation = ChartAnimation.Disabled,
+    animation: ChartAnimation = ChartAnimation.Simple(),
     chartColors: ChartColors = ChartDefaults.chartColors(),
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,

@@ -4,11 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,6 +19,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.netguru.charts.ChartAnimation
+import com.netguru.charts.StartAnimation
 import com.netguru.charts.mapValueToDifferentRange
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
@@ -35,12 +31,7 @@ fun GasBottle(
     animation: ChartAnimation = ChartAnimation.Simple(),
     chartColors: ChartColors = ChartDefaults.chartColors(),
 ) {
-    var animationPlayed by remember(percentage) {
-        mutableStateOf(animation is ChartAnimation.Disabled)
-    }
-    LaunchedEffect(Unit) {
-        animationPlayed = true
-    }
+    val animationPlayed = StartAnimation(animation, percentage)
     val targetProgress = when (animation) {
         ChartAnimation.Disabled -> {
             percentage

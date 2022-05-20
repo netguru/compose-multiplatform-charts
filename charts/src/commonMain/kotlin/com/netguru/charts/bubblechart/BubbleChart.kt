@@ -10,11 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,6 +19,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
+import com.netguru.charts.StartAnimation
 import com.netguru.charts.bubblechart.BubbleDefaults.MINIMUM_BUBBLE_RADIUS
 import com.netguru.charts.mapValueToDifferentRange
 import kotlin.math.min
@@ -40,12 +37,7 @@ fun BubbleChart(
         return
     }
 
-    var animationPlayed by remember(bubbles) {
-        mutableStateOf(animation is ChartAnimation.Disabled)
-    }
-    LaunchedEffect(Unit) {
-        animationPlayed = true
-    }
+    val animationPlayed = StartAnimation(animation, bubbles)
     val animatedScale = when (animation) {
         ChartAnimation.Disabled -> bubbles.indices.map { 1f }
         is ChartAnimation.Simple -> bubbles.indices.map {

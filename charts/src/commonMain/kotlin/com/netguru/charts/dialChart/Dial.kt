@@ -10,11 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -26,6 +21,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.netguru.charts.ChartAnimation
+import com.netguru.charts.StartAnimation
 import com.netguru.charts.dialChart.DialDefaults.GAP_DEGREE
 import com.netguru.charts.dialChart.DialDefaults.SCALE_STROKE_WIDTH
 import com.netguru.charts.dialChart.DialDefaults.START_ANGLE
@@ -48,12 +44,7 @@ fun Dial(
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
 ) {
-    var animationPlayed by remember(value) {
-        mutableStateOf(animation is ChartAnimation.Disabled)
-    }
-    LaunchedEffect(Unit) {
-        animationPlayed = true
-    }
+    val animationPlayed = StartAnimation(animation, value)
     val animatedScale = when (animation) {
         ChartAnimation.Disabled -> {
             1f

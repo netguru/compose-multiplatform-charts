@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
+import com.netguru.charts.StartAnimation
 import com.netguru.charts.gridchart.GridDefaults
 import com.netguru.charts.gridchart.LineParameters
 import com.netguru.charts.gridchart.YAxisLabels
@@ -52,7 +52,7 @@ fun LineChart(
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     overlayHeaderLabel: @Composable (value: Any) -> Unit = GridDefaults.OverlayHeaderLabel,
     overlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
-    animation: ChartAnimation = ChartAnimation.Disabled,
+    animation: ChartAnimation = ChartAnimation.Simple(),
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
 ) {
@@ -61,12 +61,7 @@ fun LineChart(
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     val horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET
 
-    var animationPlayed by remember(lineChartData) {
-        mutableStateOf(animation is ChartAnimation.Disabled)
-    }
-    LaunchedEffect(Unit) {
-        animationPlayed = true
-    }
+    val animationPlayed = StartAnimation(animation, lineChartData)
 
     val alpha = when (animation) {
         ChartAnimation.Disabled -> lineChartData.series.indices.map { 1f }

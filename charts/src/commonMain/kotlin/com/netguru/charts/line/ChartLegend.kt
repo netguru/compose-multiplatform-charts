@@ -33,7 +33,7 @@ import com.netguru.charts.gridchart.GridDefaults
 fun ChartLegend(
     legendData: List<LegendItemData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Disabled,
+    animation: ChartAnimation = ChartAnimation.Simple(),
     legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
 ) {
     LazyVerticalGrid(

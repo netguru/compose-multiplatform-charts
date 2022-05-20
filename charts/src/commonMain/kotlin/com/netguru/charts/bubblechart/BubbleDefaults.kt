@@ -23,7 +23,7 @@ internal object BubbleDefaults {
 
     const val MINIMUM_BUBBLE_RADIUS = 40f
 
-    val BubbleLabel: @Composable (Bubble) -> Unit = {bubble ->
+    val BubbleLabel: @Composable (Bubble) -> Unit = { bubble ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(bubble.radius.dp * 1.6f)
