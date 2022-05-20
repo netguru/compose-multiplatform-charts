@@ -43,7 +43,7 @@ fun PieChartScreen() {
         PieChartWithLegend(
             pieChartData = data,
             modifier = Modifier
-                .size(300.dp)
+                .size(300.dp),
         )
     }
 }

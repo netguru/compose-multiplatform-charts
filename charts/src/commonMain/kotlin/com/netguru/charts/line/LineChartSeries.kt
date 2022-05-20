@@ -7,7 +7,10 @@ import androidx.compose.ui.unit.dp
 import com.netguru.charts.gridchart.GridChartData
 
 @Immutable
-data class LineChartPoint(val timestamp: Long, val value: Float)
+data class LineChartPoint(
+    val x: Long,
+    val y: Float,
+)
 
 @Immutable
 data class LineChartSeries(
@@ -16,7 +19,7 @@ data class LineChartSeries(
     val lineColor: Color,
     val fillColor: Color = lineColor,
     val dashedLine: Boolean = false,
-    val listOfPoints: List<LineChartPoint> = emptyList()
+    val listOfPoints: List<LineChartPoint> = emptyList(),
 ) {
     val minValue: Float
     val maxValue: Float
@@ -42,19 +45,20 @@ data class LineChartSeries(
     }
 
     private fun getMinMaxTimestamp(): Pair<Long, Long> {
-        val sortedTimestamp = listOfPoints.sortedBy { it.timestamp }
-        return Pair(sortedTimestamp.first().timestamp, sortedTimestamp.last().timestamp)
+        val sortedTimestamp = listOfPoints.sortedBy { it.x }
+        return Pair(sortedTimestamp.first().x, sortedTimestamp.last().x)
     }
 
     private fun getMinMaxValue(): Pair<Float, Float> {
-        val sortedValue = listOfPoints.sortedBy { it.value }
-        return Pair(sortedValue.first().value, sortedValue.last().value)
+        val sortedValue = listOfPoints.sortedBy { it.y }
+        return Pair(sortedValue.first().y, sortedValue.last().y)
     }
 }
 
 @Immutable
-data class LineChartData(val series: List<LineChartSeries>, val units: String = "") :
-    GridChartData {
+data class LineChartData(
+    val series: List<LineChartSeries>,
+) : GridChartData {
     override val legendData: List<LegendItemData>
         get() = series.map {
             LegendItemData(
@@ -71,7 +75,7 @@ data class LineChartData(val series: List<LineChartSeries>, val units: String = 
     override val maxY: Float
 
     init {
-        // find max and mins in all data
+        // find max and min in all data
         val timeStamps = mutableListOf<Long>()
         val values = mutableListOf<Float>()
         series.forEach {

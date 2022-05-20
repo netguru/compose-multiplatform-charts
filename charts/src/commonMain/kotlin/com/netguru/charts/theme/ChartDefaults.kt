@@ -11,23 +11,15 @@ object ChartDefaults {
     @Composable
     fun chartColors(
         primary: Color = MaterialTheme.colors.primary,
-        primaryText: Color = MaterialTheme.colors.secondary,
         surface: Color = Color.Unspecified,
-        borders: Color = Color.Unspecified,
         grid: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-        labels: Color = Color.Unspecified,
-        bubbleText: Color = Color.White,
         emptyGasBottle: Color = MaterialTheme.colors.error,
         fullGasBottle: Color = MaterialTheme.colors.primary,
         overlayLine: Color = MaterialTheme.colors.error,
     ) = ChartColors(
         primary = primary,
-        primaryText = primaryText,
         surface = surface,
-        borders = borders,
         grid = grid,
-        labels = labels,
-        bubbleText = bubbleText,
         emptyGasBottle = emptyGasBottle,
         fullGasBottle = fullGasBottle,
         overlayLine = overlayLine,

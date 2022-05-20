@@ -1,7 +1,6 @@
 package com.netguru.charts.line
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,21 +25,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-
-private const val DEFAULT_ANIMATION_DURATION_MS = 300
-private const val DEFAULT_ANIMATION_DELAY_MS = 100
-private const val ALPHA_MAX = 1f
-private const val ALPHA_MIN = 0f
+import com.netguru.charts.ChartAnimation
+import com.netguru.charts.gridchart.GridDefaults
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChartLegend(
     legendData: List<LegendItemData>,
-    textColor: Color,
     modifier: Modifier = Modifier,
-    animate: Boolean = true,
-    animationDuration: Int = DEFAULT_ANIMATION_DURATION_MS,
-    animationDelay: Int = DEFAULT_ANIMATION_DELAY_MS,
+    animation: ChartAnimation = ChartAnimation.Simple(),
+    legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -57,10 +50,8 @@ fun ChartLegend(
             LegendItem(
                 data = legendData[index],
                 index = index,
-                animate = animate,
-                animationDuration = animationDuration,
-                animationDelay = animationDelay,
-                textColor = textColor,
+                animation = animation,
+                legendItemLabel = legendItemLabel,
             )
         }
     }
@@ -70,26 +61,28 @@ fun ChartLegend(
 private fun LegendItem(
     data: LegendItemData,
     index: Int,
-    animate: Boolean,
-    animationDuration: Int,
-    animationDelay: Int,
-    textColor: Color,
+    animation: ChartAnimation,
+    legendItemLabel: @Composable (String) -> Unit,
 ) {
-    var animationPlayed by remember(animate) {
-        mutableStateOf(!animate)
+    var animationPlayed by remember(animation) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
     }
 
     LaunchedEffect(key1 = true) {
         animationPlayed = true // to play animation only once
     }
 
-    val alpha by animateFloatAsState(
-        targetValue = if (animationPlayed) ALPHA_MAX else ALPHA_MIN,
-        animationSpec = tween(
-            durationMillis = animationDuration,
-            delayMillis = index * animationDelay
-        )
-    )
+    val alpha = when (animation) {
+        ChartAnimation.Disabled -> 1f
+        is ChartAnimation.Simple -> animateFloatAsState(
+            targetValue = if (animationPlayed) 1f else 0f,
+            animationSpec = animation.animationSpec(),
+        ).value
+        is ChartAnimation.Sequenced -> animateFloatAsState(
+            targetValue = if (animationPlayed) 1f else 0f,
+            animationSpec = animation.animationSpec(index),
+        ).value
+    }
 
     Row(modifier = Modifier.alpha(alpha), verticalAlignment = Alignment.CenterVertically) {
         Box(
@@ -107,10 +100,7 @@ private fun LegendItem(
         )
 
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = data.name,
-            color = textColor,
-        )
+        legendItemLabel(data.name)
     }
 }
 

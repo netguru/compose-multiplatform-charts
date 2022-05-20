@@ -1,5 +1,11 @@
 package com.netguru.charts
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -44,4 +50,16 @@ fun Number.round(decimals: Int = 2): String {
             this.toString()
         }
     }
+}
+
+@Composable
+internal fun StartAnimation(animation: ChartAnimation, data: Any): Boolean {
+    var animationPlayed by remember(data) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
+    }
+    LaunchedEffect(Unit) {
+        animationPlayed = true
+    }
+
+    return animationPlayed
 }

@@ -1,16 +1,9 @@
 package com.netguru.charts.gasBottleChart
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,30 +18,34 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import com.netguru.charts.ChartAnimation
+import com.netguru.charts.StartAnimation
 import com.netguru.charts.mapValueToDifferentRange
+import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
 @Composable
 fun GasBottle(
+    percentage: Float,
     modifier: Modifier = Modifier,
-    percentage: Int = 50,
-    animate: Boolean = true,
-    emptyColor: Color = ChartDefaults.chartColors().emptyGasBottle,
-    fullColor: Color = ChartDefaults.chartColors().fullGasBottle,
+    animation: ChartAnimation = ChartAnimation.Simple(),
+    chartColors: ChartColors = ChartDefaults.chartColors(),
 ) {
-    var animationPlayed by remember(animate) {
-        mutableStateOf(!animate)
+    val animationPlayed = StartAnimation(animation, percentage)
+    val targetProgress = when (animation) {
+        ChartAnimation.Disabled -> {
+            percentage
+        }
+        is ChartAnimation.Simple -> {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) percentage else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
+        is ChartAnimation.Sequenced -> {
+            throw UnsupportedOperationException("As GasBottle chart only shows one value, ChartAnimation.Sequenced is not supported!")
+        }
     }
-    LaunchedEffect(key1 = true) {
-        animationPlayed = true
-    }
-    val targetProgress by animateIntAsState(
-        targetValue = if (animationPlayed) percentage else 0,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessVeryLow
-        )
-    )
 
     val gasTank = rememberVectorPainter(image = GasTank)
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
@@ -61,8 +58,8 @@ fun GasBottle(
                     drawGasProgressBar(
                         percentage = targetProgress,
                         gasTank = gasTank,
-                        fullColor = fullColor,
-                        emptyColor = emptyColor
+                        fullColor = chartColors.fullGasBottle,
+                        emptyColor = chartColors.emptyGasBottle,
                     )
                 }
         )
@@ -71,23 +68,23 @@ fun GasBottle(
 
 private fun DrawScope.drawGasProgressBar(
     gasTank: VectorPainter,
-    percentage: Int,
+    percentage: Float,
     fullColor: Color,
     emptyColor: Color,
 ) {
-    var percentageTemp = percentage.coerceIn(0, 100)
-    if (percentage in 1..5) percentageTemp = 5
+    var percentageTemp = percentage.coerceIn(0f, 100f)
+    if (percentage in 1.0..5.0) percentageTemp = 5f
 
     val fluidTopLevel = size.height * 0.3f
     val fluidBottomLevel = size.height * 0.88f
     val fluidTopSurfaceHeight = size.height * 0.09f
 
     val fillLevel =
-        percentageTemp.toFloat().mapValueToDifferentRange(0f, 100f, fluidBottomLevel, fluidTopLevel)
+        percentageTemp.mapValueToDifferentRange(0f, 100f, fluidBottomLevel, fluidTopLevel)
     val color = getColorFromPercentage(
         color1 = fullColor,
         color2 = emptyColor,
-        percentage = percentageTemp.toFloat()
+        percentage = percentageTemp
     )
 
     // gas bottle

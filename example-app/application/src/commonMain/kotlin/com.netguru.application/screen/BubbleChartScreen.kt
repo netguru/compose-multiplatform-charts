@@ -1,12 +1,16 @@
 package com.netguru.application.screen
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.House
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.bubblechart.Bubble
 import com.netguru.charts.bubblechart.BubbleChart
 import com.netguru.common.AppTheme
@@ -38,7 +42,9 @@ fun BubbleChartScreen() {
         TitleText(text = "Bubble chart")
         BubbleChart(
             bubbles = bubbles,
-            unit = "unit",
+            modifier = Modifier
+                .size(300.dp),
+            animation = ChartAnimation.Sequenced(),
         )
     }
 }

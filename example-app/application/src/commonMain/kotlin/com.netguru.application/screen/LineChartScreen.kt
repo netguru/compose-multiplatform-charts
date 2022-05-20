@@ -1,12 +1,18 @@
 package com.netguru.application.screen
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.line.LineChart
 import com.netguru.charts.line.LineChartData
 import com.netguru.charts.line.LineChartPoint
@@ -18,51 +24,76 @@ import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
 
 @Composable
-fun LineChartScreen(){
+fun LineChartScreen() {
 
-    val lineData = LineChartData(
-        series = (1..3).map {
-            LineChartSeries(
-                dataName = "data $it",
-                lineColor = listOf(
-                    Color.Red,
-                    Color.Green,
-                    Color.Blue,
-                )[it - 1],
-                listOfPoints = (1..10).map { point ->
-                    LineChartPoint(
-                        timestamp = DateTime.now().minus(TimeSpan(point * 24 * 60 * 60 * 1000.0)).unixMillisLong,
-                        value = (1 .. 15).random().toFloat(),
-                    )
-                }
-            )
-        }
-    )
+    val lineData = remember {
+        LineChartData(
+            series = (1..3).map {
+                LineChartSeries(
+                    dataName = "data $it",
+                    lineColor = listOf(
+                        Color.Red,
+                        Color.Green,
+                        Color.Blue,
+                    )[it - 1],
+                    listOfPoints = (1..10).map { point ->
+                        LineChartPoint(
+                            x = DateTime.now().minus(TimeSpan(point * 24 * 60 * 60 * 1000.0)).unixMillisLong,
+                            y = (1..15).random().toFloat(),
+                        )
+                    }
+                )
+            },
+        )
+    }
 
     SpacedColumn {
 
         TitleText(text = "Line chart")
         LineChart(
             lineChartData = lineData,
-            xAxisValueFormatter = { DateTime.fromUnix(it).format("yyyy-MM-dd") },
-            timeFormatter = { DateTime.fromUnix(it).format("yyyy-MM-dd") },
             chartColors = AppChartColors(),
             modifier = Modifier
-                .height(300.dp)
+                .height(300.dp),
+            xAxisLabel = {
+                Text(
+                    fontSize = 12.sp,
+                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                    textAlign = TextAlign.Center
+                )
+            },
+            overlayHeaderLabel = {
+                Text(
+                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                    style = MaterialTheme.typography.overline
+                )
+            },
+            animation = ChartAnimation.Sequenced()
         )
 
         HorizontalDivider()
 
         TitleText(text = "Line chart with legend")
         LineChartWithLegend(
-            lineChartData = lineData,
-            xAxisValueFormatter = { DateTime.fromUnix(it).format("yyyy-MM-dd") },
-            timeFormatter = { DateTime.fromUnix(it).format("yyyy-MM-dd") },
-            maxVerticalLines = 5,
-            animate = true,
-            chartColors = AppChartColors(),
             modifier = Modifier
                 .height(300.dp),
+            lineChartData = lineData,
+            maxVerticalLines = 5,
+            chartColors = AppChartColors(),
+            xAxisLabel = {
+                Text(
+                    fontSize = 12.sp,
+                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                    textAlign = TextAlign.Center
+                )
+            },
+            overlayHeaderLabel = {
+                Text(
+                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                    style = MaterialTheme.typography.overline
+                )
+            },
+            animation = ChartAnimation.Sequenced()
         )
     }
 }

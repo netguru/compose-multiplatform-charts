@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.line.LineChartData
 import com.netguru.charts.line.LineChartPoint
 import com.netguru.charts.line.LineChartSeries
@@ -23,11 +24,9 @@ fun LineChartPreview() {
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
-            xAxisValueFormatter = { DateTime.now().format("yyyy-MM-dd") },
-            timeFormatter = { DateTime.now().format("yyyy-MM-dd") },
             lineChartData = getLineChartSampleData(),
             maxVerticalLines = 10,
-            animate = false,
+            animation = ChartAnimation.Disabled,
         )
     }
 }
@@ -81,5 +80,7 @@ private fun getLineChartSampleData(): LineChartData {
         )
     )
 
-    return LineChartData(list, units = "kW")
+    return LineChartData(
+        series = list,
+    )
 }

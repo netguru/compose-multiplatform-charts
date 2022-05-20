@@ -14,11 +14,11 @@ internal fun DrawScope.drawLineChart(
     lineChartData: LineChartData,
     graphTopPadding: Dp,
     graphBottomPadding: Dp,
-    alpha: Float = 1f
+    alpha: List<Float>,
 ) {
     // calculate path
     val path = Path()
-    lineChartData.series.forEach { data ->
+    lineChartData.series.forEachIndexed { seriesIndex, data ->
 
         val mappedPoints =
             mapDataToPixels(
@@ -49,7 +49,7 @@ internal fun DrawScope.drawLineChart(
         // draw line
         drawPath(
             path = path,
-            data.lineColor.copy(alpha),
+            color = data.lineColor.copy(alpha[seriesIndex]),
             style = Stroke(
                 width = data.lineWidth.toPx(),
                 pathEffect = if (data.dashedLine) dashedPathEffect else null
@@ -64,8 +64,8 @@ internal fun DrawScope.drawLineChart(
             Brush.verticalGradient(
                 listOf(
                     Color.Transparent,
-                    data.fillColor.copy(alpha / 12),
-                    data.fillColor.copy(alpha / 6)
+                    data.fillColor.copy(alpha[seriesIndex] / 12),
+                    data.fillColor.copy(alpha[seriesIndex] / 6)
                 ),
                 startY = path.getBounds().bottom,
                 endY = path.getBounds().top,
@@ -80,16 +80,16 @@ private fun mapDataToPixels(
     currentSeries: LineChartSeries,
     canvasSize: Size,
     graphTopPadding: Float = 0f,
-    graphBottomPadding: Float
+    graphBottomPadding: Float,
 ): List<PointF> {
     val mappedPoints = currentSeries.listOfPoints.map {
-        val x = it.timestamp.mapValueToDifferentRange(
+        val x = it.x.mapValueToDifferentRange(
             lineChartData.minX,
             lineChartData.maxX,
             0L,
             canvasSize.width.toLong()
         ).toFloat()
-        val y = it.value.mapValueToDifferentRange(
+        val y = it.y.mapValueToDifferentRange(
             lineChartData.minY,
             lineChartData.maxY,
             canvasSize.height - graphBottomPadding,

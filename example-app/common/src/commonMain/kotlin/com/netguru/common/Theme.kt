@@ -280,12 +280,8 @@ class AppDimens(
 @Composable
 fun AppChartColors() = ChartDefaults.chartColors(
     primary = AppTheme.colors.primary,
-    primaryText = AppTheme.colors.primaryText,
     surface = AppTheme.colors.background,
-    borders = AppTheme.colors.borders,
     grid = AppTheme.colors.borders,
-    labels = AppTheme.colors.secondaryText,
-    bubbleText = AppTheme.colors.onChart,
     emptyGasBottle = AppTheme.colors.emptyGasBottle,
     fullGasBottle = AppTheme.colors.fullGasBottle,
     overlayLine = AppTheme.colors.danger,
