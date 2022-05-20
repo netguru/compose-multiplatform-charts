@@ -1,7 +1,6 @@
 package com.netguru.charts.pie
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -18,32 +17,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
 import com.netguru.charts.mapValueToDifferentRange
+import com.netguru.charts.pie.PieDefaults.FULL_CIRCLE_DEGREES
+import com.netguru.charts.pie.PieDefaults.START_ANGLE
 import kotlin.math.min
 
 data class PieChartData(val name: String, val value: Double, val color: Color)
-
-private const val DEFAULT_ANIMATION_DURATION_MS = 300
-private const val DEFAULT_ANIMATION_DELAY_MS = 100
-private const val FULL_CIRCLE_DEGREES = 360f
-private const val START_ANGLE = 270.0
 
 @Composable
 fun PieChart(
     data: List<PieChartData>,
     modifier: Modifier = Modifier,
-    animate: Boolean = true,
-    animationDuration: Int = DEFAULT_ANIMATION_DURATION_MS,
-    animationDelay: Int = DEFAULT_ANIMATION_DELAY_MS,
+    animation: ChartAnimation = ChartAnimation.Simple(),
 ) {
-    var animationPlayed by remember(animate) {
-        mutableStateOf(!animate)
+    var animationPlayed by remember(data) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
     }
-
-    val maxAngle by animateFloatAsState(
-        targetValue = if (animationPlayed) FULL_CIRCLE_DEGREES else 0f,
-        animationSpec = tween(durationMillis = animationDuration, delayMillis = animationDelay)
-    )
+    LaunchedEffect(Unit) {
+        animationPlayed = true
+    }
+    val maxAngle = when (animation) {
+        ChartAnimation.Disabled -> {
+            1f
+        }
+        is ChartAnimation.Simple -> {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) FULL_CIRCLE_DEGREES else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
+        is ChartAnimation.Sequenced -> {
+            throw UnsupportedOperationException("ChartAnimation.Sequenced is currently not supported for PieChart!")
+        }
+    }
 
     val sumOfData by remember(data) {
         mutableStateOf(data.sumOf { it.value })
@@ -57,10 +64,6 @@ fun PieChart(
                 sumOfData = sumOfData
             )
         )
-    }
-
-    LaunchedEffect(key1 = true) {
-        animationPlayed = true
     }
 
     Box(
@@ -87,7 +90,7 @@ private fun calculateSweepAngles(data: List<PieChartData>, sumOfData: Double, ma
 private fun DrawScope.drawArc(
     color: Color,
     startAngle: Float,
-    sweepAngle: Float
+    sweepAngle: Float,
 ) {
     val padding = 48.dp.toPx()
 
