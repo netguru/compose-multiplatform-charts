@@ -1,6 +1,5 @@
 package com.netguru.application.screen
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,7 +7,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
-import com.netguru.charts.ChartAnimation
 import com.netguru.charts.pie.PieChart
 import com.netguru.charts.pie.PieChartData
 import com.netguru.charts.pie.PieChartWithLegend
@@ -46,12 +44,6 @@ fun PieChartScreen() {
             pieChartData = data,
             modifier = Modifier
                 .size(300.dp),
-            animation = ChartAnimation.Simple {
-                tween(
-                    durationMillis = 2000,
-                    delayMillis = 700
-                )
-            }
         )
     }
 }

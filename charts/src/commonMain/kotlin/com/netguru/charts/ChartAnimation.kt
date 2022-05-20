@@ -19,7 +19,7 @@ sealed class ChartAnimation {
     ) : ChartAnimation()
 
     private companion object {
-        const val DEFAULT_DURATION = 2300
-        const val DEFAULT_DELAY = 600
+        const val DEFAULT_DURATION = 300
+        const val DEFAULT_DELAY = 100
     }
 }
