@@ -1,86 +1,97 @@
 package com.netguru.charts.bubblechart
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.Typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.netguru.charts.ChartAnimation
+import com.netguru.charts.bubblechart.BubbleDefaults.MINIMUM_BUBBLE_RADIUS
 import com.netguru.charts.mapValueToDifferentRange
-import com.netguru.charts.round
-import com.netguru.charts.theme.ChartDefaults
 import kotlin.math.min
 import kotlin.random.Random
-
-private const val MINIMUM_BUBBLE_RADIUS = 40f
 
 @Composable
 fun BubbleChart(
     bubbles: List<Bubble>,
-    unit: String,
-    modifier: Modifier = Modifier.size(300.dp),
+    modifier: Modifier = Modifier,
+    animation: ChartAnimation = ChartAnimation.Simple(),
     distanceBetweenCircles: Float = -10f,
-    textColor: Color = ChartDefaults.chartColors().bubbleText,
-    typography: Typography = MaterialTheme.typography,
+    bubbleLabel: @Composable (Bubble) -> Unit = BubbleDefaults.BubbleLabel,
 ) {
-    if (bubbles.isNotEmpty()) {
-        BoxWithConstraints(modifier = modifier) {
-            val size = min(maxWidth.value, maxHeight.value)
-            val bubblePacking = remember(bubbles, size, distanceBetweenCircles) {
-                val largestRadius = bubbles.maxOf { it.radius }
-                val smallestRadius = bubbles.minOf { it.radius }
-                BubblePacking(
-                    data = bubbles.map {
-                        it.withRadiusRelativeTo(
-                            smallestRadius = smallestRadius,
-                            largestRadius = largestRadius,
-                            minRadiusPossible = MINIMUM_BUBBLE_RADIUS,
-                            maxRadiusPossible = size / 4f
-                        )
-                    },
-                    containerSize = Size(size, size),
-                    distanceBetweenBubbles = distanceBetweenCircles
-                )
-            }
+    if (bubbles.isEmpty()) {
+        return
+    }
 
-            Box(
-                Modifier
-                    .size(size.dp)
-                    .align(alignment = Alignment.Center)
-            ) {
-                bubblePacking.pack().forEach { circle ->
-                    BubbleComp(
-                        bubble = circle,
-                        unit = unit,
-                        textColor = textColor,
-                        typography = typography,
+    var animationPlayed by remember(bubbles) {
+        mutableStateOf(animation is ChartAnimation.Disabled)
+    }
+    LaunchedEffect(Unit) {
+        animationPlayed = true
+    }
+    val animatedScale = when (animation) {
+        ChartAnimation.Disabled -> bubbles.indices.map { 1f }
+        is ChartAnimation.Simple -> bubbles.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec()
+            ).value
+        }
+        is ChartAnimation.Sequenced -> bubbles.indices.map {
+            animateFloatAsState(
+                targetValue = if (animationPlayed) 1f else 0f,
+                animationSpec = animation.animationSpec(it)
+            ).value
+        }
+    }
+
+    BoxWithConstraints(modifier = modifier) {
+        val size = min(maxWidth.value, maxHeight.value)
+        val bubblePacking = remember(bubbles, size, distanceBetweenCircles) {
+            val largestRadius = bubbles.maxOf { it.radius }
+            val smallestRadius = bubbles.minOf { it.radius }
+            BubblePacking(
+                data = bubbles.map {
+                    it.withRadiusRelativeTo(
+                        smallestRadius = smallestRadius,
+                        largestRadius = largestRadius,
+                        minRadiusPossible = MINIMUM_BUBBLE_RADIUS,
+                        maxRadiusPossible = size / 4f
                     )
-                }
+                },
+                containerSize = Size(size, size),
+                distanceBetweenBubbles = distanceBetweenCircles
+            )
+        }
+
+        Box(
+            Modifier
+                .size(size.dp)
+                .align(alignment = Alignment.Center)
+        ) {
+            bubblePacking.pack().forEachIndexed { index, bubble ->
+                BubbleComp(
+                    bubble = bubble,
+                    animationScale = animatedScale[index],
+                    bubbleContent = bubbleLabel,
+                )
             }
         }
     }
@@ -105,48 +116,20 @@ private fun Bubble.withRadiusRelativeTo(
 @Composable
 private fun BubbleComp(
     bubble: Bubble,
-    unit: String,
-    textColor: Color,
-    typography: Typography,
+    animationScale: Float,
+    bubbleContent: @Composable (Bubble) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .size(bubble.radius.dp * 2)
             .offset((bubble.position.x - bubble.radius).dp, (bubble.position.y - bubble.radius).dp)
             .drawBehind {
-                drawCircle(bubble.color)
-            },
+                drawCircle(bubble.color.copy(alpha = animationScale))
+            }
+            .alpha(animationScale),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(bubble.radius.dp * 1.6f)
-        ) {
-            Icon(
-                painter = rememberVectorPainter(bubble.icon),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = textColor
-            )
-
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = formattedBubbleValue(bubble.value.round(1), unit, typography),
-                color = textColor,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = bubble.name,
-                color = textColor.copy(alpha = 0.6f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                style = typography.body2
-            )
-        }
+        bubbleContent(bubble)
     }
 }
 
@@ -156,7 +139,6 @@ fun BubbleChartPreview() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         BubbleChart(
             bubbles = data,
-            unit = "kWh",
             modifier = Modifier.border(1.dp, Color.Black)
         )
     }
@@ -184,22 +166,3 @@ fun bubbleChartSampleData(): List<Bubble> {
     bubbles.sortByDescending { it.radius }
     return bubbles
 }
-
-@Composable
-private fun formattedBubbleValue(
-    value: String,
-    unit: String,
-    typography: Typography,
-): AnnotatedString =
-    buildAnnotatedString {
-        withStyle(
-            style = typography.h5.toSpanStyle()
-        ) {
-            append(value)
-        }
-        withStyle(
-            style = typography.overline.toSpanStyle()
-        ) {
-            append(" $unit")
-        }
-    }
