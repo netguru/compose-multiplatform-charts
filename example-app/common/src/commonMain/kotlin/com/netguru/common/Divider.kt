@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.netguru.common.AppTheme
-
 
 @Composable
 fun HorizontalDivider(modifier: Modifier = Modifier) {

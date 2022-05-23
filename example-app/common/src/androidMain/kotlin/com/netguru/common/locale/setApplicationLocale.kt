@@ -1,7 +1,7 @@
 package com.netguru.common.locale
 
 import android.content.res.Resources
-import java.util.*
+import java.util.Locale
 
 internal actual fun setApplicationLocale(localeTag: String) {
     val resources = Resources.getSystem()

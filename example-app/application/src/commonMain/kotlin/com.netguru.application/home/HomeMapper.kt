@@ -1,8 +1,6 @@
 package com.netguru.application.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.netguru.application.navigation.NavigationState
 
 @Composable
