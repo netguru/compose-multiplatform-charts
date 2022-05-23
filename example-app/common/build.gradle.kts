@@ -1,7 +1,8 @@
-import com.netguru.extensions.*
+import com.netguru.extensions.androidMain
+import com.netguru.extensions.baseAndroidSetup
 import com.netguru.extensions.baseTestSetup
+import com.netguru.extensions.sourceSets
 import org.gradle.kotlin.dsl.kotlin
-import org.gradle.kotlin.dsl.sourceSets
 import org.jetbrains.compose.compose
 
 baseAndroidSetup()
