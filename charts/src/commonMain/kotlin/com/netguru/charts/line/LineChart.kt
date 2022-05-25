@@ -29,14 +29,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
 import com.netguru.charts.StartAnimation
-import com.netguru.charts.gridchart.GridDefaults
-import com.netguru.charts.gridchart.LineParameters
-import com.netguru.charts.gridchart.YAxisLabels
-import com.netguru.charts.gridchart.alignCenterToOffsetHorizontal
-import com.netguru.charts.gridchart.axisscale.TimestampXAxisScale
-import com.netguru.charts.gridchart.axisscale.YAxisScale
-import com.netguru.charts.gridchart.drawChartGrid
-import com.netguru.charts.gridchart.measureChartGrid
+import com.netguru.charts.grid.GridDefaults
+import com.netguru.charts.grid.LineParameters
+import com.netguru.charts.grid.YAxisLabels
+import com.netguru.charts.grid.alignCenterToOffsetHorizontal
+import com.netguru.charts.grid.axisscale.TimestampXAxisScale
+import com.netguru.charts.grid.axisscale.YAxisScale
+import com.netguru.charts.grid.drawChartGrid
+import com.netguru.charts.grid.measureChartGrid
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 

@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.barchart.BarChart
-import com.netguru.charts.barchart.BarChartCategory
-import com.netguru.charts.barchart.BarChartData
-import com.netguru.charts.barchart.BarChartEntry
-import com.netguru.charts.barchart.BarChartWithLegend
+import com.netguru.charts.bar.BarChart
+import com.netguru.charts.bar.BarChartCategory
+import com.netguru.charts.bar.BarChartData
+import com.netguru.charts.bar.BarChartEntry
+import com.netguru.charts.bar.BarChartWithLegend
 import com.netguru.common.HorizontalDivider
 
 @Composable
