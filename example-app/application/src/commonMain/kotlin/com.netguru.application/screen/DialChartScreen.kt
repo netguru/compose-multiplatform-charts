@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.dialChart.Dial
-import com.netguru.charts.dialChart.PercentageDial
+import com.netguru.charts.dial.Dial
+import com.netguru.charts.dial.PercentageDial
 
 @Composable
 fun DialChartScreen() {

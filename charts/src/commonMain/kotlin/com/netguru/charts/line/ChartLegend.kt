@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.gridchart.GridDefaults
+import com.netguru.charts.grid.GridDefaults
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

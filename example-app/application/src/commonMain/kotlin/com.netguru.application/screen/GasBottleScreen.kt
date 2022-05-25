@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.gasBottleChart.GasBottle
+import com.netguru.charts.gasbottle.GasBottle
 
 @Composable
 fun GasBottleChartScreen() {

@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.bubblechart.Bubble
-import com.netguru.charts.bubblechart.BubbleChart
+import com.netguru.charts.bubble.Bubble
+import com.netguru.charts.bubble.BubbleChart
 import com.netguru.common.AppTheme
 
 @Composable

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.netguru.charts.gridchart.GridChartData
+import com.netguru.charts.grid.GridChartData
 
 @Immutable
 data class LineChartPoint(
