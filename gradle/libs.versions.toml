@@ -19,6 +19,7 @@ desktop-packageName = "jvm"
 # Dependencies
 kotlin-gradle-plugin = "1.6.10"
 gradle = "7.0.4"
+compose = "1.1.1"
 activity-compose = "1.4.0"
 coroutines = "1.6.0"
 appcompat = "1.4.1"
@@ -31,6 +32,8 @@ turbine = "0.7.0"
 klock = "2.4.13"
 kotlin-poet = "1.10.2"
 mockk = "1.12.3"
+shot = "5.14.1"
+ktlint = "10.2.1"
 
 # Project
 project-group = "com.netguru"
@@ -43,12 +46,15 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 plugin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet"}
+plugin-shot = { module = "com.karumi:shot", version.ref = "shot" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 androidx-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-coreKtx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
 test-junit = { module = "junit:junit", version.ref = "junit" }
+test-ui-junit = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
+test-ui-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
 test-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 time-klock = { module = "com.soywiz.korlibs.klock:klock", version.ref = "klock" }
@@ -57,6 +63,6 @@ mockk-agentJvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockk" }
 
 [plugins]
-compose = { id = "org.jetbrains.compose", version = "1.1.1" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "10.2.1" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-gradle-plugin"}
