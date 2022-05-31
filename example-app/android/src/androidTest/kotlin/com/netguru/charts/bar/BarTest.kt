@@ -49,8 +49,8 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun oneCategory_tenBars_positiveValues() {
-        val data = Data.generateData(1, 10, Data.ValueTypes.POSITIVE)
+    fun oneCategory_fiveBars_positiveValues() {
+        val data = Data.generateData(1, 5, Data.ValueTypes.POSITIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
@@ -73,32 +73,32 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun twoCategories_tenBars_positiveValues() {
-        val data = Data.generateData(2, 10, Data.ValueTypes.POSITIVE)
+    fun twoCategories_fiveBars_positiveValues() {
+        val data = Data.generateData(2, 5, Data.ValueTypes.POSITIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_oneBar_positiveValues() {
-        val data = Data.generateData(10, 1, Data.ValueTypes.POSITIVE)
+    fun fiveCategories_oneBar_positiveValues() {
+        val data = Data.generateData(5, 1, Data.ValueTypes.POSITIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_twoBars_positiveValues() {
-        val data = Data.generateData(10, 2, Data.ValueTypes.POSITIVE)
+    fun fiveCategories_twoBars_positiveValues() {
+        val data = Data.generateData(5, 2, Data.ValueTypes.POSITIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_tenBars_positiveValues() {
-        val data = Data.generateData(10, 10, Data.ValueTypes.POSITIVE)
+    fun fiveCategories_fiveBars_positiveValues() {
+        val data = Data.generateData(5, 5, Data.ValueTypes.POSITIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
@@ -153,8 +153,8 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun oneCategory_tenBars_negativeValues() {
-        val data = Data.generateData(1, 10, Data.ValueTypes.NEGATIVE)
+    fun oneCategory_fiveBars_negativeValues() {
+        val data = Data.generateData(1, 5, Data.ValueTypes.NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
@@ -177,32 +177,32 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun twoCategories_tenBars_negativeValues() {
-        val data = Data.generateData(2, 10, Data.ValueTypes.NEGATIVE)
+    fun twoCategories_fiveBars_negativeValues() {
+        val data = Data.generateData(2, 5, Data.ValueTypes.NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_oneBar_negativeValues() {
-        val data = Data.generateData(10, 1, Data.ValueTypes.NEGATIVE)
+    fun fiveCategories_oneBar_negativeValues() {
+        val data = Data.generateData(5, 1, Data.ValueTypes.NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_twoBars_negativeValues() {
-        val data = Data.generateData(10, 2, Data.ValueTypes.NEGATIVE)
+    fun fiveCategories_twoBars_negativeValues() {
+        val data = Data.generateData(5, 2, Data.ValueTypes.NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_tenBars_negativeValues() {
-        val data = Data.generateData(10, 10, Data.ValueTypes.NEGATIVE)
+    fun fiveCategories_fiveBars_negativeValues() {
+        val data = Data.generateData(5, 5, Data.ValueTypes.NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
@@ -249,8 +249,8 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun oneCategory_tenBars_positiveAndNegativeValues() {
-        val data = Data.generateData(1, 10, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
+    fun oneCategory_fiveBars_positiveAndNegativeValues() {
+        val data = Data.generateData(1, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
@@ -265,24 +265,24 @@ class BarTest : ScreenshotTest {
     }
 
     @Test
-    fun twoCategories_tenBars_positiveAndNegativeValues() {
-        val data = Data.generateData(2, 10, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
+    fun twoCategories_fiveBars_positiveAndNegativeValues() {
+        val data = Data.generateData(2, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_twoBars_positiveAndNegativeValues() {
-        val data = Data.generateData(10, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
+    fun fiveCategories_twoBars_positiveAndNegativeValues() {
+        val data = Data.generateData(5, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }
     }
 
     @Test
-    fun tenCategories_tenBars_positiveAndNegativeValues() {
-        val data = Data.generateData(10, 10, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
+    fun fiveCategories_fiveBars_positiveAndNegativeValues() {
+        val data = Data.generateData(5, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
         checkComposable(composeRule) {
             BarChart(data = data)
         }

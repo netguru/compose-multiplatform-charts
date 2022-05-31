@@ -44,5 +44,5 @@ android {
 }
 
 shot {
-    tolerance = 0.1 // 0,1% tolerance, needed for testing on different devices
+    tolerance = 2.0 // 2% tolerance, needed for testing on different devices
 }
