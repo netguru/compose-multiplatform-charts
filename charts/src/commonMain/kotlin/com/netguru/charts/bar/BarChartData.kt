@@ -29,7 +29,7 @@ data class BarChartData(
         get() = if (categories.isEmpty()) {
             1f
         } else {
-            categories.maxOf { it.maxY }
+            categories.maxOf { it.maxY }.coerceAtLeast(0f)
         }
 
     override val legendData: List<LegendItemData>
