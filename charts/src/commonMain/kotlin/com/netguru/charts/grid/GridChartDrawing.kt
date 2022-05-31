@@ -56,7 +56,7 @@ private fun measureHorizontalLines(
     startPosition: Float,
     endPosition: Float
 ): List<LineParameters> {
-    val verticalLines = mutableListOf<LineParameters>()
+    val horizontalLines = mutableListOf<LineParameters>()
 
     val valueStep = axisScale.tick
     var currentValue = axisScale.min
@@ -68,7 +68,7 @@ private fun measureHorizontalLines(
             startPosition,
             endPosition
         )
-        verticalLines.add(
+        horizontalLines.add(
             LineParameters(
                 position = currentPosition,
                 value = currentValue
@@ -76,7 +76,7 @@ private fun measureHorizontalLines(
         )
         currentValue += valueStep
     }
-    return verticalLines
+    return horizontalLines
 }
 
 private fun measureVerticalLines(
