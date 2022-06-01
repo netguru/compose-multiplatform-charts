@@ -16,12 +16,47 @@ class BarTest : ScreenshotTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    private fun testBasicChart(nOfCategories: Int, nOfEntries: Int, valueTypes: Data.ValueTypes) {
+        val data = Data.generateData(nOfCategories, nOfEntries, valueTypes)
+        checkComposable(composeRule) {
+            BarChart(data = data)
+        }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun testCustomChart(nOfCategories: Int, nOfEntries: Int, valueTypes: Data.ValueTypes) {
+        val data = Data.generateData(nOfCategories, nOfEntries, valueTypes)
+        checkComposable(composeRule) {
+            BarChart(
+                data = data,
+                chartColors = ChartDefaults.chartColors(grid = Color.Red),
+                xAxisLabel = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = it.toString())
+                        Text(text = "testing")
+                    }
+                },
+                yAxisLabel = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = it.toString())
+                        Text(text = "units")
+                    }
+                },
+                maxHorizontalLinesCount = 2,
+            )
+        }
+    }
+
     /********************************
      * zero values
      ********************************/
 
 //    @Test
-//    fun oneCategory_oneBar_zeroValues() { todo! this fails rn - BN-3899
+//    fun oneCategory_oneBar_zeroValues() { TODO BN-3899
 //        val data = Data.generateData(1, 1, Data.ValueTypes.ZERO)
 //        checkComposable(composeRule) {
 //            BarChart(data = data)
@@ -34,102 +69,32 @@ class BarTest : ScreenshotTest {
 
     @Test
     fun oneCategory_oneBar_positiveValues() {
-        val data = Data.generateData(1, 1, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(1, 1, Data.ValueTypes.POSITIVE)
     }
 
     @Test
     fun oneCategory_twoBars_positiveValues() {
-        val data = Data.generateData(1, 2, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(1, 2, Data.ValueTypes.POSITIVE)
     }
 
     @Test
     fun oneCategory_fiveBars_positiveValues() {
-        val data = Data.generateData(1, 5, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun twoCategories_oneBar_positiveValues() {
-        val data = Data.generateData(2, 1, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(1, 5, Data.ValueTypes.POSITIVE)
     }
 
     @Test
     fun twoCategories_twoBars_positiveValues() {
-        val data = Data.generateData(2, 2, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(2, 2, Data.ValueTypes.POSITIVE)
     }
 
     @Test
-    fun twoCategories_fiveBars_positiveValues() {
-        val data = Data.generateData(2, 5, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_oneBar_positiveValues() {
-        val data = Data.generateData(5, 1, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_twoBars_positiveValues() {
-        val data = Data.generateData(5, 2, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_fiveBars_positiveValues() {
-        val data = Data.generateData(5, 5, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+    fun threeCategories_oneBar_positiveValues() {
+        testBasicChart(3, 1, Data.ValueTypes.POSITIVE)
     }
 
     @Test
     fun oneCategory_oneBar_positiveValues_customUI() {
-        val data = Data.generateData(1, 1, Data.ValueTypes.POSITIVE)
-        checkComposable(composeRule) {
-            BarChart(
-                data = data,
-                chartColors = ChartDefaults.chartColors(grid = Color.Red),
-                xAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "testing")
-                    }
-                },
-                yAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "units")
-                    }
-                },
-                maxHorizontalLinesCount = 2,
-            )
-        }
+        testCustomChart(1, 1, Data.ValueTypes.POSITIVE)
     }
 
     /********************************
@@ -138,102 +103,22 @@ class BarTest : ScreenshotTest {
 
     @Test
     fun oneCategory_oneBar_negativeValues() {
-        val data = Data.generateData(1, 1, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(1, 1, Data.ValueTypes.NEGATIVE)
     }
 
     @Test
     fun oneCategory_twoBars_negativeValues() {
-        val data = Data.generateData(1, 2, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun oneCategory_fiveBars_negativeValues() {
-        val data = Data.generateData(1, 5, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun twoCategories_oneBar_negativeValues() {
-        val data = Data.generateData(2, 1, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(1, 2, Data.ValueTypes.NEGATIVE)
     }
 
     @Test
     fun twoCategories_twoBars_negativeValues() {
-        val data = Data.generateData(2, 2, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun twoCategories_fiveBars_negativeValues() {
-        val data = Data.generateData(2, 5, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_oneBar_negativeValues() {
-        val data = Data.generateData(5, 1, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_twoBars_negativeValues() {
-        val data = Data.generateData(5, 2, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_fiveBars_negativeValues() {
-        val data = Data.generateData(5, 5, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(2, 2, Data.ValueTypes.NEGATIVE)
     }
 
     @Test
     fun oneCategory_oneBar_negativeValues_customUI() {
-        val data = Data.generateData(1, 1, Data.ValueTypes.NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(
-                data = data,
-                chartColors = ChartDefaults.chartColors(grid = Color.Red),
-                xAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "testing")
-                    }
-                },
-                yAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "units")
-                    }
-                },
-                maxHorizontalLinesCount = 2,
-            )
-        }
+        testCustomChart(1, 1, Data.ValueTypes.NEGATIVE)
     }
 
     /********************************
@@ -241,78 +126,12 @@ class BarTest : ScreenshotTest {
      ********************************/
 
     @Test
-    fun oneCategory_twoBars_positiveAndNegativeValues() {
-        val data = Data.generateData(1, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun oneCategory_fiveBars_positiveAndNegativeValues() {
-        val data = Data.generateData(1, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
     fun twoCategories_twoBars_positiveAndNegativeValues() {
-        val data = Data.generateData(2, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun twoCategories_fiveBars_positiveAndNegativeValues() {
-        val data = Data.generateData(2, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_twoBars_positiveAndNegativeValues() {
-        val data = Data.generateData(5, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
-    }
-
-    @Test
-    fun fiveCategories_fiveBars_positiveAndNegativeValues() {
-        val data = Data.generateData(5, 5, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(data = data)
-        }
+        testBasicChart(2, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
     }
 
     @Test
     fun oneCategory_twoBars_positiveAndNegativeValues_customUI() {
-        val data = Data.generateData(1, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
-        checkComposable(composeRule) {
-            BarChart(
-                data = data,
-                chartColors = ChartDefaults.chartColors(grid = Color.Red),
-                xAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "testing")
-                    }
-                },
-                yAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "units")
-                    }
-                },
-                maxHorizontalLinesCount = 2,
-            )
-        }
+        testCustomChart(1, 2, Data.ValueTypes.POSITIVE_AND_NEGATIVE)
     }
 }
