@@ -20,61 +20,61 @@ class LineTest : ScreenshotTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    @Test
-    fun mixedValues_defaultUI() {
-        checkComposable(composeRule) {
-            LineChart(
-                lineChartData = Data.generateLineData(3)
-            )
-        }
-    }
-
-    @Test
-    fun mixedValues_customUI() {
-        val data = Data.generateLineData(3)
-        checkComposable(composeRule) {
-            LineChart(
-                lineChartData = data
-                    .copy(
-                        series = data.series.map {
-                            it.copy(
-                                lineWidth = 12.dp,
-                                fillColor = Color.Yellow,
-                                lineColor = Color.Blue,
-                                dashedLine = true,
-                            )
-                        }
-                    ),
-                chartColors = ChartDefaults.chartColors(
-                    grid = Color.Magenta,
-                    surface = Color.Cyan,
-                    overlayLine = Color.Gray,
-                ),
-                xAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            fontSize = 12.sp,
-                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "midday"
-                        )
-                    }
-                },
-                yAxisLabel = {
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(text = it.toString())
-                        Text(text = "units")
-                    }
-                },
-                maxVerticalLines = 2,
-                maxHorizontalLines = 2,
-            )
-        }
-    }
+//    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
+//    fun mixedValues_defaultUI() {
+//        checkComposable(composeRule) {
+//            LineChart(
+//                lineChartData = Data.generateLineData(3)
+//            )
+//        }
+//    }
+//
+//    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
+//    fun mixedValues_customUI() {
+//        val data = Data.generateLineData(3)
+//        checkComposable(composeRule) {
+//            LineChart(
+//                lineChartData = data
+//                    .copy(
+//                        series = data.series.map {
+//                            it.copy(
+//                                lineWidth = 12.dp,
+//                                fillColor = Color.Yellow,
+//                                lineColor = Color.Blue,
+//                                dashedLine = true,
+//                            )
+//                        }
+//                    ),
+//                chartColors = ChartDefaults.chartColors(
+//                    grid = Color.Magenta,
+//                    surface = Color.Cyan,
+//                    overlayLine = Color.Gray,
+//                ),
+//                xAxisLabel = {
+//                    Column(
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                    ) {
+//                        Text(
+//                            fontSize = 12.sp,
+//                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+//                            textAlign = TextAlign.Center
+//                        )
+//                        Text(
+//                            text = "midday"
+//                        )
+//                    }
+//                },
+//                yAxisLabel = {
+//                    Column(
+//                        horizontalAlignment = Alignment.End
+//                    ) {
+//                        Text(text = it.toString())
+//                        Text(text = "units")
+//                    }
+//                },
+//                maxVerticalLines = 2,
+//                maxHorizontalLines = 2,
+//            )
+//        }
+//    }
 }
