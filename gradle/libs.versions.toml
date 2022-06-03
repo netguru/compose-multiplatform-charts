@@ -18,7 +18,7 @@ desktop-packageName = "jvm"
 
 # Dependencies
 kotlin-gradle-plugin = "1.6.10"
-gradle = "7.0.4"
+android-gradle-plugin = "7.2.1"
 compose = "1.1.1"
 activity-compose = "1.4.0"
 coroutines = "1.6.0"
@@ -44,7 +44,7 @@ project-name = "Compose Multiplatform Charts"
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-gradle-plugin" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
-plugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+plugin-android = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 plugin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet"}
 plugin-shot = { module = "com.karumi:shot", version.ref = "shot" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
