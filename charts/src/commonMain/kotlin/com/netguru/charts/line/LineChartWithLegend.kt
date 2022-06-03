@@ -11,7 +11,7 @@ import com.netguru.charts.theme.ChartDefaults
 @Composable
 fun LineChartWithLegend(
     lineChartData: LineChartData,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     animation: ChartAnimation = ChartAnimation.Simple(),
