@@ -1,6 +1,5 @@
 package com.netguru.charts.grid.axisscale
 
-import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -14,8 +13,8 @@ class YAxisScale(min: Float, max: Float, maxTickCount: Int) {
         val range = niceNum(max - min, false)
         this.tick = niceNum(range / (maxTickCount), true)
 
-        this.min = floor(min / tick) * tick
-        this.max = ceil(max / tick) * tick
+        this.min = if (!min.isNaN()) min else 0f
+        this.max = if (!max.isNaN()) max else 0f
     }
 
     /**
