@@ -24,6 +24,20 @@ import com.netguru.charts.mapValueToDifferentRange
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
+/**
+ * Chart in the shape of a gas cylinder. Only shows percentage from 0 to 100 and without any labels.
+ *
+ * The actual numeric value is never shown. It only colors the cylinder based on the value. Color of
+ * the colored part is interpolated between [ChartColors.fullGasBottle] and
+ * [ChartColors.emptyGasBottle] based on the 'fullness' of the cylinder.
+ *
+ * @param percentage Value to portray
+ * @param animation Animation to use. [ChartAnimation.Sequenced] throws an
+ * [kotlin.UnsupportedOperationException], since there is only one value to display.
+ * @param chartColors Colors used are [ChartColors.fullGasBottle] and [ChartColors.emptyGasBottle]
+ *
+ * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ */
 @Composable
 fun GasBottle(
     percentage: Float,

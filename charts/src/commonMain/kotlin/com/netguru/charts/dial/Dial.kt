@@ -33,6 +33,27 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Draws a half-circle and colors the part of it differently to represent the value.
+ *
+ * The [minValue] and [maxValue] value of the chart are arbitrary. In case of [value] being below
+ * [minValue] or above [maxValue], the drawing will be coerced to the min or max value (will not go
+ * beyond the half-circle), but the [value] will still be provided to the [mainLabel] to be
+ * displayed.
+ *
+ * @param value Value to portray.
+ * @param minValue Min value of the chart (will also be provided to [minAndMaxValueLabel])
+ * @param maxValue Max value of the chart (will also be provided to [minAndMaxValueLabel])
+ * @param animation Animation to use. [ChartAnimation.Sequenced] throws an
+ * [kotlin.UnsupportedOperationException], since there is only one value to display.
+ * @param chartColors Colors to use for the chart. [ChartColors.primary] is used for the value part
+ * of the chart, and [ChartColors.grid] is used for the rest of the chart and its grid scale.
+ * @param minAndMaxValueLabel Composable to represent the [minValue] and [maxValue] on the bottom
+ * left and right of the chart.
+ * @param mainLabel Composable to show in the centre of the chart, showing the [value].
+ *
+ * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ */
 @Composable
 fun Dial(
     value: Int,

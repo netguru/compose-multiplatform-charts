@@ -24,6 +24,18 @@ import kotlin.math.min
 
 data class PieChartData(val name: String, val value: Double, val color: Color)
 
+/**
+ * Donut shaped 2D pie chart, portraying the values based on the ratios between them.
+ *
+ * This chart uses no labels to describe the data. In case labels are needed, use
+ * [PieChartWithLegend]
+ *
+ * @param data Data to show
+ * @param animation Animation to use. [ChartAnimation.Sequenced] is currently not supported and will
+ * throw an [kotlin.UnsupportedOperationException] if used.
+ *
+ * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ */
 @Composable
 fun PieChart(
     data: List<PieChartData>,

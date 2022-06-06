@@ -9,6 +9,14 @@ import com.netguru.charts.line.ChartLegend
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
+/**
+ * This bar chart shows data organised in categories together with a legend.
+ *
+ * @param legendItemLabel Composable to show for each item in the legend. Square representing the
+ * color of the item, drawn to the left of it, is not customizable.
+ *
+ * @see BarChart
+ */
 @Composable
 fun BarChartWithLegend(
     data: BarChartData,

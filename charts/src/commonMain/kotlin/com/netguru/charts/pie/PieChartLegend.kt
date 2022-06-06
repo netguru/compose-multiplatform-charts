@@ -25,6 +25,14 @@ import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
 import kotlin.random.Random
 
+/**
+ * Version of [PieChart] with legend.
+ *
+ * @param columns Number of columns in the legend
+ * @param legendItemLabel Composable to use to represent the item in the legend
+ *
+ * @see PieChart
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PieChartLegend(

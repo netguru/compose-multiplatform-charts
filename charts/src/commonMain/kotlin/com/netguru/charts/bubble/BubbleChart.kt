@@ -25,6 +25,16 @@ import com.netguru.charts.mapValueToDifferentRange
 import kotlin.math.min
 import kotlin.random.Random
 
+/**
+ * Represents the data in a form of bubbles that can overlap and are sized based on data value
+ * ratios. The position of bubbles is not stable and will likely change every time it is loaded!
+ *
+ * @param bubbles Data to represent
+ * @param animation Animation to use for displaying the data
+ * @param distanceBetweenCircles Distance between circles in pixels. If negative, bubbles will
+ * overlap.
+ * @param bubbleLabel Composable to show in the middle of the bubble.
+ */
 @Composable
 fun BubbleChart(
     bubbles: List<Bubble>,

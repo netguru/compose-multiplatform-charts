@@ -8,6 +8,16 @@ import com.netguru.charts.grid.GridDefaults
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
+/**
+ * Classic line chart with legend below the chart.
+ *
+ * For more information, check [LineChart].
+ *
+ * @param legendItemLabel Composable to use to represent the value in the legend. Only text value
+ * is customizable.
+ *
+ * @see LineChart
+ */
 @Composable
 fun LineChartWithLegend(
     lineChartData: LineChartData,
