@@ -6,6 +6,13 @@ import com.netguru.charts.ChartAnimation
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
+/**
+ * Variant of [Dial] with min value set to 0 and max value set to 100.
+ *
+ * @param percentage Value to show
+ *
+ * @see Dial
+ */
 @Composable
 fun PercentageDial(
     percentage: Int,

@@ -42,6 +42,27 @@ import com.netguru.charts.theme.ChartDefaults
 
 val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
 
+/**
+ * Classic line chart with some shade below the line in the same color (albeit with a lot of
+ * transparency) as the line and floating balloon on touch/click to show values for that particular
+ * x-axis value.
+ *
+ * Color, shape and whether the line is dashed for each of the lines is specified in the
+ * [LegendItemData] class. Even though that this class is used, this particular composable does not
+ * show the legend. For this, [LineChartWithLegend] must be used.
+ *
+ * @param lineChartData Data to portray
+ * @param chartColors Colors used are [ChartColors.grid], [ChartColors.surface] and
+ * [ChartColors.overlayLine].
+ * @param xAxisLabel Composable to mark the values on the x-axis.
+ * @param yAxisLabel Composable to mark the values on the y-axis.
+ * @param overlayHeaderLabel Composable to show the current x-axis value on the overlay balloon
+ * @param overlayDataEntryLabel Composable to show the value of each line in the overlay balloon
+ * for that specific x-axis value
+ * @param animation Animation to use
+ * @param maxVerticalLines Max number of lines, representing the x-axis values
+ * @param maxHorizontalLines Max number of lines, representing the y-axis values
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LineChart(

@@ -61,8 +61,10 @@ time-klock = { module = "com.soywiz.korlibs.klock:klock", version.ref = "klock" 
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-agentJvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockk" }
+dokka = { module = "org.jetbrains.dokka:kotlin-as-java-plugin", version = "kotlin-gradle-plugin" }
 
 [plugins]
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-gradle-plugin"}
+dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin-gradle-plugin" }

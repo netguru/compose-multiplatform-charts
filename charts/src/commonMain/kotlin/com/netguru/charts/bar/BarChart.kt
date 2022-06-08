@@ -29,6 +29,19 @@ import com.netguru.charts.grid.measureChartGrid
 import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.ChartDefaults
 
+/**
+ * This bar chart shows data organised in categories.
+ *
+ * @param data Data to show in the chart
+ * @param chartColors The only parameter used is [ChartColors.grid]. Others play no role in
+ * BarChart. Colors of the bars themselves are specified together with the data
+ * @param xAxisLabel Composable to mark the values on the x-axis.
+ * @param yAxisLabel Composable to mark the values on the y-axis.
+ * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
+ * category will animate together
+ * @param maxHorizontalLinesCount Max number of lines that are allowed to draw for marking y-axis
+ * values
+ */
 @Composable
 fun BarChart(
     data: BarChartData,
