@@ -3,13 +3,12 @@ package com.netguru.application.screen
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
@@ -25,7 +24,7 @@ fun DialChartScreen() {
         PercentageDial(
             percentage = 69,
             modifier = Modifier
-                .size(300.dp),
+                .fillMaxWidth(),
             animation = ChartAnimation.Simple {
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -46,7 +45,7 @@ fun DialChartScreen() {
 
         Dial(
             modifier = Modifier
-                .size(300.dp),
+                .fillMaxWidth(),
             value = 17,
             minValue = -20,
             maxValue = 50,

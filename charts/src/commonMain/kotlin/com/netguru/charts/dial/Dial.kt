@@ -4,9 +4,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -87,42 +87,40 @@ fun Dial(
         val progressBarColor = chartColors.primary
         val progressBarBackgroundColor = chartColors.grid
         val gridScaleColor = chartColors.grid
-        BoxWithConstraints(
-            Modifier
-                .aspectRatio(1f)
-                .fillMaxSize()
-                .align(Alignment.Center)
-                .drawBehind {
-                    drawProgressBar(
-                        value = targetProgress,
-                        minValue = minValue.toFloat(),
-                        maxValue = maxValue.toFloat(),
-                        progressBarColor = progressBarColor,
-                        progressBarBackgroundColor = progressBarBackgroundColor,
-                    )
-
-                    drawScale(
-                        color = gridScaleColor,
-                        center = Offset(
-                            size.width / 2f,
-                            size.height / 2 + size.height / 4f
+        Column(modifier = Modifier.align(Alignment.Center)) {
+            BoxWithConstraints(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f)
+                    .drawBehind {
+                        drawProgressBar(
+                            value = targetProgress,
+                            minValue = minValue.toFloat(),
+                            maxValue = maxValue.toFloat(),
+                            progressBarColor = progressBarColor,
+                            progressBarBackgroundColor = progressBarBackgroundColor,
                         )
-                    )
-                }
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(top = maxHeight / 4)
-            ) {
-                mainLabel(value)
-            }
 
+                        drawScale(
+                            color = gridScaleColor,
+                            center = Offset(
+                                size.width / 2f,
+                                size.height
+                            )
+                        )
+                    }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(top = maxWidth / 4f)
+                ) {
+                    mainLabel(value)
+                }
+            }
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = maxHeight / 8),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 minAndMaxValueLabel(minValue)
@@ -149,8 +147,8 @@ private fun DrawScope.drawProgressBar(
             width = THICKNESS.toPx(),
             pathEffect = PathEffect.cornerPathEffect(20f)
         ),
-        topLeft = Offset(THICKNESS.toPx() / 2f, THICKNESS.toPx() / 2f + size.height / 4),
-        size = Size(size.width - THICKNESS.toPx(), size.height - THICKNESS.toPx())
+        topLeft = Offset(THICKNESS.toPx() / 2f, THICKNESS.toPx() / 2f),
+        size = Size(size.width - THICKNESS.toPx(), size.height * 2 - THICKNESS.toPx())
     )
 
     drawArc(
@@ -162,8 +160,8 @@ private fun DrawScope.drawProgressBar(
             width = THICKNESS.toPx(),
             pathEffect = PathEffect.cornerPathEffect(20f)
         ),
-        topLeft = Offset(THICKNESS.toPx() / 2f, THICKNESS.toPx() / 2f + size.height / 4),
-        size = Size(size.width - THICKNESS.toPx(), size.height - THICKNESS.toPx())
+        topLeft = Offset(THICKNESS.toPx() / 2f, THICKNESS.toPx() / 2f),
+        size = Size(size.width - THICKNESS.toPx(), size.height * 2 - THICKNESS.toPx())
     )
 }
 
