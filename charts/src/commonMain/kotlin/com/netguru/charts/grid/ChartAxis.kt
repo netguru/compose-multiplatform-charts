@@ -37,7 +37,7 @@ private fun Modifier.alignCenterToOffsetVertical(
     offsetToAlignWith: Float,
 ) = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints)
-    val placeableY = offsetToAlignWith - (placeable.height / 2f)
+    val placeableY = (offsetToAlignWith - (placeable.height / 2f)).coerceAtLeast(0f)
 
     layout(placeable.width, placeable.height) {
         placeable.placeRelative(0, placeableY.roundToInt())
