@@ -58,7 +58,13 @@ private fun measureHorizontalLines(
 ): List<LineParameters> {
     val horizontalLines = mutableListOf<LineParameters>()
 
-    if (axisScale.max == axisScale.min || axisScale.tick == 0f) return emptyList()
+    if (axisScale.max == axisScale.min || axisScale.tick == 0f)
+        return listOf(
+            LineParameters(
+                position = startPosition / 2f,
+                value = 0
+            )
+        )
 
     val valueStep = axisScale.tick
     var currentValue = axisScale.min
