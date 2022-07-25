@@ -21,11 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.ChartAnimation
+import com.netguru.charts.bar.BarChartConfig
 import com.netguru.charts.grid.GridDefaults
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -34,6 +36,7 @@ fun ChartLegend(
     legendData: List<LegendItemData>,
     modifier: Modifier = Modifier,
     animation: ChartAnimation = ChartAnimation.Simple(),
+    config: BarChartConfig = BarChartConfig(),
     legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
 ) {
     LazyVerticalGrid(
@@ -51,6 +54,7 @@ fun ChartLegend(
                 data = legendData[index],
                 index = index,
                 animation = animation,
+                config = config,
                 legendItemLabel = legendItemLabel,
             )
         }
@@ -62,6 +66,7 @@ private fun LegendItem(
     data: LegendItemData,
     index: Int,
     animation: ChartAnimation,
+    config: BarChartConfig,
     legendItemLabel: @Composable (String) -> Unit,
 ) {
     var animationPlayed by remember(animation) {
@@ -89,13 +94,24 @@ private fun LegendItem(
             modifier = Modifier
                 .size(data.selectSymbolSize())
                 .drawBehind {
-                    drawLine(
-                        strokeWidth = size.height,
-                        pathEffect = if (data.dashed) dashedPathEffect else null,
-                        color = data.color,
-                        start = Offset(0f, size.height / 2),
-                        end = Offset(size.width, size.height / 2)
-                    )
+                    when (data.symbolShape) {
+                        SymbolShape.LINE ->
+                            drawLine(
+                                strokeWidth = size.height,
+                                pathEffect = if (data.dashed) dashedPathEffect else null,
+                                color = data.color,
+                                start = Offset(0f, size.height / 2),
+                                end = Offset(size.width, size.height / 2)
+                            )
+                        SymbolShape.RECTANGLE ->
+                            drawRoundRect(
+                                color = data.color,
+                                cornerRadius = CornerRadius(
+                                    config.cornerRadius.toPx(),
+                                    config.cornerRadius.toPx(),
+                                )
+                            )
+                    }
                 }
         )
 

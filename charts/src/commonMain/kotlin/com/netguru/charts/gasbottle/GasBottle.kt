@@ -22,7 +22,7 @@ import com.netguru.charts.ChartAnimation
 import com.netguru.charts.StartAnimation
 import com.netguru.charts.mapValueToDifferentRange
 import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 /**
  * Chart in the shape of a gas cylinder. Only shows percentage from 0 to 100 and without any labels.
@@ -34,7 +34,7 @@ import com.netguru.charts.theme.ChartDefaults
  * @param percentage Value to portray
  * @param animation Animation to use. [ChartAnimation.Sequenced] throws an
  * [kotlin.UnsupportedOperationException], since there is only one value to display.
- * @param chartColors Colors used are [ChartColors.fullGasBottle] and [ChartColors.emptyGasBottle]
+ * @param colors Allows to specify full and empty bottle color
  *
  * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
  */
@@ -43,7 +43,7 @@ fun GasBottle(
     percentage: Float,
     modifier: Modifier = Modifier,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: GasBottleColors = ChartTheme.colors.gasBottleColors,
 ) {
     val animationPlayed = StartAnimation(animation, percentage)
     val targetProgress = when (animation) {
@@ -72,8 +72,8 @@ fun GasBottle(
                     drawGasProgressBar(
                         percentage = targetProgress,
                         gasTank = gasTank,
-                        fullColor = chartColors.fullGasBottle,
-                        emptyColor = chartColors.emptyGasBottle,
+                        fullColor = colors.fullGasBottle,
+                        emptyColor = colors.emptyGasBottle,
                     )
                 }
         )

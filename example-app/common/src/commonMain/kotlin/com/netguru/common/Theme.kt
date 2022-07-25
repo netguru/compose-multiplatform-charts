@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.LocalChartColors
 import com.netguru.common.locale.LocaleProvider
 
 val LocalAppShapes = staticCompositionLocalOf {
@@ -180,7 +181,8 @@ fun AppTheme(
         LocalResources provides ResourcesImpl(LocaleProvider.locale.collectAsState().value),
         LocalAppTypography provides appTypography(),
         LocalAppDimens provides appDimens,
-        LocalWindowSize provides windowSize
+        LocalWindowSize provides windowSize,
+        LocalChartColors provides ChartDefaults.chartColors(),
     ) {
         MaterialTheme(
             typography = appTypography(),
@@ -275,14 +277,4 @@ class AppDimens(
     val grid_6: Dp,
     val borders_thickness: Dp = 0.5.dp,
     val collapsable_icon_size: Dp = 24.dp,
-)
-
-@Composable
-fun AppChartColors() = ChartDefaults.chartColors(
-    primary = AppTheme.colors.primary,
-    surface = AppTheme.colors.background,
-    grid = AppTheme.colors.borders,
-    emptyGasBottle = AppTheme.colors.emptyGasBottle,
-    fullGasBottle = AppTheme.colors.fullGasBottle,
-    overlayLine = AppTheme.colors.danger,
 )

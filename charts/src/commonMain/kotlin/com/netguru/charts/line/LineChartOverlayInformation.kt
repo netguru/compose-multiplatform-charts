@@ -25,7 +25,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.netguru.charts.mapValueToDifferentRange
-import com.netguru.charts.theme.ChartColors
 
 private val TOUCH_OFFSET = 20.dp
 private val OVERLAY_WIDTH = 200.dp
@@ -35,7 +34,7 @@ internal fun OverlayInformation(
     lineChartData: LineChartData,
     positionX: Float,
     containerSize: Size,
-    chartColors: ChartColors,
+    colors: LineChartColors,
     overlayHeaderLayout: @Composable (value: Long) -> Unit,
     overlayDataEntryLayout: @Composable (dataName: String, value: Float) -> Unit,
 ) {
@@ -58,7 +57,7 @@ internal fun OverlayInformation(
             .width(OVERLAY_WIDTH)
             .alpha(0.9f)
             .clip(RoundedCornerShape(10.dp))
-            .background(chartColors.surface)
+            .background(colors.surface)
             .padding(8.dp)
     ) {
 
@@ -111,7 +110,7 @@ internal fun OverlayInformation(
             )
             .width(1.dp)
             .fillMaxHeight()
-            .background(chartColors.overlayLine)
+            .background(colors.overlayLine)
     )
 }
 

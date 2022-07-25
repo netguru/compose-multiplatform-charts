@@ -52,10 +52,10 @@ class DialTest : ScreenshotTest {
                 value = 69,
                 minValue = 0,
                 maxValue = 100,
-                chartColors = ChartDefaults.chartColors(
+                colors = ChartDefaults.chartColors(
                     primary = Color.Blue,
                     grid = Color.Magenta,
-                ),
+                ).dialColors,
                 minAndMaxValueLabel = {
                     Text(
                         text = it.toString(),

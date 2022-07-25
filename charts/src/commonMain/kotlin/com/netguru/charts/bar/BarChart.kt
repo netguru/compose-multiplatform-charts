@@ -27,14 +27,15 @@ import com.netguru.charts.grid.axisscale.YAxisScale
 import com.netguru.charts.grid.drawChartGrid
 import com.netguru.charts.grid.measureChartGrid
 import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 /**
  * This bar chart shows data organised in categories.
  *
  * @param data Data to show in the chart
- * @param chartColors The only parameter used is [ChartColors.grid]. Others play no role in
+ * @param colors The only parameter used is [ChartColors.grid]. Others play no role in
  * BarChart. Colors of the bars themselves are specified together with the data
+ * @param config The parameters for chart appearance customization
  * @param xAxisLabel Composable to mark the values on the x-axis.
  * @param yAxisLabel Composable to mark the values on the y-axis.
  * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
@@ -46,7 +47,8 @@ import com.netguru.charts.theme.ChartDefaults
 fun BarChart(
     data: BarChartData,
     modifier: Modifier = Modifier,
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: BarChartColors = ChartTheme.colors.barChartColors,
+    config: BarChartConfig = BarChartConfig(),
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     animation: ChartAnimation = ChartAnimation.Simple(),
@@ -86,7 +88,7 @@ fun BarChart(
         Spacer(modifier = Modifier.size(width = 4.dp, height = 0.dp))
 
         Column(modifier = Modifier.fillMaxSize()) {
-            val gridColor = chartColors.grid
+            val gridColor = colors.grid
             Canvas(
                 modifier = Modifier
                     .weight(1f)
@@ -111,6 +113,7 @@ fun BarChart(
                 drawChartGrid(grid, gridColor)
                 drawBarChart(
                     data = data,
+                    config = config,
                     yAxisUpperValue = grid.horizontalLines.last().value.toFloat(),
                     yAxisLowerValue = grid.horizontalLines.first().value.toFloat(),
                     verticalPadding = horizontalLinesOffset.toPx(),

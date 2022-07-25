@@ -50,10 +50,10 @@ class PercentageDialTest : ScreenshotTest {
         checkComposable(composeRule) {
             PercentageDial(
                 percentage = 69,
-                chartColors = ChartDefaults.chartColors(
+                colors = ChartDefaults.chartColors(
                     primary = Color.Blue,
                     grid = Color.Magenta,
-                ),
+                ).dialColors,
                 minAndMaxValueLabel = {
                     Text(
                         text = it.toString(),

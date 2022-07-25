@@ -2,6 +2,7 @@ package com.netguru.charts.pie
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
 import com.karumi.shot.ScreenshotTest
 import com.netguru.charts.Util.checkComposable
 import org.junit.Rule
@@ -19,6 +20,9 @@ class PieTest : ScreenshotTest {
                 data = listOf(
                     PieChartData("first", 22.0, Color.Blue),
                     PieChartData("second", 22.0, Color.Yellow)
+                ),
+                config = PieChartConfig(
+                    thickness = 80.dp
                 )
             )
         }
@@ -32,6 +36,9 @@ class PieTest : ScreenshotTest {
                     PieChartData("first", 22.0, Color.Blue),
                     PieChartData("second", 22.0, Color.Yellow),
                     PieChartData("third", 22.0, Color.Green)
+                ),
+                config = PieChartConfig(
+                    thickness = 80.dp
                 )
             )
         }
@@ -44,6 +51,9 @@ class PieTest : ScreenshotTest {
                 data = listOf(
                     PieChartData("first", 22.0, Color.Blue),
                     PieChartData("second", 0.0, Color.Yellow)
+                ),
+                config = PieChartConfig(
+                    thickness = 80.dp
                 )
             )
         }

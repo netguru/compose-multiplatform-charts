@@ -6,8 +6,7 @@ import androidx.compose.ui.Modifier
 import com.netguru.charts.ChartAnimation
 import com.netguru.charts.grid.GridDefaults
 import com.netguru.charts.line.ChartLegend
-import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 /**
  * This bar chart shows data organised in categories together with a legend.
@@ -23,7 +22,8 @@ fun BarChartWithLegend(
     modifier: Modifier = Modifier,
     maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: BarChartColors = ChartTheme.colors.barChartColors,
+    config: BarChartConfig = BarChartConfig(),
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
@@ -34,13 +34,15 @@ fun BarChartWithLegend(
             data = data,
             maxHorizontalLinesCount = maxHorizontalLinesCount,
             animation = animation,
-            chartColors = chartColors,
+            colors = colors,
+            config = config,
             xAxisLabel = xAxisLabel,
             yAxisLabel = yAxisLabel,
         )
         ChartLegend(
             legendData = data.legendData,
             animation = animation,
+            config = config,
             legendItemLabel = legendItemLabel,
         )
     }
