@@ -5,6 +5,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
 import com.karumi.shot.ScreenshotTest
 import com.netguru.charts.Util.checkComposable
 import com.netguru.charts.theme.ChartDefaults
@@ -19,7 +20,14 @@ class BarTest : ScreenshotTest {
     private fun testBasicChart(nOfCategories: Int, nOfEntries: Int, valueTypes: Data.ValueTypes) {
         val data = Data.generateData(nOfCategories, nOfEntries, valueTypes)
         checkComposable(composeRule) {
-            BarChart(data = data)
+            BarChart(
+                data = data,
+                config = BarChartConfig(
+                    thickness = 8.dp,
+                    cornerRadius = 0.dp,
+                    barsSpacing = 1.dp
+                )
+            )
         }
     }
 
@@ -29,7 +37,12 @@ class BarTest : ScreenshotTest {
         checkComposable(composeRule) {
             BarChart(
                 data = data,
-                chartColors = ChartDefaults.chartColors(grid = Color.Red),
+                config = BarChartConfig(
+                    thickness = 8.dp,
+                    cornerRadius = 0.dp,
+                    barsSpacing = 1.dp
+                ),
+                colors = ChartDefaults.chartColors(grid = Color.Red).barChartColors,
                 xAxisLabel = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

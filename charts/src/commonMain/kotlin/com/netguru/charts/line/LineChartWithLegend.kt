@@ -5,8 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.netguru.charts.ChartAnimation
 import com.netguru.charts.grid.GridDefaults
-import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 /**
  * Classic line chart with legend below the chart.
@@ -25,7 +24,7 @@ fun LineChartWithLegend(
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: LineChartColors = ChartTheme.colors.lineChartColors,
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     overlayHeaderLabel: @Composable (value: Any) -> Unit = GridDefaults.OverlayHeaderLabel,
@@ -39,7 +38,7 @@ fun LineChartWithLegend(
             maxVerticalLines = maxVerticalLines,
             maxHorizontalLines = maxHorizontalLines,
             animation = animation,
-            chartColors = chartColors,
+            colors = colors,
             xAxisLabel = xAxisLabel,
             yAxisLabel = yAxisLabel,
             overlayHeaderLabel = overlayHeaderLabel,

@@ -11,9 +11,11 @@ import androidx.compose.ui.unit.sp
 internal object DialDefaults {
 
     val THICKNESS = 15.dp
-    const val GAP_DEGREE = 2
-    const val START_ANGLE = -180f
+    val SCALE_PADDING = 24.dp
     val SCALE_STROKE_WIDTH = 2.dp
+    val SCALE_STROKE_LENGTH = 16.dp
+    const val START_ANGLE = -180f
+    val JOIN_STYLE = DialJoinStyle.WithDegreeGap(2f)
 
     val MainLabel: @Composable (value: Any) -> Unit = {
         Text(text = it.toString(), fontSize = 24.sp)

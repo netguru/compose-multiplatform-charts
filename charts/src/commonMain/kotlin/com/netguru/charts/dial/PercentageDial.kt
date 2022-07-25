@@ -3,8 +3,7 @@ package com.netguru.charts.dial
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.netguru.charts.ChartAnimation
-import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 /**
  * Variant of [Dial] with min value set to 0 and max value set to 100.
@@ -18,7 +17,8 @@ fun PercentageDial(
     percentage: Int,
     modifier: Modifier = Modifier,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: DialColors = ChartTheme.colors.dialColors,
+    config: DialConfig = DialConfig(),
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
 ) {
@@ -28,7 +28,8 @@ fun PercentageDial(
         maxValue = 100,
         modifier = modifier,
         animation = animation,
-        chartColors = chartColors,
+        colors = colors,
+        config = config,
         minAndMaxValueLabel = minAndMaxValueLabel,
         mainLabel = mainLabel,
     )

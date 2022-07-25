@@ -9,10 +9,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
 import com.netguru.charts.dial.Dial
+import com.netguru.charts.dial.DialConfig
 import com.netguru.charts.dial.PercentageDial
 
 @Composable
@@ -31,6 +33,9 @@ fun DialChartScreen() {
                     stiffness = Spring.StiffnessLow
                 )
             },
+            config = DialConfig(
+                roundCorners = true,
+            ),
             mainLabel = {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -55,6 +60,9 @@ fun DialChartScreen() {
                     stiffness = Spring.StiffnessLow
                 )
             },
+            config = DialConfig(
+                thickness = 40.dp,
+            ),
             mainLabel = {
                 Text(text = "$it°C")
             }

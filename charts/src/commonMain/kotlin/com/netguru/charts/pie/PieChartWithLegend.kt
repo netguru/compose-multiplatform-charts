@@ -1,35 +1,73 @@
 package com.netguru.charts.pie
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.netguru.charts.ChartAnimation
 
+/**
+ * Version of [PieChart] with legend.
+ *
+ * @param legendItemLabel Composable to use to represent the item in the legend
+ *
+ * @see PieChart
+ */
 @Composable
 fun PieChartWithLegend(
     pieChartData: List<PieChartData>,
     modifier: Modifier = Modifier,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    columns: Int = PieDefaults.NUMBER_OF_COLS_IN_LEGEND,
+    config: PieChartConfig = PieChartConfig(),
     legendItemLabel: @Composable (PieChartData) -> Unit = PieDefaults.LegendItemLabel,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-    ) {
-        PieChart(
-            data = pieChartData,
-            modifier = Modifier.weight(1f),
-            animation = animation,
-        )
-        PieChartLegend(
-            data = pieChartData,
-            columns = columns,
-            animation = animation,
-            legendItemLabel = legendItemLabel,
-            modifier = Modifier.fillMaxWidth(),
-        )
+    when (config.legendOrientation) {
+        LegendOrientation.HORIZONTAL ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(config.legendPadding),
+                modifier = modifier,
+            ) {
+                PieChart(
+                    data = pieChartData,
+                    modifier = Modifier.weight(1f),
+                    animation = animation,
+                    config = config,
+                )
+                PieChartLegend(
+                    data = pieChartData,
+                    animation = animation,
+                    legendItemLabel = legendItemLabel,
+                    config = config,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        LegendOrientation.VERTICAL ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(config.legendPadding),
+                modifier = modifier,
+            ) {
+                PieChart(
+                    data = pieChartData,
+                    modifier = Modifier.fillMaxHeight().background(Color.Red.copy(alpha = 0.5f)),
+                    animation = animation,
+                    config = config,
+                )
+                PieChartLegend(
+                    data = pieChartData,
+                    animation = animation,
+                    legendItemLabel = legendItemLabel,
+                    config = config,
+                    modifier = Modifier.wrapContentWidth(),
+                )
+            }
     }
 }

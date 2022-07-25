@@ -6,10 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,27 +19,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipRect
 import com.netguru.charts.ChartAnimation
 import kotlin.random.Random
 
-/**
- * Version of [PieChart] with legend.
- *
- * @param columns Number of columns in the legend
- * @param legendItemLabel Composable to use to represent the item in the legend
- *
- * @see PieChart
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PieChartLegend(
+internal fun PieChartLegend(
     data: List<PieChartData>,
     modifier: Modifier = Modifier,
-    columns: Int = PieDefaults.NUMBER_OF_COLS_IN_LEGEND,
     animation: ChartAnimation = ChartAnimation.Simple(),
+    config: PieChartConfig = PieChartConfig(),
     legendItemLabel: @Composable (PieChartData) -> Unit = PieDefaults.LegendItemLabel,
 ) {
     var animationPlayed by remember(data) {
@@ -63,14 +58,20 @@ fun PieChartLegend(
             ).value
         }
     }
+    val columnsPerRow = when (config.legendOrientation) {
+        LegendOrientation.HORIZONTAL -> config.numberOfColsInLegend
+        LegendOrientation.VERTICAL -> 1
+    }
     LazyVerticalGrid(
         horizontalArrangement = Arrangement.SpaceAround,
-        cells = GridCells.Fixed(columns),
+        verticalArrangement = Arrangement.SpaceAround,
+        cells = GridCells.Fixed(columnsPerRow),
         content = {
             items(data.count()) { index ->
                 LegendItem(
                     pieChartData = data[index],
                     alpha = animatedAlpha[index],
+                    config = config,
                     legendItemLabel = legendItemLabel,
                 )
             }
@@ -83,20 +84,71 @@ fun PieChartLegend(
 private fun LegendItem(
     pieChartData: PieChartData,
     alpha: Float,
+    config: PieChartConfig,
     legendItemLabel: @Composable (PieChartData) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.alpha(alpha),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(pieChartData.color)
-        )
+    when (config.legendOrientation) {
+        LegendOrientation.HORIZONTAL ->
+            Column(
+                modifier = Modifier.alpha(alpha),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(config.legendIconSize)
+                        .drawBehind {
+                            drawLegendIcon(
+                                color = pieChartData.color,
+                                config = config,
+                            )
+                        }
+                )
+                legendItemLabel(pieChartData)
+            }
+        LegendOrientation.VERTICAL ->
+            Row(
+                modifier = Modifier.alpha(alpha),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(config.legendIconSize)
+                        .drawBehind {
+                            drawLegendIcon(
+                                color = pieChartData.color,
+                                config = config,
+                            )
+                        }
+                )
+                legendItemLabel(pieChartData)
+            }
+    }
+}
 
-        legendItemLabel(pieChartData)
+private fun DrawScope.drawLegendIcon(
+    color: Color,
+    config: PieChartConfig,
+) {
+    clipRect {
+        when (config.legendIcon) {
+            LegendIcon.SQUARE -> drawRect(
+                color = color,
+            )
+            LegendIcon.CIRCLE -> drawCircle(
+                color = color
+            )
+            LegendIcon.ROUND -> drawRoundRect(
+                color = color,
+                cornerRadius = CornerRadius(
+                    config.legendIconSize.toPx() / 4f
+                )
+            )
+            LegendIcon.CAKE -> drawCircle(
+                color = color,
+                center = Offset(x = 0f, y = size.height),
+                radius = size.height
+            )
+        }
     }
 }
 

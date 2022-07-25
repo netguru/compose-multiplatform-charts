@@ -38,7 +38,7 @@ import com.netguru.charts.grid.axisscale.YAxisScale
 import com.netguru.charts.grid.drawChartGrid
 import com.netguru.charts.grid.measureChartGrid
 import com.netguru.charts.theme.ChartColors
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartTheme
 
 val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
 
@@ -52,7 +52,7 @@ val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
  * show the legend. For this, [LineChartWithLegend] must be used.
  *
  * @param lineChartData Data to portray
- * @param chartColors Colors used are [ChartColors.grid], [ChartColors.surface] and
+ * @param colors Colors used are [ChartColors.grid], [ChartColors.surface] and
  * [ChartColors.overlayLine].
  * @param xAxisLabel Composable to mark the values on the x-axis.
  * @param yAxisLabel Composable to mark the values on the y-axis.
@@ -68,7 +68,7 @@ val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
 fun LineChart(
     lineChartData: LineChartData,
     modifier: Modifier = Modifier,
-    chartColors: ChartColors = ChartDefaults.chartColors(),
+    colors: LineChartColors = ChartTheme.colors.lineChartColors,
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     overlayHeaderLabel: @Composable (value: Any) -> Unit = GridDefaults.OverlayHeaderLabel,
@@ -131,7 +131,7 @@ fun LineChart(
                         )
                         verticalGridLines = lines.verticalLines
                         horizontalGridLines = lines.horizontalLines
-                        drawChartGrid(lines, chartColors.grid)
+                        drawChartGrid(lines, colors.grid)
 
                         drawLineChart(
                             lineChartData = lineChartData,
@@ -175,7 +175,7 @@ fun LineChart(
                             maxHeight.toPx()
                         )
                     },
-                    chartColors = chartColors,
+                    colors = colors,
                     overlayHeaderLayout = overlayHeaderLabel,
                     overlayDataEntryLayout = overlayDataEntryLabel,
                 )

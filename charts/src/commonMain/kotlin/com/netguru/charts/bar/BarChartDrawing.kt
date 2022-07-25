@@ -1,15 +1,14 @@
 package com.netguru.charts.bar
 
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import kotlin.math.abs
 
-const val BAR_MAX_WIDTH = 20f
-const val BAR_MAX_HORIZONTAL_SPACING = 10f
-
 internal fun DrawScope.drawBarChart(
     data: BarChartData,
+    config: BarChartConfig,
     yAxisUpperValue: Float,
     yAxisLowerValue: Float,
     verticalPadding: Float,
@@ -19,8 +18,12 @@ internal fun DrawScope.drawBarChart(
 
     val xAxisTickWidth = size.width / (data.categories.size * 2)
     val maxBarsCountInACluster = data.categories.maxOfOrNull { it.entries.size } ?: return
-    val barWidth = (xAxisTickWidth / maxBarsCountInACluster).coerceAtMost(BAR_MAX_WIDTH)
-    val barsHorizontalSpacing = BAR_MAX_HORIZONTAL_SPACING / maxBarsCountInACluster
+    val maximumThickness = config.thickness.toPx().coerceAtLeast(1f)
+    val barWidth = (xAxisTickWidth / maxBarsCountInACluster).coerceIn(1f, maximumThickness)
+    val gapsCount = maxBarsCountInACluster - 1
+    val freeSpaceInACluster = (xAxisTickWidth - (barWidth * maxBarsCountInACluster))
+    val maxHorizontalSpacing = if (gapsCount > 0) freeSpaceInACluster / gapsCount else 0f
+    val barsHorizontalSpacing = config.barsSpacing.toPx().coerceIn(0f, maxHorizontalSpacing)
 
     val gridHeight = canvasHeight - 2 * verticalPadding
     val yAxisZeroPosition = verticalPadding +
@@ -34,7 +37,7 @@ internal fun DrawScope.drawBarChart(
         category.entries.forEachIndexed { entryIndex, entry ->
             val clusterHeight = gridHeight * valueScale[entryIndex]
             val barHeight = abs(entry.y) / (yAxisUpperValue - yAxisLowerValue) * clusterHeight
-            drawRect(
+            drawRoundRect(
                 color = entry.color,
                 topLeft = Offset(
                     x = clusterXOffset + entryIndex * (barWidth + barsHorizontalSpacing),
@@ -48,6 +51,7 @@ internal fun DrawScope.drawBarChart(
                     width = barWidth,
                     height = barHeight
                 ),
+                cornerRadius = CornerRadius(config.cornerRadius.toPx(), config.cornerRadius.toPx())
             )
         }
     }

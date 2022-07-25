@@ -18,7 +18,6 @@ import com.netguru.charts.line.LineChartData
 import com.netguru.charts.line.LineChartPoint
 import com.netguru.charts.line.LineChartSeries
 import com.netguru.charts.line.LineChartWithLegend
-import com.netguru.common.AppChartColors
 import com.netguru.common.HorizontalDivider
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
@@ -52,7 +51,6 @@ fun LineChartScreen() {
         TitleText(text = "Line chart")
         LineChart(
             lineChartData = lineData,
-            chartColors = AppChartColors(),
             modifier = Modifier
                 .height(300.dp),
             xAxisLabel = {
@@ -79,7 +77,6 @@ fun LineChartScreen() {
                 .height(300.dp),
             lineChartData = lineData,
             maxVerticalLines = 5,
-            chartColors = AppChartColors(),
             xAxisLabel = {
                 Text(
                     fontSize = 12.sp,

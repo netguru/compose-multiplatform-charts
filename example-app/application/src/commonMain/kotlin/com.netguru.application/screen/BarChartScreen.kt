@@ -13,6 +13,7 @@ import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
 import com.netguru.charts.bar.BarChart
 import com.netguru.charts.bar.BarChartCategory
+import com.netguru.charts.bar.BarChartConfig
 import com.netguru.charts.bar.BarChartData
 import com.netguru.charts.bar.BarChartEntry
 import com.netguru.charts.bar.BarChartWithLegend
@@ -112,6 +113,9 @@ fun BarChartScreen() {
         TitleText(text = "Bar chart with legend")
         BarChartWithLegend(
             data = data,
+            config = BarChartConfig(
+                cornerRadius = 10.dp
+            ),
             modifier = Modifier
                 .height(300.dp),
             animation = ChartAnimation.Sequenced()
