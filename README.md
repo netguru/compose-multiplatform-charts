@@ -1,55 +1,324 @@
-# Library of charts for Kotlin Multiplatform projects
+<div align="center">
+    <img alt="Compose multiplatform charts" src="./assets/charts-logo.svg"/>
+    <h1>Charts for Kotlin Multiplatform projects</h1>
+</div>
 
+<div align="center">
 Library contains several chart composables for usage in Kotlin Multiplatform projects.   
-Currently supported platforms are **Desktop** and **Android**.
+Currently supported platforms are <strong>Desktop</strong> and <strong>Android</strong>.
+</div>
 
-## Documentation
-Dokka is added to the project, so to create (or, better say, update) the docs, you need to run
+<div align="center">
+  <br/><em>Brought with</em> &nbsp;❤️ <em>by</em> &nbsp; <a href="https://www.netguru.com"><img align="center" alt="Netguru logo" src='./assets/readme_netguru_logo.png' width='30'/></a>
+</div>
+
+# Installation
+TBA
+
+# Usage
+The library provides following components:
+ - [BarChart](#BarChart)
+ - [BubbleChart](#BubbleChart)
+ - [Dial](#Dial)
+ - [GasBottle](#GasBottle)
+ - [LineChart](#LineChart)
+ - [PieChart](#PieChart)
+
+Most of the components have arguments like:
+ - **data** - depends on chart type it's complex dataset or few primitives arguments
+ - **colors** - gives the possibility to change colors of the chart. In some cases the colors are stored in datasets (like in BarChart or LineChart). See [theming](#Theming) section to set same appearance to all charts.
+ - **config** - allows to personalize charts. Depends on chart type it can modify different parts of component. See documentation of specific chart
+ - **animation** - the way how chart should appear at the first time
+
+## BarChart
+![Bar chart](/assets/bar-chart.png)
+
+Before using component the BarChartData has to be prepared:
+```kotlin
+val barChartData = BarChartData(
+    categories = listOf(
+        BarChartCategory(
+            name = "Bar Chart 1",
+            entries = listOf(
+                BarChartEntry(
+                    x = "primary",
+                    y = 17f,
+                    color = Color.Yellow,
+                ),
+                BarChartEntry(
+                    x = "secondary",
+                    y = 30f,
+                    color = Color.Red,
+                ),
+            )
+        ),
+        BarChartCategory(
+            name = "Bar Chart 2",
+            entries = listOf(
+                BarChartEntry(
+                    x = "primary",
+                    y = -5f,
+                    color = Color.Yellow,
+                ),
+                BarChartEntry(
+                    x = "secondary",
+                    y = -24f,
+                    color = Color.Red,
+                ),
+            )
+        ),
+    )
+)
 ```
-./gradlew charts:dokkaHtml
+
+```kotlin
+BarChart(
+    data = barChartData,
+    config = BarChartConfig(
+        thickness = 14.dp,
+        cornerRadius = 7.dp,
+    ),
+    modifier = Modifier.height(500.dp),
+    animation = ChartAnimation.Sequenced(),
+)
 ```
-on the root dir of the project.
 
-After the task is done, copy the generated docs into `./docs`, which can also be done by running
+There is another component called `BarChartWithLegend`. It renders bar chart with legend.
+
+## BubbleChart
+![Bubble chart](/assets/bubble-chart.png)
+
+Before using component the list of Bubble has to be prepared:
+```kotlin
+val bubbles = listOf(
+    Bubble(
+        name = "first",
+        value = 1.2f,
+        icon = Icons.Default.Album,
+        color = Color.Yellow
+    ),
+    Bubble(
+        name = "second",
+        value = 4.6f,
+        icon = Icons.Default.House,
+        color = Color.Green
+    ),
+    Bubble(
+        name = "third",
+        value = 6.9f,
+        icon = Icons.Default.Bed,
+        color = Color.Blue
+    ),
+)
 ```
-rm -rf ./docs ; cp -r ./charts/build/dokka/html ./docs
+
+```kotlin
+BubbleChart(
+    bubbles = bubbles,
+    modifier = Modifier.size(300.dp),
+    animation = ChartAnimation.Sequenced(),
+)
 ```
 
-## Testing
-Testing is implemented using [Shot](https://github.com/pedrovgs/Shot) library. In order to run 
-it against prerecorded results, create at least one of the following emulators:
-- tablet: Nexus 10, running API 31
-- phone: Pixel 4a, running API 31
+# Dial
+![Dial chart](/assets/dial-chart.png)
 
-For tests to work, make sure you create emulators with default values, as **screen size and 
-density must be exactly the same**.
-
-Details as to how to run the tests are in the link to the library itself, but to run it against 
-prerecorded screenshots, run the following command:
+```kotlin
+Dial(
+    value = 22,
+    minValue = -20,
+    maxValue = 50,
+    modifier = Modifier.fillMaxWidth(),
+    animation = ChartAnimation.Simple {
+        spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    },
+    config = DialConfig(
+        thickness = 20.dp,
+        roundCorners = true,
+    ),
+    mainLabel = {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "$it°C",
+                style = MaterialTheme.typography.h4,
+                color = Color.Yellow
+            )
+            Text(
+                text = "outside temperature",
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.padding(top = 12.dp)
+            )
+        }
+    }
+)
 ```
-./gradlew executeScreenshotTests -PdirectorySuffix=$deviceName
+
+There is another component `ProcentageDial`. It accepts only one data argument `percentage` in [0-100] range.
+
+
+# GasBottle
+![Gas bottle chart](/assets/gas-bottle.png)
+
+```kotlin
+GasBottle(
+    percentage = 75f,
+    modifier = Modifier.size(width = 200.dp, height = 300.dp),
+    animation = ChartAnimation.Simple {
+        spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessVeryLow
+        )
+    }
+)
 ```
-where `$deviceName` is one of:
-- Nexus_10_API_31
-- Pixel_4a_API_31
 
-### Flakiness
-Due to differences in graphics between M1 and x86 chips, images appear different to the script 
-and so the tests fail (difference between images can be well above 10%). To human eye they do 
-seem the same, though. This is explained and shown in [issue 265](https://github.com/pedrovgs/Shot/issues/265). Until this is fixed, there is a way to test stuff at least locally:
+# LineChart
+![Line chart](/assets/line-chart.png)
 
-1. uncomment tests that are commented out because of this issue
-2. record all the tests
-3. make the desired changes in the code
-4. check the new UI state against the pre-recorded screenshots (I suggest removing tolerance if 
-   the tests were recorded on your machine!)
-5. comment the flaky tests out again
-6. revert the screenshots
+Before using component the LineChartData has to be prepared:
+```kotlin
+val lineData = remember {
+    LineChartData(
+        series = (1..3).map {
+            LineChartSeries(
+                dataName = "data $it",
+                lineColor = listOf(
+                    Color.Yellow,
+                    Color.Red,
+                    Color.Blue,
+                )[it - 1],
+                listOfPoints = (1..10).map { point ->
+                    LineChartPoint(
+                        x = DateTime.now().minus(TimeSpan(point * 24 * 60 * 60 * 1000.0)).unixMillisLong,
+                        y = (1..15).random().toFloat(),
+                    )
+                }
+            )
+        },
+    )
+}
+```
 
-### Other issues
+```kotlin
+LineChart(
+    lineChartData = lineData,
+    modifier = Modifier.height(300.dp),
+    xAxisLabel = {
+        Text(
+            fontSize = 12.sp,
+            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+            textAlign = TextAlign.Center
+        )
+    },
+    overlayHeaderLabel = {
+        Text(
+            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+            style = MaterialTheme.typography.overline
+        )
+    },
+    animation = ChartAnimation.Sequenced()
+)
+```
 
-- Library [does not work with Java 17](https://github.com/pedrovgs/Shot/pull/292). The error 
-  itself is not as obvious as one might expect, though. To fix the issue, use Java 11.
-- Java heap space sometimes [needs to be enlarged](https://github.com/pedrovgs/Shot/issues/304)
-- You might encounter [INSTALL_FAILED_SHARED_USER_INCOMPATIBLE](https://stackoverflow.com/questions/15205159/install-failed-shared-user-incompatible-while-using-shared-user-id) 
-  issue. [Here](https://stackoverflow.com/a/21809883/6835732) is a shortcut to the answer.
+
+# PieChart
+![Line chart](/assets/pie-chart.png)
+
+Before using component the list of PieChartData has to be prepared:
+```kotlin
+val data = listOf(
+    PieChartData(
+        name = "Data 1",
+        value = 10.0,
+        color = Color.Yellow,
+    ),
+    PieChartData(
+        name = "Data 2",
+        value = 20.0,
+        color = Color.Green,
+    ),
+    PieChartData(
+        name = "Data 3",
+        value = 30.0,
+        color = Color.Blue,
+    ),
+    PieChartData(
+        name = "Data 4",
+        value = 40.0,
+        color = Color.Red,
+    )
+)
+```
+```kotlin
+PieChart(
+    data = data,
+    modifier = Modifier.size(300.dp),
+    config = PieChartConfig(
+        thickness = 40.dp
+    ),
+)
+```
+
+By default the thickness is `Dp.Infinity`, it means the chart will be fully filled.
+
+# Theming
+The easiest way to set the same colors for all charts is to provide `ChartColors` in the app theme.
+```kotlin
+private val chartColors = ChartColors(
+    primary = Color.Green,
+    grid = Color.LightGray,
+    surface = Color.White,
+    fullGasBottle = Color.Green,
+    emptyGasBottle = Color.Red,
+    overlayLine = Color.Magenta
+)
+
+@Composable
+fun AppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
+    CompositionLocalProvider(
+        // ...
+        LocalChartColors provides chartColors,
+    ) {
+        MaterialTheme(
+            // ...
+            content = content,
+        )
+    }
+}
+
+```
+There is also default ChartColors provided by the library. It uses the default color set from `MaterialTheme`.
+```kotlin
+LocalChartColors provides ChartDefaults.chartColors()
+```
+
+Each chart has its own color set which can be used like:
+```kotlin
+BarChart(
+    data = barChartData,
+    colors = BarChartColors(grid = Color.LightGray)
+)
+```
+
+Also there is possibility to use ChartColors inside the specific chart:
+```kotlin
+BarChart(
+    data = barChartData,
+    colors = ChartColors(...).barChartColors,
+)
+```
+
+
+# Contributing
+[Contributing guidelines](CONTRIBUTING.md)
+
+# License
+This library is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.GridItemSpan
@@ -33,10 +34,6 @@ import com.netguru.common.WindowSize
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GasBottleChartScreen() {
-
-    val gasBottleModifier = Modifier
-        .width(200.dp)
-        .height(300.dp)
 
     val gasBottles = arrayListOf(
         GasBottleItem(name = "Cylinder A", value = 0.3f),
@@ -82,7 +79,7 @@ fun GasBottleChartScreen() {
                     )
                     GasBottle(
                         percentage = 100 * item.value / item.capacity,
-                        modifier = gasBottleModifier,
+                        modifier = Modifier.size(width = 200.dp, height = 300.dp),
                         animation = ChartAnimation.Simple {
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
