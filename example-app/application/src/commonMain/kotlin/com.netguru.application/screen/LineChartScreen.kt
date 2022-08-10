@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.netguru.application.ScrollableScreen
 import com.netguru.application.SpacedColumn
 import com.netguru.application.TitleText
 import com.netguru.charts.ChartAnimation
@@ -31,9 +32,9 @@ fun LineChartScreen() {
                 LineChartSeries(
                     dataName = "data $it",
                     lineColor = listOf(
-                        Color.Red,
-                        Color.Green,
-                        Color.Blue,
+                        Color(0xFFFFCC00),
+                        Color(0xFF00D563),
+                        Color(0xFF32ADE6),
                     )[it - 1],
                     listOfPoints = (1..10).map { point ->
                         LineChartPoint(
@@ -46,51 +47,53 @@ fun LineChartScreen() {
         )
     }
 
-    SpacedColumn {
+    ScrollableScreen {
+        SpacedColumn {
 
-        TitleText(text = "Line chart")
-        LineChart(
-            lineChartData = lineData,
-            modifier = Modifier
-                .height(300.dp),
-            xAxisLabel = {
-                Text(
-                    fontSize = 12.sp,
-                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                    textAlign = TextAlign.Center
-                )
-            },
-            overlayHeaderLabel = {
-                Text(
-                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                    style = MaterialTheme.typography.overline
-                )
-            },
-            animation = ChartAnimation.Sequenced()
-        )
+            TitleText(text = "Line chart")
+            LineChart(
+                lineChartData = lineData,
+                modifier = Modifier
+                    .height(300.dp),
+                xAxisLabel = {
+                    Text(
+                        fontSize = 12.sp,
+                        text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                overlayHeaderLabel = {
+                    Text(
+                        text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                        style = MaterialTheme.typography.overline
+                    )
+                },
+                animation = ChartAnimation.Sequenced()
+            )
 
-        HorizontalDivider()
+            HorizontalDivider()
 
-        TitleText(text = "Line chart with legend")
-        LineChartWithLegend(
-            modifier = Modifier
-                .height(300.dp),
-            lineChartData = lineData,
-            maxVerticalLines = 5,
-            xAxisLabel = {
-                Text(
-                    fontSize = 12.sp,
-                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                    textAlign = TextAlign.Center
-                )
-            },
-            overlayHeaderLabel = {
-                Text(
-                    text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                    style = MaterialTheme.typography.overline
-                )
-            },
-            animation = ChartAnimation.Sequenced()
-        )
+            TitleText(text = "Line chart with legend")
+            LineChartWithLegend(
+                modifier = Modifier
+                    .height(300.dp),
+                lineChartData = lineData,
+                maxVerticalLines = 5,
+                xAxisLabel = {
+                    Text(
+                        fontSize = 12.sp,
+                        text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                overlayHeaderLabel = {
+                    Text(
+                        text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                        style = MaterialTheme.typography.overline
+                    )
+                },
+                animation = ChartAnimation.Sequenced()
+            )
+        }
     }
 }

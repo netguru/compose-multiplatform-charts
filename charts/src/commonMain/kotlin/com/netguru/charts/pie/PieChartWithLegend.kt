@@ -1,6 +1,5 @@
 package com.netguru.charts.pie
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.netguru.charts.ChartAnimation
 
 /**
@@ -57,7 +55,7 @@ fun PieChartWithLegend(
             ) {
                 PieChart(
                     data = pieChartData,
-                    modifier = Modifier.fillMaxHeight().background(Color.Red.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxHeight(),
                     animation = animation,
                     config = config,
                 )

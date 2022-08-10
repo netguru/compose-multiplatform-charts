@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.netguru.charts.theme.ChartDefaults
+import com.netguru.charts.theme.ChartColors
 import com.netguru.charts.theme.LocalChartColors
 import com.netguru.common.locale.LocaleProvider
 
@@ -48,14 +48,9 @@ val LocalAppColors = staticCompositionLocalOf {
         borders = Color.Unspecified,
         success = Color.Unspecified,
         danger = Color.Unspecified,
-        onChart = Color.Unspecified,
-        chart1 = Color.Unspecified,
-        chart2 = Color.Unspecified,
-        chart3 = Color.Unspecified,
-        chart4 = Color.Unspecified,
-        chart5 = Color.Unspecified,
-        fullGasBottle = Color.Unspecified,
-        emptyGasBottle = Color.Unspecified,
+        yellow = Color.Unspecified,
+        green = Color.Unspecified,
+        blue = Color.Unspecified,
     )
 }
 
@@ -68,43 +63,51 @@ private val appShapes = AppShapes(
 )
 
 private val appDarkColors = AppColors(
-    primary = Color(0xFFAEC6FF),
+    primary = Color(0xFF00D563),
     onPrimary = Color(0xFF002C70),
-    primaryText = Color(0xFFb6bbe8),
+    primaryText = Color(0xFFFFFFFF),
     secondaryText = Color(0xFF938F99),
-    borders = Color(0xFF938F99),
-    surface = Color(0xFF1D1D20),
-    background = Color(0xFF1B1B1E),
-    success = Color(0xFF4FE086),
-    danger = Color(0xFFFFB3AD),
-    onChart = Color(0xFFFFFFFF),
-    chart1 = Color(0xFF3D7FF9),
-    chart2 = Color(0xFF3DC0F9),
-    chart3 = Color(0xFF464CD3),
-    chart4 = Color(0xFF2C4074),
-    chart5 = Color(0xFF25DC89),
-    emptyGasBottle = Color(0xFFFCA9A9),
-    fullGasBottle = Color(0xFF5fa777)
+    borders = Color(0x66D4D5D9),
+    surface = Color(0xFF000000),
+    background = Color(0xFF001409),
+    success = Color(0xFF00D563),
+    danger = Color(0xFFFF3B30),
+    yellow = Color(0xFFFFCC00),
+    green = Color(0xFF00D563),
+    blue = Color(0xFF32ADE6),
 )
 
 private val appLightColors = AppColors(
-    primary = Color(0xFF3D7FF9),
+    primary = Color(0xFF00D563),
     onPrimary = Color(0xFFFFFFFF),
-    primaryText = Color(0xFF1A1D3E),
+    primaryText = Color(0xFF001409),
     secondaryText = Color(0xFF505159),
-    borders = Color(0xFFD4D5D9),
+    borders = Color(0x66D4D5D9),
     surface = Color(0xFFF2F4F7),
     background = Color(0xFFFFFFFF),
-    success = Color(0xFF20BE69),
-    danger = Color(0xFFEB4F4F),
-    onChart = Color(0xFFFFFFFF),
-    chart1 = Color(0xFF3D7FF9),
-    chart2 = Color(0xFF3DC0F9),
-    chart3 = Color(0xFF464CD3),
-    chart4 = Color(0xFF2C4074),
-    chart5 = Color(0xFF25DC89),
-    emptyGasBottle = Color(0xFFFCA9A9),
-    fullGasBottle = Color(0xFF5fa777)
+    success = Color(0xFF00D563),
+    danger = Color(0xFFFF3B30),
+    yellow = Color(0xFFFFCC00),
+    green = Color(0xFF00D563),
+    blue = Color(0xFF32ADE6),
+)
+
+val lightChartColors = ChartColors(
+    primary = appLightColors.primary,
+    grid = appLightColors.borders,
+    surface = appLightColors.background,
+    fullGasBottle = appLightColors.success,
+    emptyGasBottle = appLightColors.danger,
+    overlayLine = appLightColors.danger
+)
+
+val darkChartColors = ChartColors(
+    primary = appDarkColors.primary,
+    grid = appDarkColors.borders,
+    surface = appDarkColors.background,
+    fullGasBottle = appDarkColors.success,
+    emptyGasBottle = appDarkColors.danger,
+    overlayLine = appDarkColors.danger
 )
 
 @Composable
@@ -182,7 +185,7 @@ fun AppTheme(
         LocalAppTypography provides appTypography(),
         LocalAppDimens provides appDimens,
         LocalWindowSize provides windowSize,
-        LocalChartColors provides ChartDefaults.chartColors(),
+        LocalChartColors provides if (darkTheme) darkChartColors else lightChartColors,
     ) {
         MaterialTheme(
             typography = appTypography(),
@@ -251,14 +254,9 @@ data class AppColors(
     val borders: Color,
     val success: Color,
     val danger: Color,
-    val onChart: Color,
-    val chart1: Color,
-    val chart2: Color,
-    val chart3: Color,
-    val chart4: Color,
-    val chart5: Color,
-    val emptyGasBottle: Color,
-    val fullGasBottle: Color,
+    val yellow: Color,
+    val green: Color,
+    val blue: Color,
 )
 
 class AppDimens(

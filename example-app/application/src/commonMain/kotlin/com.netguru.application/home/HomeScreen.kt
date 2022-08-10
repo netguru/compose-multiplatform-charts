@@ -120,21 +120,14 @@ private fun HomeContent(state: NavigationState, dispatch: (AppAction) -> Unit) {
             if (isScreenExpanded) {
                 HomeDrawer(state, dispatch)
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(AppTheme.dimens.grid_2)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Crossfade(state.currentTab) { tab ->
-                    when (tab) {
-                        NavigationState.Tab.BAR -> BarChartScreen()
-                        NavigationState.Tab.BUBBLE -> BubbleChartScreen()
-                        NavigationState.Tab.DIAL -> DialChartScreen()
-                        NavigationState.Tab.GAS_BOTTLE -> GasBottleChartScreen()
-                        NavigationState.Tab.LINE -> LineChartScreen()
-                        NavigationState.Tab.PIE -> PieChartScreen()
-                    }
+            Crossfade(state.currentTab) { tab ->
+                when (tab) {
+                    NavigationState.Tab.BAR -> BarChartScreen()
+                    NavigationState.Tab.BUBBLE -> BubbleChartScreen()
+                    NavigationState.Tab.DIAL -> DialChartScreen()
+                    NavigationState.Tab.GAS_BOTTLE -> GasBottleChartScreen()
+                    NavigationState.Tab.LINE -> LineChartScreen()
+                    NavigationState.Tab.PIE -> PieChartScreen()
                 }
             }
         }
