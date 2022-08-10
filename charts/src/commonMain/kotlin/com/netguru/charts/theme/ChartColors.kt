@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 @Immutable
-data class ChartColors internal constructor(
+data class ChartColors constructor(
     val primary: Color,
     val surface: Color,
     val grid: Color,

@@ -39,7 +39,7 @@ private fun getLineChartSampleData(): LineChartData {
     list.add(
         LineChartSeries(
             "Solar",
-            lineColor = AppTheme.colors.chart1,
+            lineColor = AppTheme.colors.yellow,
             dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 0f),
@@ -54,7 +54,7 @@ private fun getLineChartSampleData(): LineChartData {
     list.add(
         LineChartSeries(
             "Grid",
-            lineColor = AppTheme.colors.chart2,
+            lineColor = AppTheme.colors.green,
             dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 3f),
@@ -68,7 +68,7 @@ private fun getLineChartSampleData(): LineChartData {
     list.add(
         LineChartSeries(
             "Fossil",
-            lineColor = AppTheme.colors.chart3,
+            lineColor = AppTheme.colors.blue,
             dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 1f),

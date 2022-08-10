@@ -35,50 +35,50 @@ fun barChartSampleData(): BarChartData {
             BarChartCategory(
                 name = "Mon",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 10f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 20f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 10f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 20f, AppTheme.colors.green)
                 )
             ),
             BarChartCategory(
                 name = "Tue",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 15f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 15f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.green)
                 )
             ),
             BarChartCategory(
                 name = "Wed",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 5f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 5f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.green)
                 )
             ),
             BarChartCategory(
                 name = "Thu",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 10f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.chart5),
+                    BarChartEntry("Actual usage", 10f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 10f, AppTheme.colors.green),
                 )
             ),
             BarChartCategory(
                 name = "Fri",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 3f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 2f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 3f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 2f, AppTheme.colors.green)
                 )
             ),
             BarChartCategory(
                 name = "Sat",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 0f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 2f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 0f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 2f, AppTheme.colors.green)
                 )
             ),
             BarChartCategory(
                 name = "Sun",
                 entries = listOf(
-                    BarChartEntry("Actual usage", 12f, AppTheme.colors.chart1),
-                    BarChartEntry("Forecasted usage", 12f, AppTheme.colors.chart5)
+                    BarChartEntry("Actual usage", 12f, AppTheme.colors.yellow),
+                    BarChartEntry("Forecasted usage", 12f, AppTheme.colors.green)
                 )
             ),
         ),
