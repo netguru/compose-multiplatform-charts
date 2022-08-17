@@ -1,7 +1,7 @@
-import com.netguru.extensions.androidMain
-import com.netguru.extensions.baseAndroidSetup
-import com.netguru.extensions.baseTestSetup
-import com.netguru.extensions.commonMain
+import com.netguru.multiplatform.charts.extensions.androidMain
+import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
+import com.netguru.multiplatform.charts.extensions.baseTestSetup
+import com.netguru.multiplatform.charts.extensions.commonMain
 import org.jetbrains.compose.compose
 
 baseAndroidSetup()

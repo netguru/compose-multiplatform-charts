@@ -1,7 +1,7 @@
-import com.netguru.extensions.androidMain
-import com.netguru.extensions.baseAndroidSetup
-import com.netguru.extensions.baseTestSetup
-import com.netguru.extensions.sourceSets
+import com.netguru.multiplatform.charts.extensions.androidMain
+import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
+import com.netguru.multiplatform.charts.extensions.baseTestSetup
+import com.netguru.multiplatform.charts.extensions.sourceSets
 import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.compose.compose
 
@@ -48,7 +48,7 @@ android {
 }
 
 project.rootProject.tasks.apply {
-    register("resourceGeneratorTask", com.netguru.resources.ResourceGeneratorTask::class) {
+    register("resourceGeneratorTask", com.netguru.multiplatform.charts.resources.ResourceGeneratorTask::class) {
         group = "resource Generator"
         description = "Task for generating resources"
     }
@@ -60,7 +60,7 @@ project.rootProject.tasks.apply {
 }
 
 project.tasks.apply {
-    register("resourceGeneratorTask", com.netguru.resources.ResourceGeneratorTask::class) {
+    register("resourceGeneratorTask", com.netguru.multiplatform.charts.resources.ResourceGeneratorTask::class) {
         group = "resource Generator"
         description = "Task for generating resources"
     }

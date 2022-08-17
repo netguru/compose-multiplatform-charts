@@ -1,8 +1,8 @@
-import com.netguru.extensions.baseAndroidSetup
-import com.netguru.extensions.commonMain
-import com.netguru.extensions.commonTest
-import com.netguru.extensions.kotlin
-import com.netguru.extensions.sourceSets
+import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
+import com.netguru.multiplatform.charts.extensions.commonMain
+import com.netguru.multiplatform.charts.extensions.commonTest
+import com.netguru.multiplatform.charts.extensions.kotlin
+import com.netguru.multiplatform.charts.extensions.sourceSets
 import org.jetbrains.compose.compose
 import java.net.URL
 
