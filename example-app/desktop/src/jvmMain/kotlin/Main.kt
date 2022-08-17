@@ -3,9 +3,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.netguru.application.Application
-import com.netguru.common.AppTheme.strings
-import com.netguru.common.WindowSize
+import com.netguru.multiplatform.charts.application.Application
+import com.netguru.multiplatform.charts.common.AppTheme.strings
+import com.netguru.multiplatform.charts.common.WindowSize
 
 fun main() = application {
     val windowState = rememberWindowState(size = DpSize(1050.dp, 950.dp))

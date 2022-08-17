@@ -1,4 +1,4 @@
-import com.netguru.extensions.baseAndroidSetup
+import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
 import kotlin.collections.listOf
 
 baseAndroidSetup()
