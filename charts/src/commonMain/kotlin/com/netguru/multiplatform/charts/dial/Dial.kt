@@ -160,26 +160,35 @@ private fun DrawScope.drawProgressBar(
         pathEffect = PathEffect.cornerPathEffect(20f)
     )
 
-    drawArc(
-        color = progressBarColor,
-        startAngle = START_ANGLE + arcPadding,
-        sweepAngle = sweepAngle - (2f * arcPadding),
-        useCenter = false,
-        style = style,
-        topLeft = topLeftOffset,
-        size = arcSize
-    )
+    val joinStyle = if (value == minValue || value == maxValue)
+        DialJoinStyle.Joined
+    else
+        config.joinStyle
 
-    drawArc(
-        color = progressBarBackgroundColor,
-        startAngle = START_ANGLE + sweepAngle + config.joinStyle.startAnglePadding(arcPadding),
-        sweepAngle = (MAX_ANGLE - sweepAngle - config.joinStyle.sweepAnglePadding(arcPadding))
-            .coerceAtLeast(0f),
-        useCenter = false,
-        style = style,
-        topLeft = topLeftOffset,
-        size = arcSize
-    )
+    if (value > minValue) {
+        drawArc(
+            color = progressBarColor,
+            startAngle = START_ANGLE + arcPadding,
+            sweepAngle = sweepAngle - (2f * arcPadding),
+            useCenter = false,
+            style = style,
+            topLeft = topLeftOffset,
+            size = arcSize
+        )
+    }
+
+    if (value < maxValue) {
+        drawArc(
+            color = progressBarBackgroundColor,
+            startAngle = START_ANGLE + sweepAngle + joinStyle.startAnglePadding(arcPadding),
+            sweepAngle = (MAX_ANGLE - sweepAngle - joinStyle.sweepAnglePadding(arcPadding))
+                .coerceAtLeast(0f),
+            useCenter = false,
+            style = style,
+            topLeft = topLeftOffset,
+            size = arcSize
+        )
+    }
 }
 
 private const val MAX_LINE_LENGTH = 0.20f
