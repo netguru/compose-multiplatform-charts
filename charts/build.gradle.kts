@@ -2,17 +2,21 @@ import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
 import com.netguru.multiplatform.charts.extensions.commonMain
 import com.netguru.multiplatform.charts.extensions.commonTest
 import com.netguru.multiplatform.charts.extensions.kotlin
+import com.netguru.multiplatform.charts.extensions.publishingSetup
 import com.netguru.multiplatform.charts.extensions.sourceSets
 import org.jetbrains.compose.compose
 import java.net.URL
 
 baseAndroidSetup()
+publishingSetup()
 
 plugins {
     alias(libs.plugins.compose)
     kotlin("multiplatform")
     id("com.android.library")
     alias(libs.plugins.dokka)
+    `maven-publish`
+    signing
 }
 
 kotlin {
@@ -35,6 +39,11 @@ kotlin {
             }
         }
     }
+}
+
+signing {
+    // Uncomment when the signing will be possible
+    // sign(publishing.publications)
 }
 
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
