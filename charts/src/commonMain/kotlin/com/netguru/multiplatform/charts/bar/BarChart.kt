@@ -114,10 +114,11 @@ fun BarChart(
                 drawBarChart(
                     data = data,
                     config = config,
-                    yAxisUpperValue = grid.horizontalLines.last().value.toFloat(),
-                    yAxisLowerValue = grid.horizontalLines.first().value.toFloat(),
+                    yAxisUpperValue = data.maxY,
+                    yAxisLowerValue = data.minY,
                     verticalPadding = horizontalLinesOffset.toPx(),
                     valueScale = valueScale,
+                    yAxisZeroPosition = grid.zeroPosition.position,
                 )
             }
 
