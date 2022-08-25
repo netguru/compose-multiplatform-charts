@@ -17,6 +17,7 @@ internal object PieDefaults {
     const val START_ANGLE = 270.0
     const val NUMBER_OF_COLS_IN_LEGEND = 4
     val THICKNESS = Dp.Infinity
+    val GAP_SIZE = 0.dp
     val LEGEND_PADDING = 16.dp
     val LEGEND_ICON_SIZE = 12.dp
 
