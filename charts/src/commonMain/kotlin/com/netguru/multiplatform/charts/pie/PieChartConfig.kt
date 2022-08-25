@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.Dp
  * The customization parameters for [PieChart]
  *
  * @param thickness Width of the arc
+ * @param gap The margin between segments
  * @param legendPadding The space between chart and legend in both orientations
  * @param legendIcon The type of icon in legend [LegendIcon]
  * @param legendIconSize Size of the icon in legend
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 @Immutable
 data class PieChartConfig(
     val thickness: Dp = PieDefaults.THICKNESS,
+    val gap: Dp = PieDefaults.GAP_SIZE,
     val legendPadding: Dp = PieDefaults.LEGEND_PADDING,
     val legendIcon: LegendIcon = LegendIcon.CAKE,
     val legendIconSize: Dp = PieDefaults.LEGEND_ICON_SIZE,

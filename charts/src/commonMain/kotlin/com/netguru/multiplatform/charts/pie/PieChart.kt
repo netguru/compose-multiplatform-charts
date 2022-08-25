@@ -10,16 +10,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import com.netguru.multiplatform.charts.ChartAnimation
 import com.netguru.multiplatform.charts.StartAnimation
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.pie.PieDefaults.FULL_CIRCLE_DEGREES
 import com.netguru.multiplatform.charts.pie.PieDefaults.START_ANGLE
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
 
 data class PieChartData(val name: String, val value: Double, val color: Color)
 
@@ -77,15 +84,21 @@ fun PieChart(
         modifier = modifier
             .aspectRatio(1f)
             .drawBehind {
-                var startAngle = START_ANGLE
-                sweepAngles.forEachIndexed { index, sweepAngle ->
-                    drawArc(
-                        color = data[index].color,
-                        startAngle = startAngle.toFloat(),
-                        sweepAngle = sweepAngle.toFloat(),
-                        config = config,
-                    )
-                    startAngle += sweepAngle
+                val clipPath = calculateClipPath(
+                    angles = sweepAngles,
+                    config = config,
+                )
+                clipPath(clipPath) {
+                    var startAngle = START_ANGLE
+                    sweepAngles.forEachIndexed { index, sweepAngle ->
+                        drawArc(
+                            color = data[index].color,
+                            startAngle = startAngle.toFloat(),
+                            sweepAngle = sweepAngle.toFloat(),
+                            config = config,
+                        )
+                        startAngle += sweepAngle
+                    }
                 }
             }
     )
@@ -120,5 +133,51 @@ private fun DrawScope.drawArc(
             width = strokeWidth,
         ),
         topLeft = Offset(strokeWidth / 2f, strokeWidth / 2f)
+    )
+}
+
+private const val RIGHT_ANGLE = 90f
+private const val HALF_CIRCLE_ANGLE = 180f
+private const val FULL_CIRCLE_ANGLE = 360f
+
+private fun DrawScope.calculateClipPath(
+    angles: List<Double>,
+    config: PieChartConfig,
+): Path {
+    val r = min(size.width, size.height) / 2f
+    val gapWidth = config.gap.toPx()
+    val chartPath = Path().apply { addRect(Rect(Offset.Zero, size)) }
+    var angle = START_ANGLE
+    val gapPaths = Path()
+
+    angles.forEach {
+        val p1 = findNextGapPoint(angle - RIGHT_ANGLE, gapWidth / 2f, center)
+        val p2 = findNextGapPoint(angle, r, p1)
+        val p3 = findNextGapPoint(angle + RIGHT_ANGLE, gapWidth, p2)
+        val p4 = findNextGapPoint(angle - HALF_CIRCLE_ANGLE, r, p3)
+
+        val gapPath = Path().apply {
+            moveTo(center.x, center.y)
+            lineTo(p1.x, p1.y)
+            lineTo(p2.x, p2.y)
+            lineTo(p3.x, p3.y)
+            lineTo(p4.x, p4.y)
+            close()
+        }
+        gapPaths.addPath(gapPath)
+        angle += it
+    }
+    return Path().apply { op(chartPath, gapPaths, PathOperation.Difference) }
+}
+
+private fun findNextGapPoint(
+    angle: Double,
+    distance: Float,
+    from: Offset,
+): Offset {
+    val t = angle * 2f * PI / FULL_CIRCLE_ANGLE
+    return Offset(
+        from.x + distance * cos(t).toFloat(),
+        from.y + distance * sin(t).toFloat()
     )
 }
