@@ -53,6 +53,7 @@ fun BarChart(
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     animation: ChartAnimation = ChartAnimation.Simple(),
     maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
+    roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
     val horizontalLinesOffset =
@@ -94,17 +95,19 @@ fun BarChart(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
+                val yAxisScale = YAxisScale(
+                    min = data.minY,
+                    max = data.maxY,
+                    maxTickCount = maxHorizontalLinesCount,
+                    roundClosestTo = roundMinMaxClosestTo,
+                )
                 val grid = measureChartGrid(
                     xAxisScale = FixedTicksXAxisScale(
                         min = data.minX,
                         max = data.maxX,
                         tickCount = verticalLinesCount - 1
                     ),
-                    yAxisScale = YAxisScale(
-                        min = data.minY,
-                        max = data.maxY,
-                        maxTickCount = maxHorizontalLinesCount - 1
-                    ),
+                    yAxisScale = yAxisScale,
                     horizontalLinesOffset = horizontalLinesOffset
                 )
                 verticalGridLines = grid.verticalLines
@@ -114,9 +117,8 @@ fun BarChart(
                 drawBarChart(
                     data = data,
                     config = config,
-                    yAxisUpperValue = data.maxY,
-                    yAxisLowerValue = data.minY,
-                    verticalPadding = horizontalLinesOffset.toPx(),
+                    yAxisUpperValue = yAxisScale.max,
+                    yAxisLowerValue = yAxisScale.min,
                     valueScale = valueScale,
                     yAxisZeroPosition = grid.zeroPosition.position,
                 )

@@ -13,6 +13,7 @@ internal object GridDefaults {
 
     val HORIZONTAL_LINES_OFFSET = 10.dp
     const val NUMBER_OF_GRID_LINES = 5
+    const val ROUND_MIN_MAX_CLOSEST_TO = 10
 
     val YAxisLabel: @Composable (value: Any) -> Unit = { value ->
         Text(

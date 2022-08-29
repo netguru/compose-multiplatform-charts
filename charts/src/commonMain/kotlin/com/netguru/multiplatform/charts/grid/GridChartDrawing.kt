@@ -41,8 +41,8 @@ fun DrawScope.measureChartGrid(
 
     val horizontalLines = measureHorizontalLines(
         axisScale = yAxisScale,
-        startPosition = size.height - horizontalLinesOffset.toPx(),
-        endPosition = horizontalLinesOffset.toPx()
+        startPosition = size.height,
+        endPosition = 0f
     )
 
     val verticalLines = measureVerticalLines(

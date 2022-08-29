@@ -11,7 +11,6 @@ internal fun DrawScope.drawBarChart(
     config: BarChartConfig,
     yAxisUpperValue: Float,
     yAxisLowerValue: Float,
-    verticalPadding: Float,
     valueScale: List<Float>,
     yAxisZeroPosition: Float
 ) {
@@ -23,7 +22,6 @@ internal fun DrawScope.drawBarChart(
     val freeSpaceInACluster = (xAxisTickWidth - (barWidth * maxBarsCountInACluster))
     val maxHorizontalSpacing = if (gapsCount > 0) freeSpaceInACluster / gapsCount else 0f
     val barsHorizontalSpacing = config.barsSpacing.toPx().coerceIn(0f, maxHorizontalSpacing)
-    val gridHeight = size.height - 2 * verticalPadding
 
     data.categories.forEachIndexed { categoryIndex, category ->
         val clusterWidth = category.entries.size * barWidth +
@@ -35,8 +33,8 @@ internal fun DrawScope.drawBarChart(
             val currentPosition = entry.y.mapValueToDifferentRange(
                 yAxisLowerValue,
                 yAxisUpperValue,
-                gridHeight,
-                verticalPadding
+                size.height,
+                0f
             )
             val barHeight = if (currentPosition < yAxisZeroPosition) {
                 yAxisZeroPosition - currentPosition

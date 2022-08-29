@@ -4,17 +4,36 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-class YAxisScale(min: Float, max: Float, maxTickCount: Int) {
+class YAxisScale(
+    min: Float,
+    max: Float,
+    maxTickCount: Int,
+    roundClosestTo: Int,
+) {
     val tick: Float
     val min: Float
     val max: Float
 
     init {
-        val range = niceNum(max - min, false)
-        this.tick = niceNum(range / (maxTickCount), true)
+        this.min = if (!min.isNaN()) {
+            min.getClosest(roundClosestTo)
+        } else {
+            0f
+        }
+        this.max = if (!max.isNaN()) {
+            max.getClosest(roundClosestTo)
+        } else {
+            0f
+        }
 
-        this.min = if (!min.isNaN()) min else 0f
-        this.max = if (!max.isNaN()) max else 0f
+        val range = niceNum(this.max - this.min, false)
+        this.tick = niceNum(range / (maxTickCount), true)
+    }
+
+    private fun Float.getClosest(n: Int) = when {
+        this > 0f -> (((this.toInt() + n - 1) / n) * n).toFloat()
+        this < 0f -> (((this.toInt() - n - 1) / n) * n).toFloat()
+        else -> 0f
     }
 
     /**

@@ -76,6 +76,7 @@ fun LineChart(
     animation: ChartAnimation = ChartAnimation.Simple(),
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
+    roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
@@ -125,7 +126,8 @@ fun LineChart(
                             yAxisScale = YAxisScale(
                                 min = lineChartData.minY,
                                 max = lineChartData.maxY,
-                                maxTickCount = maxHorizontalLines - 1
+                                maxTickCount = maxHorizontalLines - 1,
+                                roundClosestTo = roundMinMaxClosestTo,
                             ),
                             horizontalLinesOffset = horizontalLinesOffset
                         )
