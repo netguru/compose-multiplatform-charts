@@ -30,7 +30,8 @@ internal fun DrawScope.drawBarChart(
 
         category.entries.forEachIndexed { entryIndex, entry ->
             val x = clusterXOffset + entryIndex * (barWidth + barsHorizontalSpacing)
-            val currentPosition = entry.y.mapValueToDifferentRange(
+            val y = entry.y * valueScale[entryIndex]
+            val currentPosition = y.mapValueToDifferentRange(
                 yAxisLowerValue,
                 yAxisUpperValue,
                 size.height,
@@ -54,7 +55,7 @@ internal fun DrawScope.drawBarChart(
                 ),
                 size = Size(
                     width = barWidth,
-                    height = barHeight * valueScale[entryIndex]
+                    height = barHeight
                 ),
                 cornerRadius = CornerRadius(config.cornerRadius.toPx(), config.cornerRadius.toPx())
             )
