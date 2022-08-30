@@ -63,8 +63,8 @@ fun DrawScope.measureChartGrid(
             zero.mapValueToDifferentRange(
                 yAxisScale.min,
                 yAxisScale.max,
-                size.height - horizontalLinesOffset.toPx(),
-                horizontalLinesOffset.toPx()
+                size.height,
+                0f
             ),
             zero
         )
