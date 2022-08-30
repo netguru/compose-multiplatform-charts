@@ -31,12 +31,12 @@ fun BarChartScreen() {
                 entries = listOf(
                     BarChartEntry(
                         x = "primary",
-                        y = -201f,
+                        y = 17f,
                         color = AppTheme.colors.yellow,
                     ),
                     BarChartEntry(
                         x = "secondary",
-                        y = 149f,
+                        y = 30f,
                         color = AppTheme.colors.green,
                     ),
                     BarChartEntry(

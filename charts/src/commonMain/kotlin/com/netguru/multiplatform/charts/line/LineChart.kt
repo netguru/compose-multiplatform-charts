@@ -62,6 +62,7 @@ val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
  * @param animation Animation to use
  * @param maxVerticalLines Max number of lines, representing the x-axis values
  * @param maxHorizontalLines Max number of lines, representing the y-axis values
+ * @param roundMinMaxClosestTo Number to which min and max range will be rounded to
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

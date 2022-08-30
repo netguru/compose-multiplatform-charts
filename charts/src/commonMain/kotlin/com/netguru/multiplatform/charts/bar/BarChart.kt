@@ -40,7 +40,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * @param yAxisLabel Composable to mark the values on the y-axis.
  * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
  * category will animate together
- * @param maxHorizontalLinesCount Max number of lines that are allowed to draw for marking y-axis
  * values
  */
 @Composable
@@ -52,8 +51,6 @@ fun BarChart(
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
     val horizontalLinesOffset =
@@ -98,8 +95,8 @@ fun BarChart(
                 val yAxisScale = YAxisScale(
                     min = data.minY,
                     max = data.maxY,
-                    maxTickCount = maxHorizontalLinesCount,
-                    roundClosestTo = roundMinMaxClosestTo,
+                    maxTickCount = config.maxHorizontalLinesCount,
+                    roundClosestTo = config.roundMinMaxClosestTo,
                 )
                 val grid = measureChartGrid(
                     xAxisScale = FixedTicksXAxisScale(
