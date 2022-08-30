@@ -30,7 +30,8 @@ class BarWithLegendTest : ScreenshotTest {
                 config = BarChartConfig(
                     thickness = 8.dp,
                     cornerRadius = 0.dp,
-                    barsSpacing = 1.dp
+                    barsSpacing = 1.dp,
+                    maxHorizontalLinesCount = 2,
                 )
             )
         }
@@ -63,7 +64,6 @@ class BarWithLegendTest : ScreenshotTest {
                         Text(text = "units")
                     }
                 },
-                maxHorizontalLinesCount = 2,
                 legendItemLabel = {
                     Text(text = "Custom label for: $it")
                 }

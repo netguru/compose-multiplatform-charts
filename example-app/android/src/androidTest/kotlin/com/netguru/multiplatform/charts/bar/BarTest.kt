@@ -40,7 +40,8 @@ class BarTest : ScreenshotTest {
                 config = BarChartConfig(
                     thickness = 8.dp,
                     cornerRadius = 0.dp,
-                    barsSpacing = 1.dp
+                    barsSpacing = 1.dp,
+                    maxHorizontalLinesCount = 2,
                 ),
                 colors = ChartDefaults.chartColors(grid = Color.Red).barChartColors,
                 xAxisLabel = {
@@ -59,7 +60,6 @@ class BarTest : ScreenshotTest {
                         Text(text = "units")
                     }
                 },
-                maxHorizontalLinesCount = 2,
             )
         }
     }
