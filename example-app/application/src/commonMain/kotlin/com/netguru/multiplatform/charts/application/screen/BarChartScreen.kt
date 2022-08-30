@@ -36,7 +36,7 @@ fun BarChartScreen() {
                     ),
                     BarChartEntry(
                         x = "secondary",
-                        y = 141f,
+                        y = 149f,
                         color = AppTheme.colors.green,
                     ),
                     BarChartEntry(

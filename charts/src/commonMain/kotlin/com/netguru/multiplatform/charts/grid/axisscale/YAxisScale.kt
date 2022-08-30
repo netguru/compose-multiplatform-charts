@@ -32,7 +32,7 @@ class YAxisScale(
 
     private fun Float.getClosest(n: Int) = when {
         this > 0f -> (((this.toInt() + n - 1) / n) * n).toFloat()
-        this < 0f -> (((this.toInt() - n - 1) / n) * n).toFloat()
+        this < 0f -> (((this.toInt() - n + 1) / n) * n).toFloat()
         else -> 0f
     }
 
