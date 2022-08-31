@@ -40,7 +40,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * @param yAxisLabel Composable to mark the values on the y-axis.
  * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
  * category will animate together
- * @param maxHorizontalLinesCount Max number of lines that are allowed to draw for marking y-axis
  * values
  */
 @Composable
@@ -52,7 +51,6 @@ fun BarChart(
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
     val horizontalLinesOffset =
@@ -94,17 +92,19 @@ fun BarChart(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
+                val yAxisScale = YAxisScale(
+                    min = data.minY,
+                    max = data.maxY,
+                    maxTickCount = config.maxHorizontalLinesCount,
+                    roundClosestTo = config.roundMinMaxClosestTo,
+                )
                 val grid = measureChartGrid(
                     xAxisScale = FixedTicksXAxisScale(
                         min = data.minX,
                         max = data.maxX,
                         tickCount = verticalLinesCount - 1
                     ),
-                    yAxisScale = YAxisScale(
-                        min = data.minY,
-                        max = data.maxY,
-                        maxTickCount = maxHorizontalLinesCount - 1
-                    ),
+                    yAxisScale = yAxisScale,
                     horizontalLinesOffset = horizontalLinesOffset
                 )
                 verticalGridLines = grid.verticalLines
@@ -114,10 +114,10 @@ fun BarChart(
                 drawBarChart(
                     data = data,
                     config = config,
-                    yAxisUpperValue = grid.horizontalLines.last().value.toFloat(),
-                    yAxisLowerValue = grid.horizontalLines.first().value.toFloat(),
-                    verticalPadding = horizontalLinesOffset.toPx(),
+                    yAxisUpperValue = yAxisScale.max,
+                    yAxisLowerValue = yAxisScale.min,
                     valueScale = valueScale,
+                    yAxisZeroPosition = grid.zeroPosition.position,
                 )
             }
 

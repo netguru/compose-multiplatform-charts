@@ -20,7 +20,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 fun BarChartWithLegend(
     data: BarChartData,
     modifier: Modifier = Modifier,
-    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     animation: ChartAnimation = ChartAnimation.Simple(),
     colors: BarChartColors = ChartTheme.colors.barChartColors,
     config: BarChartConfig = BarChartConfig(),
@@ -32,7 +31,6 @@ fun BarChartWithLegend(
         BarChart(
             modifier = Modifier.weight(1f),
             data = data,
-            maxHorizontalLinesCount = maxHorizontalLinesCount,
             animation = animation,
             colors = colors,
             config = config,
