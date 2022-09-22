@@ -1,4 +1,18 @@
-# Documentation
+# Contributing
+
+## Creating new Pull Request
+* Fork repository and work on your fork.
+* Create a new PR with a request to merge to the **main** branch
+* If PR is based on issue, then include its number in PR title and add link to it in description
+* One pull request should always address one issue or feature
+* When contributing a new feature, provide motivation and use-cases describing value it may brings to the project
+* Adding video or screenshot is very beneficial, but it's not mandatory
+* Make sure any code contributed is covered by test and documented
+
+## Code Style
+* Make sure your code is meeting the default [Ktlint standards](https://ktlint.github.io/#rules) 
+
+## Documentation
 Dokka is added to the project, so to create (or, better say, update) the docs, you need to run
 ```
 ./gradlew charts:dokkaHtml
@@ -10,7 +24,7 @@ After the task is done, copy the generated docs into `./docs`, which can also be
 rm -rf ./docs ; cp -r ./charts/build/dokka/html ./docs
 ```
 
-# Testing
+## Testing
 Testing is implemented using [Shot](https://github.com/pedrovgs/Shot) library. In order to run
 it against prerecorded results, create at least one of the following emulators:
 - tablet: Nexus 10, running API 31
@@ -28,7 +42,7 @@ where `$deviceName` is one of:
 - Nexus_10_API_31
 - Pixel_4a_API_31
 
-## Flakiness
+### Flakiness
 Due to differences in graphics between M1 and x86 chips, images appear different to the script
 and so the tests fail (difference between images can be well above 10%). To human eye they do
 seem the same, though. This is explained and shown in [issue 265](https://github.com/pedrovgs/Shot/issues/265). Until this is fixed, there is a way to test stuff at least locally:
@@ -41,7 +55,7 @@ seem the same, though. This is explained and shown in [issue 265](https://github
 5. comment the flaky tests out again
 6. revert the screenshots
 
-## Other issues
+### Other issues
 
 - Library [does not work with Java 17](https://github.com/pedrovgs/Shot/pull/292). The error
   itself is not as obvious as one might expect, though. To fix the issue, use Java 11.
