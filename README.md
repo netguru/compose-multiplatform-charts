@@ -316,6 +316,8 @@ BarChart(
 )
 ```
 
+# Security Issues
+[Reporting Security Vulnerabilities](SECURITY.md)
 
 # Contributing
 [Contributing guidelines](CONTRIBUTING.md)
