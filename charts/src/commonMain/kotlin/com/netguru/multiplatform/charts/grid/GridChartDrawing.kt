@@ -3,7 +3,6 @@ package com.netguru.multiplatform.charts.grid
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.unit.Dp
 import com.netguru.multiplatform.charts.grid.axisscale.XAxisScale
 import com.netguru.multiplatform.charts.grid.axisscale.YAxisScale
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
@@ -36,7 +35,6 @@ fun DrawScope.drawChartGrid(grid: ChartGrid, color: Color) {
 fun DrawScope.measureChartGrid(
     xAxisScale: XAxisScale,
     yAxisScale: YAxisScale,
-    horizontalLinesOffset: Dp
 ): ChartGrid {
 
     val horizontalLines = measureHorizontalLines(
