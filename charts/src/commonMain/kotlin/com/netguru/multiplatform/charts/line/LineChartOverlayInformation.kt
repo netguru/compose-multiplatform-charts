@@ -2,35 +2,28 @@ package com.netguru.multiplatform.charts.line
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.netguru.multiplatform.charts.OverlayInformation
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 
-private val TOUCH_OFFSET = 20.dp
-private val OVERLAY_WIDTH = 200.dp
-
 @Composable
-internal fun OverlayInformation(
+internal fun LineChartOverlayInformation(
     lineChartData: LineChartData,
     positionX: Float,
     containerSize: Size,
@@ -40,27 +33,11 @@ internal fun OverlayInformation(
 ) {
     if (positionX < 0) return
 
-    BoxWithConstraints(
-        modifier = Modifier
-            .offset(
-                x = with(LocalDensity.current) {
-                    positionX.toDp() +
-                        // change offset based on cursor position to avoid out of screen drawing on the right
-                        if (positionX.toDp() > (containerSize.width / 2).toDp()) {
-                            -OVERLAY_WIDTH - TOUCH_OFFSET
-                        } else {
-                            TOUCH_OFFSET
-                        }
-                },
-                y = TOUCH_OFFSET
-            )
-            .width(OVERLAY_WIDTH)
-            .alpha(0.9f)
-            .clip(RoundedCornerShape(10.dp))
-            .background(colors.surface)
-            .padding(8.dp)
+    OverlayInformation(
+        positionX = positionX,
+        containerSize = containerSize,
+        surfaceColor = colors.surface
     ) {
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
