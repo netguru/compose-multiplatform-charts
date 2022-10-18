@@ -169,7 +169,7 @@ fun LineChart(
                     }
             ) {
                 // Overlay
-                OverlayInformation(
+                LineChartOverlayInformation(
                     lineChartData = lineChartData,
                     positionX = touchPositionX,
                     containerSize = with(LocalDensity.current) {
