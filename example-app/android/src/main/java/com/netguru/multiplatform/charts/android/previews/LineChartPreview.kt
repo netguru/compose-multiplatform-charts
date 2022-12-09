@@ -10,21 +10,24 @@ import com.netguru.multiplatform.charts.ChartAnimation
 import com.netguru.multiplatform.charts.common.AppTheme
 import com.netguru.multiplatform.charts.common.HOUR_IN_MS
 import com.netguru.multiplatform.charts.common.WindowSize
+import com.netguru.multiplatform.charts.line.LineChart
 import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
 import com.netguru.multiplatform.charts.line.LineChartSeries
-import com.netguru.multiplatform.charts.line.LineChartWithLegend
+import com.netguru.multiplatform.charts.line.YAxisData
 import com.soywiz.klock.DateTime
 
 @Preview(showBackground = true, widthDp = 600)
 @Composable
 fun LineChartPreview() {
     AppTheme(windowSize = WindowSize.EXPANDED) {
-        LineChartWithLegend(
+        LineChart(
+            yAxisData = YAxisData(
+                lineChartData = getLineChartSampleData(),
+            ),
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
-            lineChartData = getLineChartSampleData(),
             maxVerticalLines = 10,
             animation = ChartAnimation.Disabled,
         )

@@ -44,7 +44,7 @@ class BarTest : ScreenshotTest {
                     maxHorizontalLinesCount = 2,
                 ),
                 colors = ChartDefaults.chartColors(grid = Color.Red).barChartColors,
-                xAxisLabel = {
+                xAxisMarkerLayout = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -52,7 +52,7 @@ class BarTest : ScreenshotTest {
                         Text(text = "testing")
                     }
                 },
-                yAxisLabel = {
+                yAxisMarkerLayout = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {

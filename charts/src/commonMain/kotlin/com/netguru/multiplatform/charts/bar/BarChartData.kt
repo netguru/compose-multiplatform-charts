@@ -8,6 +8,7 @@ import com.netguru.multiplatform.charts.line.SymbolShape
 @Immutable
 data class BarChartData(
     val categories: List<BarChartCategory>,
+    val unit: String?,
 ) : GridChartData {
     // TODO hide those values from the user
     override val minX: Long = 0
@@ -40,9 +41,10 @@ data class BarChartData(
                 .map {
                     LegendItemData(
                         name = it.x,
+                        unit = unit,
                         symbolShape = SymbolShape.RECTANGLE,
                         color = it.color,
-                        dashed = false,
+                        pathEffect = null,
                     )
                 }
         }

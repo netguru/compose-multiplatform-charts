@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.pie
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -19,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.pie.PieDefaults.FULL_CIRCLE_DEGREES
 import com.netguru.multiplatform.charts.pie.PieDefaults.START_ANGLE
@@ -50,21 +49,11 @@ fun PieChart(
     animation: ChartAnimation = ChartAnimation.Simple(),
     config: PieChartConfig = PieChartConfig(),
 ) {
-    val animationPlayed = StartAnimation(animation, data)
-    val maxAngle = when (animation) {
-        ChartAnimation.Disabled -> {
-            1f
-        }
-        is ChartAnimation.Simple -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) FULL_CIRCLE_DEGREES else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> {
-            throw UnsupportedOperationException("ChartAnimation.Sequenced is currently not supported for PieChart!")
-        }
-    }
+    val maxAngle = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = 1,
+        uniqueDatasetKey = data,
+    ).first() * FULL_CIRCLE_DEGREES
 
     val sumOfData by remember(data) {
         mutableStateOf(data.sumOf { it.value })

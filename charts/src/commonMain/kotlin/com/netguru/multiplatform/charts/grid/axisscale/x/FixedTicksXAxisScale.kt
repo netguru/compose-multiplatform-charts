@@ -1,4 +1,4 @@
-package com.netguru.multiplatform.charts.grid.axisscale
+package com.netguru.multiplatform.charts.grid.axisscale.x
 
 class FixedTicksXAxisScale(
     override val min: Long,

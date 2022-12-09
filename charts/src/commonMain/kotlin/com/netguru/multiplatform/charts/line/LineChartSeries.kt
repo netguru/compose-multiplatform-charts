@@ -2,6 +2,7 @@ package com.netguru.multiplatform.charts.line
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.netguru.multiplatform.charts.grid.GridChartData
@@ -9,7 +10,7 @@ import com.netguru.multiplatform.charts.grid.GridChartData
 @Immutable
 data class LineChartPoint(
     val x: Long,
-    val y: Float,
+    val y: Float?,
 )
 
 @Immutable
@@ -18,13 +19,13 @@ data class LineChartSeries(
     val lineWidth: Dp = 3.dp,
     val lineColor: Color,
     val fillColor: Color = lineColor,
-    val dashedLine: Boolean = false,
+    val pathEffect: PathEffect? = null,
     val listOfPoints: List<LineChartPoint> = emptyList(),
 ) {
     val minValue: Float
     val maxValue: Float
     val minTimestamp: Long
-    val maxTimeStamp: Long
+    val maxTimestamp: Long
 
     init {
         // find max and min in series
@@ -35,12 +36,12 @@ data class LineChartSeries(
 
             val minMaxTimestamp = getMinMaxTimestamp()
             minTimestamp = minMaxTimestamp.first
-            maxTimeStamp = minMaxTimestamp.second
+            maxTimestamp = minMaxTimestamp.second
         } else {
             minValue = 0f
             maxValue = 0f
             minTimestamp = 0L
-            maxTimeStamp = 0L
+            maxTimestamp = 0L
         }
     }
 
@@ -50,22 +51,29 @@ data class LineChartSeries(
     }
 
     private fun getMinMaxValue(): Pair<Float, Float> {
-        val sortedValue = listOfPoints.sortedBy { it.y }
-        return Pair(sortedValue.first().y, sortedValue.last().y)
+        return listOfPoints
+            .filter { it.y != null }
+            .sortedBy { it.y }
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                Pair(it.first().y!!, it.last().y!!)
+            } ?: Pair(0f, 0f)
     }
 }
 
 @Immutable
 data class LineChartData(
     val series: List<LineChartSeries>,
+    val dataUnit: String?,
 ) : GridChartData {
     override val legendData: List<LegendItemData>
         get() = series.map {
             LegendItemData(
                 name = it.dataName,
+                unit = dataUnit,
                 symbolShape = SymbolShape.LINE,
                 color = it.lineColor,
-                dashed = it.dashedLine
+                pathEffect = it.pathEffect,
             )
         }
 
@@ -78,12 +86,17 @@ data class LineChartData(
         // find max and min in all data
         val timeStamps = mutableListOf<Long>()
         val values = mutableListOf<Float>()
-        series.forEach {
-            timeStamps.add(it.minTimestamp)
-            timeStamps.add(it.maxTimeStamp)
-            values.add(it.minValue)
-            values.add(it.maxValue)
-        }
+        series
+            .forEach {
+                if (it.listOfPoints.any { point -> point.y != null }) {
+                    // null-only series, that are used to make timestamp ranges compatible between different series,
+                    // must not be used for y-axis values, since they always report min=0f, which breaks the chart.
+                    values.add(it.minValue)
+                    values.add(it.maxValue)
+                }
+                timeStamps.add(it.minTimestamp)
+                timeStamps.add(it.maxTimestamp)
+            }
         minX = timeStamps.minOrNull() ?: 0
         maxX = timeStamps.maxOrNull() ?: 0
         minY = values.minOrNull() ?: 0f

@@ -10,6 +10,7 @@ data class NavigationState(
         DIAL,
         GAS_BOTTLE,
         LINE,
+        LINE_WITH_TWO_Y_AXIS,
         PIE,
     }
 }

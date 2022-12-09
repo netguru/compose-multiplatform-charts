@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.dial
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -21,8 +20,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
 import com.netguru.multiplatform.charts.dial.DialDefaults.START_ANGLE
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.theme.ChartTheme
 import kotlin.math.PI
@@ -70,21 +69,11 @@ fun Dial(
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
 ) {
-    val animationPlayed = StartAnimation(animation, value)
-    val animatedScale = when (animation) {
-        ChartAnimation.Disabled -> {
-            1f
-        }
-        is ChartAnimation.Simple -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> {
-            throw UnsupportedOperationException("As Dial chart only shows one value, ChartAnimation.Sequenced is not supported!")
-        }
-    }
+    val animatedScale = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = 1,
+        uniqueDatasetKey = value,
+    ).first()
 
     val targetProgress = value.coerceIn(minValue..maxValue) * animatedScale
 
@@ -210,14 +199,14 @@ private fun DrawScope.drawScale(
 
     for (point in 0..100 step SCALE_STEP) {
         val angle = (
-            point.toFloat()
-                .mapValueToDifferentRange(
-                    0f,
-                    100f,
-                    START_ANGLE,
-                    0f
-                )
-            ) * PI.toFloat() / 180f // to radians
+                point.toFloat()
+                    .mapValueToDifferentRange(
+                        0f,
+                        100f,
+                        START_ANGLE,
+                        0f
+                    )
+                ) * PI.toFloat() / 180f // to radians
         val startPos = point.position(
             angle,
             scaleMultiplier,

@@ -17,9 +17,10 @@ desktop-packageVersion = "1.0.0"
 desktop-packageName = "jvm"
 
 # Dependencies
-kotlin-gradle-plugin = "1.6.10"
+kotlin-gradle-plugin = "1.7.20"
 android-gradle-plugin = "7.2.1"
-compose = "1.1.1"
+#compose = "1.2.1"
+compose = "1.3.0-beta03"
 activity-compose = "1.4.0"
 coroutines = "1.6.0"
 appcompat = "1.4.1"

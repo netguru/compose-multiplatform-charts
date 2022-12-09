@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.gasbottle
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -19,7 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
@@ -45,21 +44,13 @@ fun GasBottle(
     animation: ChartAnimation = ChartAnimation.Simple(),
     colors: GasBottleColors = ChartTheme.colors.gasBottleColors,
 ) {
-    val animationPlayed = StartAnimation(animation, percentage)
-    val targetProgress = when (animation) {
-        ChartAnimation.Disabled -> {
-            percentage
-        }
-        is ChartAnimation.Simple -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) percentage else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> {
-            throw UnsupportedOperationException("As GasBottle chart only shows one value, ChartAnimation.Sequenced is not supported!")
-        }
-    }
+    val animationPercentage = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = 1,
+        uniqueDatasetKey = percentage,
+    ).first()
+
+    val targetProgress = percentage * animationPercentage
 
     val gasTank = rememberVectorPainter(image = GasTank)
     Box(modifier = modifier, contentAlignment = Alignment.Center) {

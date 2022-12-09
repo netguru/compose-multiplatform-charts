@@ -10,5 +10,6 @@ fun NavigationState.Tab.toLabel(): String = when (this) {
     NavigationState.Tab.DIAL -> "Dial"
     NavigationState.Tab.GAS_BOTTLE -> "Gas bottle"
     NavigationState.Tab.LINE -> "Line"
+    NavigationState.Tab.LINE_WITH_TWO_Y_AXIS -> "Line with two Y axis"
     NavigationState.Tab.PIE -> "Pie"
 }

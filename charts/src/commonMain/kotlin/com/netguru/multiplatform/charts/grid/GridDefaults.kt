@@ -8,14 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.netguru.multiplatform.charts.vertical
 
 internal object GridDefaults {
 
-    val HORIZONTAL_LINES_OFFSET = 10.dp
+    val HORIZONTAL_LINES_OFFSET = 0.dp
     const val NUMBER_OF_GRID_LINES = 5
-    const val ROUND_MIN_MAX_CLOSEST_TO = 10
+    const val ROUND_MIN_MAX_CLOSEST_TO = 10f
 
-    val YAxisLabel: @Composable (value: Any) -> Unit = { value ->
+    val YAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -26,22 +27,38 @@ internal object GridDefaults {
         )
     }
 
-    val OverlayHeaderLabel: @Composable (value: Any) -> Unit = { value ->
+    val YAxisDataTitleLayout: @Composable () -> Unit = {
         Text(
-            text = value.toString(),
+            fontSize = 12.sp,
+            text = "y-axis label",
+            maxLines = 1,
+            modifier = Modifier
+                .vertical()
+        )
+    }
+
+    val YAxisDataTitleYAxisData: YAxisTitleData = YAxisTitleData(
+        labelLayout = YAxisDataTitleLayout,
+        labelPosition = YAxisTitleData.LabelPosition.Left,
+    )
+
+    val OverlayHeaderLabel: @Composable (value: Any, dataUnit: String?) -> Unit = { value, dataUnit ->
+        Text(
+            text = value.toString() + dataUnit?.let { " $it" }.orEmpty(),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.overline
         )
     }
 
-    val OverlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = { dataName, value ->
-        Text(
-            text = "$dataName: $value"
-        )
-    }
+    val OverlayDataEntryLabel: @Composable (dataName: String, dataUnit: String?, value: Any) -> Unit =
+        { dataName, dataUnit, value ->
+            Text(
+                text = "$dataName: $value" + dataUnit?.let { " $it" }.orEmpty()
+            )
+        }
 
-    val XAxisLabel: @Composable (value: Any) -> Unit = { value ->
+    val XAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
         Text(
             fontSize = 12.sp,
             text = value.toString(),
@@ -49,9 +66,9 @@ internal object GridDefaults {
         )
     }
 
-    val LegendItemLabel: @Composable (String) -> Unit = {
+    val LegendItemLabel: @Composable (name: String, unit: String?) -> Unit = { name, unit ->
         Text(
-            text = it,
+            text = name + unit?.let { " ($it)" }.orEmpty(),
         )
     }
 }
