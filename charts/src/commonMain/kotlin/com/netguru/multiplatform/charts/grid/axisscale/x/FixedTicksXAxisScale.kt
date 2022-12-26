@@ -7,4 +7,5 @@ class FixedTicksXAxisScale(
 ) : XAxisScale {
     override val tick: Long = (max - min) / tickCount
     override val start: Long = min
+    override val end: Long = max
 }

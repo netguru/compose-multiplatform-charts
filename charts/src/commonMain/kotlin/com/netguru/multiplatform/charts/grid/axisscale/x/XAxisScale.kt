@@ -5,4 +5,5 @@ interface XAxisScale {
     val min: Long
     val max: Long
     val start: Long
+    val end: Long
 }

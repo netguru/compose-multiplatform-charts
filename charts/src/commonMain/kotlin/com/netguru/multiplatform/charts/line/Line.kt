@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 
 internal fun DrawScope.drawLineChart(
@@ -20,6 +21,7 @@ internal fun DrawScope.drawLineChart(
     alpha: List<Float>,
     drawPoints: Boolean,
     selectedPointsForDrawing: List<SeriesAndClosestPoint>,
+    xAxisScale: TimestampXAxisScale,
 ) {
     // calculate path
     val path = Path()
@@ -56,6 +58,7 @@ internal fun DrawScope.drawLineChart(
         }
         val mappedPoints =
             mapDataToPixels(
+                xAxisScale = xAxisScale,
                 lineChartData = lineChartData,
                 currentSeries = data,
                 canvasSize = size,
@@ -134,8 +137,8 @@ internal fun DrawScope.drawLineChart(
             val offsets = selectedPointsForDrawing
                 .map { seriesAndClosestPoint ->
                     val x = seriesAndClosestPoint.closestPoint.x.mapValueToDifferentRange(
-                        lineChartData.minX,
-                        lineChartData.maxX,
+                        xAxisScale.start,
+                        xAxisScale.end,
                         0L,
                         size.width.toLong()
                     ).toFloat()
@@ -167,11 +170,12 @@ private fun mapDataToPixels(
     graphTopPadding: Float = 0f,
     graphBottomPadding: Float,
     shouldSetZeroAsMinValue: Boolean,
+    xAxisScale: TimestampXAxisScale,
 ): List<PointF> {
     val mappedPoints = currentSeries.listOfPoints.map {
         val x = it.x.mapValueToDifferentRange(
-            inMin = lineChartData.minX,
-            inMax = lineChartData.maxX,
+            inMin = xAxisScale.start,
+            inMax = xAxisScale.end,
             outMin = 0L,
             outMax = canvasSize.width.toLong()
         ).toFloat()

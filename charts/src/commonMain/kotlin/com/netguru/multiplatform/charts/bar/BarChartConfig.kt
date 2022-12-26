@@ -19,5 +19,5 @@ data class BarChartConfig(
     val cornerRadius: Dp = BarChartDefaults.BAR_CORNER_RADIUS,
     val barsSpacing: Dp = BarChartDefaults.BAR_HORIZONTAL_SPACING,
     val maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    val roundMinMaxClosestTo: Float = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
+    val roundMinMaxClosestTo: Float = GridDefaults.ROUND_Y_AXIS_MIN_MAX_CLOSEST_TO,
 )

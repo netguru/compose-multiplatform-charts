@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.netguru.multiplatform.charts.OverlayInformation
+import com.netguru.multiplatform.charts.grid.axisscale.x.XAxisScale
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import kotlin.math.abs
 
@@ -38,6 +39,7 @@ internal fun LineChartOverlayInformation(
     colors: LineChartColors,
     drawPoints: (points: List<SeriesAndClosestPoint>) -> Unit,
     overlayData: OverlayData,
+    xAxisScale: XAxisScale,
 ) {
     if (overlayData.showInterpolatedValues) {
         LineChartOverlayInformationWithInterpolatedValues(
@@ -50,6 +52,8 @@ internal fun LineChartOverlayInformation(
             touchOffsetHorizontal = overlayData.touchOffsetHorizontal,
             touchOffsetVertical = overlayData.touchOffsetVertical,
             overlayWidth = overlayData.overlayWidth,
+            overlayAlpha = overlayData.overlayAlpha,
+            xAxisScale = xAxisScale,
         )
     } else {
         LineChartOverlayInformation(
@@ -64,6 +68,8 @@ internal fun LineChartOverlayInformation(
             touchOffsetHorizontal = overlayData.touchOffsetHorizontal,
             touchOffsetVertical = overlayData.touchOffsetVertical,
             overlayWidth = overlayData.overlayWidth,
+            overlayAlpha = overlayData.overlayAlpha,
+            xAxisScale = xAxisScale,
         )
     }
 }
@@ -71,34 +77,27 @@ internal fun LineChartOverlayInformation(
 @Composable
 private fun LineChartOverlayInformation(
     lineChartData: List<LineChartData>,
+    xAxisScale: XAxisScale,
     positionX: Float,
     containerSize: Size,
     colors: LineChartColors,
     overlayHeaderLayout: @Composable (value: Any, dataUnit: String?) -> Unit,
-    overlayDataEntryLayout: @Composable (dataName: String, dataUnit: String?, value: Any) -> Unit,
+    overlayDataEntryLayout: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit,
     drawPoints: (points: List<SeriesAndClosestPoint>) -> Unit,
     highlightPointsCloserThan: Dp,
     touchOffsetHorizontal: Dp,
     touchOffsetVertical: Dp,
-    overlayWidth: Dp,
+    overlayWidth: Dp?,
+    overlayAlpha: Float,
 ) {
     if (positionX < 0) {
         drawPoints(emptyList())
         return
     }
 
-    val combinedLineChartData by remember(lineChartData) {
-        derivedStateOf {
-            LineChartData(
-                series = lineChartData.flatMap { it.series },
-                dataUnit = null,
-            )
-        }
-    }
-
     val timestampCursor = getTimestampFromCursor(
         xCursorPosition = positionX,
-        lineChartData = combinedLineChartData,
+        xAxisScale = xAxisScale,
         containerSize = containerSize
     )
     val listOfValues = retrieveDataWithClosestPointForEachSeries(lineChartData, timestampCursor)
@@ -114,8 +113,8 @@ private fun LineChartOverlayInformation(
 
         linePositionX =
             listOfValues.first().closestPoint.x.mapValueToDifferentRange(
-                inMin = combinedLineChartData.minX,
-                inMax = combinedLineChartData.maxX,
+                inMin = xAxisScale.start,
+                inMax = xAxisScale.end,
                 outMin = 0f,
                 outMax = containerSize.width,
             )
@@ -123,8 +122,8 @@ private fun LineChartOverlayInformation(
         val (pointsToAvoid, valuesToShowDataFor) = listOfValues.mapNotNull {
             val (x, y) = it.closestPoint.let { point ->
                 point.x.mapValueToDifferentRange(
-                    inMin = combinedLineChartData.minX,
-                    inMax = combinedLineChartData.maxX,
+                    inMin = xAxisScale.start,
+                    inMax = xAxisScale.end,
                     outMin = 0f,
                     outMax = containerSize.width,
                 ) to point.y!!.mapValueToDifferentRange(
@@ -148,11 +147,12 @@ private fun LineChartOverlayInformation(
         OverlayInformation(
             positionX = linePositionX,
             containerSize = containerSize,
-            surfaceColor = colors.surface,
+            surfaceColor = colors.overlaySurface,
             pointsToAvoid = pointsToAvoid,
             touchOffsetHorizontal = touchOffsetHorizontal,
             touchOffsetVertical = touchOffsetVertical,
-            overlayWidth = overlayWidth,
+            requiredOverlayWidth = overlayWidth,
+            overlayAlpha = overlayAlpha,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,10 +168,13 @@ private fun LineChartOverlayInformation(
 
                             Spacer(modifier = Modifier.height(4.dp))
 
-
                             closestPointBySeries.value
                                 .forEach { seriesAndClosestPoint ->
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .align(Alignment.Start)
+                                    ) {
                                         Box(
                                             modifier = Modifier
                                                 .size(16.dp, 4.dp)
@@ -189,9 +192,10 @@ private fun LineChartOverlayInformation(
                                         Spacer(modifier = Modifier.width(8.dp))
 
                                         val dataName = seriesAndClosestPoint.lineChartSeries.dataName
+                                        val dataNameShort = seriesAndClosestPoint.lineChartSeries.dataNameShort
                                         val dataUnit = seriesAndClosestPoint.dataUnit
                                         val value = seriesAndClosestPoint.closestPoint.y
-                                        overlayDataEntryLayout(dataName, dataUnit, value!!)
+                                        overlayDataEntryLayout(dataName, dataNameShort, dataUnit, value!!)
                                     }
                                 }
                         }
@@ -217,14 +221,16 @@ private fun LineChartOverlayInformation(
 @Composable
 private fun LineChartOverlayInformationWithInterpolatedValues(
     lineChartData: List<LineChartData>,
+    xAxisScale: XAxisScale,
     positionX: Float,
     containerSize: Size,
     colors: LineChartColors,
     overlayHeaderLayout: @Composable (value: Any, dataUnit: String?) -> Unit,
-    overlayDataEntryLayout: @Composable (dataName: String, dataUnit: String?, value: Any) -> Unit,
+    overlayDataEntryLayout: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit,
     touchOffsetHorizontal: Dp,
     touchOffsetVertical: Dp,
-    overlayWidth: Dp,
+    overlayWidth: Dp?,
+    overlayAlpha: Float,
 ) {
     if (positionX < 0) {
         return
@@ -241,7 +247,7 @@ private fun LineChartOverlayInformationWithInterpolatedValues(
 
     val timestampCursor = getTimestampFromCursor(
         xCursorPosition = positionX,
-        lineChartData = combinedLineChartData,
+        xAxisScale = xAxisScale,
         containerSize = containerSize
     )
     val listOfValues = retrieveDataWithInterpolatedValue(combinedLineChartData, timestampCursor)
@@ -250,21 +256,27 @@ private fun LineChartOverlayInformationWithInterpolatedValues(
         OverlayInformation(
             positionX = positionX,
             containerSize = containerSize,
-            surfaceColor = colors.surface,
+            surfaceColor = colors.overlaySurface,
             touchOffsetHorizontal = touchOffsetHorizontal,
             touchOffsetVertical = touchOffsetVertical,
-            overlayWidth = overlayWidth,
+            requiredOverlayWidth = overlayWidth,
+            overlayAlpha = overlayAlpha,
             content = {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     val dataUnit = listOfValues.first().lineChartSeries.dataName // todo
+                    val dataNameShort = listOfValues.first().lineChartSeries.dataNameShort
                     overlayHeaderLayout(timestampCursor, dataUnit)
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     listOfValues.forEach { seriesAndInterpolatedValue ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(16.dp, 4.dp)
@@ -282,9 +294,8 @@ private fun LineChartOverlayInformationWithInterpolatedValues(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             val dataName = seriesAndInterpolatedValue.lineChartSeries.dataName
-                            val dataUnit = dataUnit
                             val interpolatedValue = seriesAndInterpolatedValue.interpolatedValue
-                            overlayDataEntryLayout(dataName, dataUnit, interpolatedValue)
+                            overlayDataEntryLayout(dataName, dataNameShort, dataUnit, interpolatedValue)
                         }
                     }
                 }
@@ -306,14 +317,14 @@ private fun LineChartOverlayInformationWithInterpolatedValues(
 
 private fun getTimestampFromCursor(
     xCursorPosition: Float,
-    lineChartData: LineChartData,
     containerSize: Size,
+    xAxisScale: XAxisScale,
 ) =
     xCursorPosition.toLong().mapValueToDifferentRange(
         0L,
         containerSize.width.toLong(),
-        lineChartData.minX,
-        lineChartData.maxX
+        xAxisScale.start,
+        xAxisScale.end,
     )
 
 private fun retrieveDataWithClosestPointForEachSeries(

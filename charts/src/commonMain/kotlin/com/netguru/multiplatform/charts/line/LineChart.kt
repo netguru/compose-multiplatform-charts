@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
@@ -61,7 +60,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * @param maxHorizontalLines Max number of lines, representing the y-axis values
  * @param roundMinMaxClosestTo Number to which min and max range will be rounded to
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LineChart(
     yAxisData: YAxisData,
@@ -118,19 +116,21 @@ fun LineChart(
                 var pointsToDraw: List<SeriesAndClosestPoint> by remember {
                     mutableStateOf(emptyList())
                 }
+                val xAxisScale = TimestampXAxisScale(
+                    min = yAxisData.lineChartData.minX,
+                    max = yAxisData.lineChartData.maxX,
+                    maxTicksCount = (minOf(
+                        maxVerticalLines, numberOfXAxisEntries
+                    ) - 1).coerceAtLeast(1),
+                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                )
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                         .drawBehind {
                             val lines = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(
-                                    min = yAxisData.lineChartData.minX,
-                                    max = yAxisData.lineChartData.maxX,
-                                    maxTicksCount = (minOf(
-                                        maxVerticalLines, numberOfXAxisEntries
-                                    ) - 1).coerceAtLeast(1)
-                                ),
+                                xAxisScale = xAxisScale,
                                 yAxisScale = YAxisScaleDynamic(
                                     min = yAxisData.lineChartData.minY,
                                     max = yAxisData.lineChartData.maxY,
@@ -146,6 +146,7 @@ fun LineChart(
                             )
 
                             drawLineChart(
+                                xAxisScale = xAxisScale,
                                 lineChartData = yAxisData.lineChartData,
                                 graphTopPadding = horizontalLinesOffset,
                                 graphBottomPadding = horizontalLinesOffset,
@@ -216,6 +217,7 @@ fun LineChart(
                                     pointsToDraw = it
                                 },
                                 overlayData = overlayData,
+                                xAxisScale = xAxisScale,
                             )
                         }
                     }

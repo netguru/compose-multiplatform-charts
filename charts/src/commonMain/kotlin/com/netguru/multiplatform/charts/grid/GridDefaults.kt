@@ -14,7 +14,8 @@ internal object GridDefaults {
 
     val HORIZONTAL_LINES_OFFSET = 0.dp
     const val NUMBER_OF_GRID_LINES = 5
-    const val ROUND_MIN_MAX_CLOSEST_TO = 10f
+    const val ROUND_Y_AXIS_MIN_MAX_CLOSEST_TO = 10f
+    const val ROUND_X_AXIS_MIN_MAX_CLOSEST_TO = 15 * 60 * 1000L // 15 minutes
 
     val YAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
         Text(
@@ -51,10 +52,11 @@ internal object GridDefaults {
         )
     }
 
-    val OverlayDataEntryLabel: @Composable (dataName: String, dataUnit: String?, value: Any) -> Unit =
-        { dataName, dataUnit, value ->
+    val OverlayDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit =
+        { dataName, dataNameShort, dataUnit, value ->
             Text(
-                text = "$dataName: $value" + dataUnit?.let { " $it" }.orEmpty()
+                text = "$dataName${dataNameShort?.let { " ($it)" }.orEmpty()}: $value" + dataUnit?.let { " $it" }
+                    .orEmpty()
             )
         }
 

@@ -124,10 +124,10 @@ fun measureVerticalLines(
     val valueStep = axisScale.tick.coerceAtLeast(1)
     var currentValue = axisScale.start
 
-    while (currentValue in axisScale.min..axisScale.max) {
+    while (currentValue in axisScale.start..axisScale.end) {
         val currentPosition = currentValue.mapValueToDifferentRange(
-            axisScale.min,
-            axisScale.max,
+            axisScale.start,
+            axisScale.end,
             startPosition,
             endPosition
         )

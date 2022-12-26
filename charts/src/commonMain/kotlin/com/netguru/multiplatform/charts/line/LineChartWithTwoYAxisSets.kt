@@ -23,35 +23,6 @@ import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleStatic
 import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
-data class YAxisData(
-    val lineChartData: LineChartData,
-    val markerLayout: (@Composable (value: Any) -> Unit)? = GridDefaults.YAxisMarkerLayout,
-    val yAxisTitleData: YAxisTitleData? = GridDefaults.YAxisDataTitleYAxisData,
-    val roundMinMaxClosestTo: Float = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
-)
-
-data class XAxisData(
-    val markerLayout: @Composable (value: Any) -> Unit = GridDefaults.XAxisMarkerLayout,
-    val hideMarkersWhenOverlapping: Boolean = false,
-    val alignFirstAndLastToChartEdges: Boolean = false,
-)
-
-data class OverlayData(
-    val overlayHeaderLabel: @Composable (value: Any, dataUnit: String?) -> Unit = GridDefaults.OverlayHeaderLabel,
-    val overlayDataEntryLabel: @Composable (dataName: String, dataUnit: String?, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
-    val showEnlargedPointOnLine: Boolean = false,
-    val showInterpolatedValues: Boolean = true,
-    val highlightPointsCloserThan: Dp = 30.dp,
-    val touchOffsetHorizontal: Dp = 20.dp,
-    val touchOffsetVertical: Dp = 20.dp,
-    val overlayWidth: Dp = 200.dp,
-)
-
-data class LegendData(
-    val columnMinWidth: Dp = 200.dp,
-    val legendItemLabel: @Composable (name: String, unit: String?) -> Unit = GridDefaults.LegendItemLabel,
-)
-
 /**
  * Classic line chart with some shade below the line in the same color (albeit with a lot of
  * transparency) as the line and floating balloon on touch/click to show values for that particular
@@ -205,19 +176,21 @@ private fun LineChartWithTwoYAxisSetsLayout(
                 var pointsToDraw: List<SeriesAndClosestPoint> by remember {
                     mutableStateOf(emptyList())
                 }
+                val xAxisScale = TimestampXAxisScale(
+                    min = minOf(leftYAxisData.lineChartData.minX, rightYAxisData.lineChartData.minX),
+                    max = maxOf(leftYAxisData.lineChartData.maxX, rightYAxisData.lineChartData.maxX),
+                    maxTicksCount = (minOf(
+                        maxVerticalLines, numberOfXAxisEntries
+                    ) - 1).coerceAtLeast(1),
+                    roundClosestTo = xAxisData?.roundMinMaxClosestTo
+                )
                 BoxWithConstraints(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f)
                         .drawBehind {
                             val lines = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(
-                                    min = minOf(leftYAxisData.lineChartData.minX, rightYAxisData.lineChartData.minX),
-                                    max = maxOf(leftYAxisData.lineChartData.maxX, rightYAxisData.lineChartData.maxX),
-                                    maxTicksCount = (minOf(
-                                        maxVerticalLines, numberOfXAxisEntries
-                                    ) - 1).coerceAtLeast(1)
-                                ),
+                                xAxisScale = xAxisScale,
                                 yAxisScale = YAxisScaleStatic(
                                     min = 0f,
                                     max = maxHorizontalLines.toFloat(),
@@ -229,7 +202,11 @@ private fun LineChartWithTwoYAxisSetsLayout(
                             }
 
                             leftYAxisMarks = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(0, 0),
+                                xAxisScale = TimestampXAxisScale(
+                                    min = 0,
+                                    max = 0,
+                                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                                ),
                                 yAxisScale = YAxisScaleDynamic(
                                     min = leftYAxisData.lineChartData.minY,
                                     max = leftYAxisData.lineChartData.maxY,
@@ -248,7 +225,11 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                     }
                                 }
                             rightYAxisMarks = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(0, 0),
+                                xAxisScale = TimestampXAxisScale(
+                                    min = 0,
+                                    max = 0,
+                                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                                ),
                                 yAxisScale = YAxisScaleDynamic(
                                     min = rightYAxisData.lineChartData.minY,
                                     max = rightYAxisData.lineChartData.maxY,
@@ -283,6 +264,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                         it.lineChartSeries
                                     )
                                 },
+                                xAxisScale = xAxisScale,
                             )
 
                             drawLineChart(
@@ -299,6 +281,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                         it.lineChartSeries
                                     )
                                 },
+                                xAxisScale = xAxisScale,
                             )
                         }
                         // Touch input
@@ -342,6 +325,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                     pointsToDraw = it
                                 },
                                 overlayData = overlayData,
+                                xAxisScale = xAxisScale,
                             )
                         }
                     }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +29,8 @@ internal fun OverlayInformation(
     surfaceColor: Color,
     touchOffsetVertical: Dp,
     touchOffsetHorizontal: Dp,
-    overlayWidth: Dp,
+    requiredOverlayWidth: Dp?,
+    overlayAlpha: Float,
     pointsToAvoid: List<Offset> = emptyList(),
     content: @Composable () -> Unit,
 ) {
@@ -37,14 +38,22 @@ internal fun OverlayInformation(
         return
     }
 
+    val density = LocalDensity.current
+
     var overlayHeight by remember {
         mutableStateOf(0)
     }
+    var overlayWidth by remember {
+        val pxs: Int
+        with(density) {
+            pxs = requiredOverlayWidth?.roundToPx() ?: 0
+        }
+        mutableStateOf(pxs)
+    }
 
-    val density = LocalDensity.current
 
     val putInfoOnTheLeft = positionX > (containerSize.width / 2)
-    val (offsetX, offsetY) = remember(pointsToAvoid, overlayHeight, putInfoOnTheLeft) {
+    val (offsetX, offsetY) = remember(pointsToAvoid, overlayHeight, overlayWidth, putInfoOnTheLeft) {
         pointsToAvoid
             .takeIf { it.isNotEmpty() }
             ?.let {
@@ -53,7 +62,7 @@ internal fun OverlayInformation(
                 with(density) {
                     x = if (putInfoOnTheLeft) {
                         val minX = it.minOf { it.x }.toDp()
-                        minX - touchOffsetHorizontal - overlayWidth
+                        minX - touchOffsetHorizontal - overlayWidth.toDp()
                     } else {
                         val maxX = it.maxOf { it.x }.toDp()
                         maxX + touchOffsetHorizontal
@@ -76,7 +85,7 @@ internal fun OverlayInformation(
                     positionX.toDp() +
                             // change offset based on cursor position to avoid out of screen drawing on the right
                             if (putInfoOnTheLeft) {
-                                -overlayWidth - touchOffsetHorizontal
+                                -overlayWidth.toDp() - touchOffsetHorizontal
                             } else {
                                 touchOffsetHorizontal
                             }
@@ -88,16 +97,25 @@ internal fun OverlayInformation(
         modifier = Modifier
             .onSizeChanged {
                 overlayHeight = it.height
+                if (requiredOverlayWidth == null) {
+                    overlayWidth = it.width
+                }
             }
             .offset(
                 x = offsetX,
                 y = offsetY,
             )
-            .width(overlayWidth)
-            .alpha(0.9f)
+            .alpha(overlayAlpha)
             .clip(RoundedCornerShape(10.dp))
             .background(surfaceColor)
             .padding(8.dp)
+            .then(
+                if (requiredOverlayWidth != null) {
+                    Modifier.requiredWidth(requiredOverlayWidth)
+                } else {
+                    Modifier
+                }
+            )
     ) {
         content()
     }

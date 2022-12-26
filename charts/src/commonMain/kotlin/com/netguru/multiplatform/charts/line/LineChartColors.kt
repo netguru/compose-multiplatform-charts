@@ -9,6 +9,7 @@ data class LineChartColors(
     val grid: Color,
     val surface: Color,
     val overlayLine: Color,
+    val overlaySurface: Color = surface,
 )
 
 val ChartColors.lineChartColors

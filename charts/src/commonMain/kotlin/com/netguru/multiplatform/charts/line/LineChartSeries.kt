@@ -16,6 +16,7 @@ data class LineChartPoint(
 @Immutable
 data class LineChartSeries(
     val dataName: String,
+    val dataNameShort: String? = null,
     val lineWidth: Dp = 3.dp,
     val lineColor: Color,
     val fillColor: Color = lineColor,

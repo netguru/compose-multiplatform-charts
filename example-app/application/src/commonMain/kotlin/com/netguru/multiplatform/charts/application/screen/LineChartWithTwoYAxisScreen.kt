@@ -73,6 +73,7 @@ fun LineChartWithTwoYAxisScreen() {
             series = listOf(
                 LineChartSeries(
                     dataName = "data right",
+                    dataNameShort = "short name",
                     lineColor = colorRight,
                     listOfPoints = (1..15).map { point ->
                         LineChartPoint(
@@ -166,7 +167,7 @@ fun LineChartWithTwoYAxisScreen() {
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
-                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                            text = DateTime.fromUnix(it as Long).format("HH:mm"),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -174,10 +175,11 @@ fun LineChartWithTwoYAxisScreen() {
                 overlayData = OverlayData(
                     overlayHeaderLabel = { it, _ ->
                         Text(
-                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+                            text = DateTime.fromUnix(it as Long).format("HH:mm"),
                             style = MaterialTheme.typography.overline
                         )
-                    }
+                    },
+                    overlayWidth = null,
                 ),
                 animation = ChartAnimation.Sequenced(),
                 drawPoints = true,
