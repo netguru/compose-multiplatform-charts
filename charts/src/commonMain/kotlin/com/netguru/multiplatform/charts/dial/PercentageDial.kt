@@ -21,6 +21,7 @@ fun PercentageDial(
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
+    indicator: (@Composable () -> Unit)? = null,
 ) {
     Dial(
         value = percentage,
@@ -32,5 +33,6 @@ fun PercentageDial(
         config = config,
         minAndMaxValueLabel = minAndMaxValueLabel,
         mainLabel = mainLabel,
+        indicator = indicator,
     )
 }

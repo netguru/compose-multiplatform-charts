@@ -6,14 +6,21 @@ import com.netguru.multiplatform.charts.theme.ChartColors
 
 @Immutable
 data class DialColors(
-    val progressBarColor: Color,
+    val progressBarColor: DialProgressColors,
     val progressBarBackgroundColor: Color,
     val gridScaleColor: Color,
 )
 
+@Immutable
+sealed class DialProgressColors {
+    data class SingleColor(val color: Color) : DialProgressColors()
+    data class GradientWithStops(val colorStops: List<Pair<Float, Color>>) : DialProgressColors()
+    data class Gradient(val colors: List<Color>) : DialProgressColors()
+}
+
 val ChartColors.dialColors
     get() = DialColors(
-        progressBarColor = primary,
+        progressBarColor = DialProgressColors.SingleColor(primary),
         progressBarBackgroundColor = grid,
         gridScaleColor = grid
     )

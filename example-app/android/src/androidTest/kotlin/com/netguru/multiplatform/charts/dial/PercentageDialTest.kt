@@ -22,27 +22,27 @@ class PercentageDialTest : ScreenshotTest {
 
     @Test
     fun value_50_UI_default() {
-        checkComposable(composeRule) { PercentageDial(percentage = 50) }
+        checkComposable(composeRule) { PercentageDial(percentage = 50,) }
     }
 
     @Test
     fun value_0_UI_default() {
-        checkComposable(composeRule) { PercentageDial(percentage = 0) }
+        checkComposable(composeRule) { PercentageDial(percentage = 0,) }
     }
 
     @Test
     fun value_100_UI_default() {
-        checkComposable(composeRule) { PercentageDial(percentage = 100) }
+        checkComposable(composeRule) { PercentageDial(percentage = 100,) }
     }
 
     @Test
     fun value_minus100_UI_default() {
-        checkComposable(composeRule) { PercentageDial(percentage = -100) }
+        checkComposable(composeRule) { PercentageDial(percentage = -100,) }
     }
 
     @Test
     fun value_150_UI_default() {
-        checkComposable(composeRule) { PercentageDial(percentage = 150) }
+        checkComposable(composeRule) { PercentageDial(percentage = 150,) }
     }
 
     @Test
@@ -69,7 +69,7 @@ class PercentageDialTest : ScreenshotTest {
                         Text(text = it.toString(), color = Color.Blue, fontSize = 40.sp)
                         Text(text = "tests", color = Color.Magenta, fontSize = 24.sp)
                     }
-                }
+                },
             )
         }
     }
@@ -80,7 +80,7 @@ class PercentageDialTest : ScreenshotTest {
             PercentageDial(
                 percentage = 69,
                 minAndMaxValueLabel = { },
-                mainLabel = { }
+                mainLabel = { },
             )
         }
     }

@@ -8,17 +8,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import com.netguru.multiplatform.charts.ChartAnimation
 import com.netguru.multiplatform.charts.dial.DialDefaults.START_ANGLE
 import com.netguru.multiplatform.charts.getAnimationAlphas
@@ -68,6 +73,7 @@ fun Dial(
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
+    indicator: (@Composable () -> Unit)? = null,
 ) {
     val animatedScale = getAnimationAlphas(
         animation = animation,
@@ -79,6 +85,8 @@ fun Dial(
 
     Box(modifier = modifier) {
         Column(modifier = Modifier.align(Alignment.Center)) {
+            val sweepAngle =
+                targetProgress.mapValueToDifferentRange(minValue.toFloat(), maxValue.toFloat(), MIN_ANGLE, MAX_ANGLE)
             BoxWithConstraints(
                 Modifier
                     .fillMaxWidth()
@@ -86,6 +94,7 @@ fun Dial(
                     .drawBehind {
                         drawProgressBar(
                             value = targetProgress,
+                            sweepAngle = sweepAngle,
                             minValue = minValue.toFloat(),
                             maxValue = maxValue.toFloat(),
                             config = config,
@@ -113,6 +122,29 @@ fun Dial(
                 ) {
                     mainLabel(value)
                 }
+
+                if (indicator != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(maxWidth / 2)
+                            .align(Alignment.BottomStart)
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, placeable.height / 2)
+                                }
+                            }
+                            .graphicsLayer(
+                                rotationZ = sweepAngle,
+                                transformOrigin = TransformOrigin(
+                                    pivotFractionX = 1f,
+                                    pivotFractionY = 0.5f,
+                                )
+                            )
+                    ) {
+                        indicator()
+                    }
+                }
             }
             Row(
                 modifier = Modifier
@@ -128,20 +160,20 @@ fun Dial(
 
 private fun DrawScope.drawProgressBar(
     value: Float,
+    sweepAngle: Float,
     minValue: Float,
     maxValue: Float,
     config: DialConfig,
-    progressBarColor: Color,
+    progressBarColor: DialProgressColors,
     progressBarBackgroundColor: Color,
 ) {
-    val sweepAngle = value.mapValueToDifferentRange(minValue, maxValue, MIN_ANGLE, MAX_ANGLE)
     val thickness = config.thickness.toPx()
     val radius = (size.width - thickness) / 2f
     val circumference = (2f * PI * radius).toFloat()
     val thicknessInDegrees = CIRCLE_ANGLE * thickness / circumference
     val arcPadding = if (config.roundCorners) thicknessInDegrees / 2f else 0f
     val topLeftOffset = Offset(thickness / 2f, thickness / 2f)
-    // Arc has to be drawn on 2 * height space cause we want only half of the circle
+    // Arc has to be drawn on 2 * height space because we want only half of the circle
     val arcSize = Size(size.width - thickness, size.height * ASPECT_RATIO - thickness)
     val style = Stroke(
         width = thickness,
@@ -149,16 +181,18 @@ private fun DrawScope.drawProgressBar(
         pathEffect = PathEffect.cornerPathEffect(20f)
     )
 
-    val joinStyle = if (value == minValue || value == maxValue)
+    val joinStyle = if (config.joinStyle != DialJoinStyle.Overlapped && (value == minValue || value == maxValue)) {
         DialJoinStyle.Joined
-    else
+    } else {
         config.joinStyle
+    }
 
-    if (value > minValue) {
+    if (value < maxValue) {
         drawArc(
-            color = progressBarColor,
-            startAngle = START_ANGLE + arcPadding,
-            sweepAngle = sweepAngle - (2f * arcPadding),
+            color = progressBarBackgroundColor,
+            startAngle = START_ANGLE + joinStyle.startAnglePadding(sweepAngle, arcPadding),
+            sweepAngle = (MAX_ANGLE - joinStyle.sweepAnglePadding(sweepAngle, arcPadding))
+                .coerceAtLeast(0f),
             useCenter = false,
             style = style,
             topLeft = topLeftOffset,
@@ -166,17 +200,56 @@ private fun DrawScope.drawProgressBar(
         )
     }
 
-    if (value < maxValue) {
-        drawArc(
-            color = progressBarBackgroundColor,
-            startAngle = START_ANGLE + sweepAngle + joinStyle.startAnglePadding(arcPadding),
-            sweepAngle = (MAX_ANGLE - sweepAngle - joinStyle.sweepAnglePadding(arcPadding))
-                .coerceAtLeast(0f),
-            useCenter = false,
-            style = style,
-            topLeft = topLeftOffset,
-            size = arcSize
-        )
+    if (value >= minValue) {
+        when (progressBarColor) {
+            is DialProgressColors.Gradient -> {
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        colors = progressBarColor.colors,
+                        center = Offset(
+                            x = size.width / 2,
+                            y = size.height,
+                        ),
+                    ),
+                    startAngle = START_ANGLE + arcPadding,
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    useCenter = false,
+                    style = style,
+                    topLeft = topLeftOffset,
+                    size = arcSize
+                )
+            }
+
+            is DialProgressColors.GradientWithStops -> {
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        colorStops = progressBarColor.colorStops.toTypedArray(),
+                        center = Offset(
+                            x = size.width / 2,
+                            y = size.height,
+                        ),
+                    ),
+                    startAngle = START_ANGLE + arcPadding,
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    useCenter = false,
+                    style = style,
+                    topLeft = topLeftOffset,
+                    size = arcSize
+                )
+            }
+
+            is DialProgressColors.SingleColor -> {
+                drawArc(
+                    color = progressBarColor.color,
+                    startAngle = START_ANGLE + arcPadding,
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    useCenter = false,
+                    style = style,
+                    topLeft = topLeftOffset,
+                    size = arcSize
+                )
+            }
+        }
     }
 }
 
@@ -249,14 +322,14 @@ private fun Int.position(
 private val DialConfig.strokeCap: StrokeCap
     get() = if (roundCorners) StrokeCap.Round else StrokeCap.Butt
 
-private fun DialJoinStyle.startAnglePadding(arcPadding: Float) = when (this) {
-    is DialJoinStyle.Joined -> arcPadding
-    is DialJoinStyle.Overlapped -> -2f * arcPadding
-    is DialJoinStyle.WithDegreeGap -> degrees + arcPadding
+private fun DialJoinStyle.startAnglePadding(sweepAngle: Float, arcPadding: Float) = when (this) {
+    is DialJoinStyle.Joined -> sweepAngle + (arcPadding)
+    is DialJoinStyle.Overlapped -> arcPadding
+    is DialJoinStyle.WithDegreeGap -> sweepAngle + (degrees + arcPadding)
 }
 
-private fun DialJoinStyle.sweepAnglePadding(arcPadding: Float) = when (this) {
-    is DialJoinStyle.Joined -> 2f * arcPadding
-    is DialJoinStyle.Overlapped -> -arcPadding
-    is DialJoinStyle.WithDegreeGap -> degrees + (2f * arcPadding)
+private fun DialJoinStyle.sweepAnglePadding(sweepAngle: Float, arcPadding: Float) = when (this) {
+    is DialJoinStyle.Joined -> sweepAngle + (2f * arcPadding)
+    is DialJoinStyle.Overlapped -> 2f * arcPadding
+    is DialJoinStyle.WithDegreeGap -> sweepAngle + (degrees + (2f * arcPadding))
 }
