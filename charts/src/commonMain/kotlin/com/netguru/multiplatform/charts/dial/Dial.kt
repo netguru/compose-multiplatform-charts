@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -24,22 +27,27 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.dial.DialDefaults.START_ANGLE
+import com.netguru.multiplatform.charts.dial.scale.Scale
+import com.netguru.multiplatform.charts.dial.scale.ScalePositions
+import com.netguru.multiplatform.charts.dial.scale.drawScale
+import com.netguru.multiplatform.charts.dial.scale.drawScaleLabels
 import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.theme.ChartTheme
 import kotlin.math.PI
-import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * Aspect ratio for dial is 2:1 (width:height). We want to draw only half of the circle
  */
-private const val ASPECT_RATIO = 2f
 private const val CIRCLE_ANGLE = 360f
-private const val MIN_ANGLE = 0f
-private const val MAX_ANGLE = 180f
+internal const val MIN_ANGLE = -40f
+internal const val MAX_ANGLE = 220f
+internal const val START_ANGLE = MIN_ANGLE + 180f
+
+internal fun getAspectRatio() = 1 / sin((MAX_ANGLE - MIN_ANGLE) / 4)
 
 /**
  * Draws a half-circle and colors the part of it differently to represent the value.
@@ -64,16 +72,17 @@ private const val MAX_ANGLE = 180f
  */
 @Composable
 fun Dial(
-    value: Int,
-    minValue: Int,
-    maxValue: Int,
+    value: Float,
+    minValue: Float,
+    maxValue: Float,
     modifier: Modifier = Modifier,
     animation: ChartAnimation = ChartAnimation.Simple(),
     colors: DialColors = ChartTheme.colors.dialColors,
     config: DialConfig = DialConfig(),
-    minAndMaxValueLabel: @Composable (value: Int) -> Unit = DialDefaults.MinAndMaxValueLabel,
-    mainLabel: @Composable (value: Int) -> Unit = DialDefaults.MainLabel,
+    minAndMaxValueLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MinAndMaxValueLabel,
+    mainLabel: @Composable (value: Float) -> Unit = DialDefaults.MainLabel,
     indicator: (@Composable () -> Unit)? = null,
+    scale: Scale = Scale.Linear(null),
 ) {
     val animatedScale = getAnimationAlphas(
         animation = animation,
@@ -85,57 +94,131 @@ fun Dial(
 
     Box(modifier = modifier) {
         Column(modifier = Modifier.align(Alignment.Center)) {
-            val sweepAngle =
-                targetProgress.mapValueToDifferentRange(minValue.toFloat(), maxValue.toFloat(), MIN_ANGLE, MAX_ANGLE)
+
+            val fullAngle = MAX_ANGLE - MIN_ANGLE
+            val sweepAngle = when (scale) {
+                is Scale.Linear -> {
+                    targetProgress.mapValueToDifferentRange(
+                        minValue,
+                        maxValue,
+                        0f,
+                        fullAngle
+                    )
+                }
+
+                is Scale.NonLinear -> {
+                    if (targetProgress.isNaN()) {
+                        val range = scale.scalePoints.first() to scale.scalePoints[1]
+
+                        minValue.mapValueToDifferentRange(
+                            range.first.value,
+                            range.second.value,
+                            /*MIN_ANGLE + */(fullAngle * range.first.position),
+                            fullAngle * range.second.position,
+                        )
+
+                    } else {
+                        scale
+                            .scalePoints
+                            .zipWithNext()
+                            .firstOrNull {
+                                targetProgress in it.first.value..it.second.value
+                            }
+                            ?.let { range ->
+                                targetProgress.mapValueToDifferentRange(
+                                    range.first.value,
+                                    range.second.value,
+                                    fullAngle * range.first.position,
+                                    fullAngle * range.second.position,
+                                )
+                            }
+                            ?: run {
+                                val isSmaller = targetProgress < scale.scalePoints.minOf { it.value }
+                                if (isSmaller) {
+                                    0f
+                                } else {
+                                    fullAngle
+                                }
+                            }
+                    }
+                }
+            }
+
+            val density = LocalDensity.current
+            var angles by remember {
+                mutableStateOf(
+                    ScalePositions(
+                        containerWidth = 0f,
+                        containerCenterX = 0f,
+                        offsets = emptyList(),
+                    )
+                )
+            }
             BoxWithConstraints(
                 Modifier
                     .fillMaxWidth()
-                    .aspectRatio(ASPECT_RATIO)
+                    .aspectRatio(getAspectRatio())
                     .drawBehind {
                         drawProgressBar(
                             value = targetProgress,
                             sweepAngle = sweepAngle,
-                            minValue = minValue.toFloat(),
-                            maxValue = maxValue.toFloat(),
+                            minValue = minValue,
+                            maxValue = maxValue,
                             config = config,
                             progressBarColor = colors.progressBarColor,
                             progressBarBackgroundColor = colors.progressBarBackgroundColor,
                         )
 
                         if (config.displayScale) {
+                            val scaleCenter = Offset(
+                                center.x,
+                                size.width / 2 - (config.scaleLineWidth.toPx() / 2f)
+                            )
+                            if (!angles.calculatedFor(size.width, scaleCenter.x)) {
+                                angles = ScalePositions(
+                                    containerWidth = size.width,
+                                    containerCenterX = scaleCenter.x,
+                                    offsets = scale.calculateAngles(config, density, size.width, scaleCenter)
+                                )
+                            }
                             drawScale(
                                 color = colors.gridScaleColor,
-                                center = Offset(
-                                    center.x,
-                                    size.height - (config.scaleLineWidth.toPx() / 2f)
-                                ),
                                 config = config,
+                                markType = scale.markType,
+                                calculatedAngles = angles.offsets,
                             )
                         }
                     }
             ) {
-                val desiredHeight = maxWidth / ASPECT_RATIO
                 Box(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(top = desiredHeight / 2f)
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.place(
+                                    x = maxWidth.roundToPx() / 2 - placeable.width / 2,
+                                    y = maxWidth.roundToPx() / 2 - placeable.height / 2
+                                )
+                            }
+                        }
                 ) {
                     mainLabel(value)
                 }
+
+                drawScaleLabels(scale, angles.offsets)
 
                 if (indicator != null) {
                     Box(
                         modifier = Modifier
                             .width(maxWidth / 2)
-                            .align(Alignment.BottomStart)
                             .layout { measurable, constraints ->
                                 val placeable = measurable.measure(constraints)
                                 layout(placeable.width, placeable.height) {
-                                    placeable.place(0, placeable.height / 2)
+                                    placeable.place(0, maxWidth.roundToPx() / 2 - placeable.height / 2)
                                 }
                             }
                             .graphicsLayer(
-                                rotationZ = sweepAngle,
+                                rotationZ = sweepAngle + MIN_ANGLE,
                                 transformOrigin = TransformOrigin(
                                     pivotFractionX = 1f,
                                     pivotFractionY = 0.5f,
@@ -146,13 +229,15 @@ fun Dial(
                     }
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                minAndMaxValueLabel(minValue)
-                minAndMaxValueLabel(maxValue)
+            if (minAndMaxValueLabel != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    minAndMaxValueLabel(minValue)
+                    minAndMaxValueLabel(maxValue)
+                }
             }
         }
     }
@@ -174,7 +259,7 @@ private fun DrawScope.drawProgressBar(
     val arcPadding = if (config.roundCorners) thicknessInDegrees / 2f else 0f
     val topLeftOffset = Offset(thickness / 2f, thickness / 2f)
     // Arc has to be drawn on 2 * height space because we want only half of the circle
-    val arcSize = Size(size.width - thickness, size.height * ASPECT_RATIO - thickness)
+    val arcSize = Size(size.width - thickness, size.height * getAspectRatio() - thickness)
     val style = Stroke(
         width = thickness,
         cap = config.strokeCap,
@@ -187,11 +272,11 @@ private fun DrawScope.drawProgressBar(
         config.joinStyle
     }
 
-    if (value < maxValue) {
+    if (value < maxValue || !value.isFinite()) {
         drawArc(
             color = progressBarBackgroundColor,
-            startAngle = START_ANGLE + joinStyle.startAnglePadding(sweepAngle, arcPadding),
-            sweepAngle = (MAX_ANGLE - joinStyle.sweepAnglePadding(sweepAngle, arcPadding))
+            startAngle = MIN_ANGLE + 180 + joinStyle.startAnglePadding(sweepAngle, arcPadding),
+            sweepAngle = ((MAX_ANGLE - MIN_ANGLE) - joinStyle.sweepAnglePadding(sweepAngle, arcPadding))
                 .coerceAtLeast(0f),
             useCenter = false,
             style = style,
@@ -212,7 +297,7 @@ private fun DrawScope.drawProgressBar(
                         ),
                     ),
                     startAngle = START_ANGLE + arcPadding,
-                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
                     topLeft = topLeftOffset,
@@ -230,7 +315,7 @@ private fun DrawScope.drawProgressBar(
                         ),
                     ),
                     startAngle = START_ANGLE + arcPadding,
-                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
                     topLeft = topLeftOffset,
@@ -242,7 +327,7 @@ private fun DrawScope.drawProgressBar(
                 drawArc(
                     color = progressBarColor.color,
                     startAngle = START_ANGLE + arcPadding,
-                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(MIN_ANGLE),
+                    sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
                     topLeft = topLeftOffset,
@@ -251,72 +336,6 @@ private fun DrawScope.drawProgressBar(
             }
         }
     }
-}
-
-private const val MAX_LINE_LENGTH = 0.20f
-private const val MINOR_SCALE_ALPHA = 0.5f
-private const val MINOR_SCALE_LENGTH_FACTOR = 0.35f
-private const val SCALE_STEP = 2
-private const val MAJOR_SCALE_MODULO = 5 * SCALE_STEP
-private fun DrawScope.drawScale(
-    color: Color,
-    center: Offset,
-    config: DialConfig,
-) {
-    val scaleLineLength = (config.scaleLineLength.toPx() / center.x).coerceAtMost(MAX_LINE_LENGTH)
-    val scalePadding = (config.thickness.toPx() + config.scalePadding.toPx()) / center.x
-    val startRadiusFactor = 1 - scalePadding - scaleLineLength
-    val endRadiusFactor = startRadiusFactor + scaleLineLength
-    val smallLineRadiusFactor = scaleLineLength * MINOR_SCALE_LENGTH_FACTOR
-    val scaleMultiplier = size.width / 2f
-
-    for (point in 0..100 step SCALE_STEP) {
-        val angle = (
-                point.toFloat()
-                    .mapValueToDifferentRange(
-                        0f,
-                        100f,
-                        START_ANGLE,
-                        0f
-                    )
-                ) * PI.toFloat() / 180f // to radians
-        val startPos = point.position(
-            angle,
-            scaleMultiplier,
-            startRadiusFactor,
-            smallLineRadiusFactor
-        )
-        val endPos = point.position(
-            angle,
-            scaleMultiplier,
-            endRadiusFactor,
-            -smallLineRadiusFactor
-        )
-        drawLine(
-            color = if (point % MAJOR_SCALE_MODULO == 0)
-                color
-            else
-                color.copy(alpha = MINOR_SCALE_ALPHA),
-            start = center + startPos,
-            end = center + endPos,
-            strokeWidth = config.scaleLineWidth.toPx(),
-            cap = StrokeCap.Round
-        )
-    }
-}
-
-private fun Int.position(
-    angle: Float,
-    scaleMultiplier: Float,
-    radiusFactor: Float,
-    minorRadiusFactor: Float
-): Offset {
-    val pointRadiusFactor = if (this % MAJOR_SCALE_MODULO == 0)
-        radiusFactor
-    else
-        radiusFactor + minorRadiusFactor
-    val scaledRadius = scaleMultiplier * pointRadiusFactor
-    return Offset(cos(angle) * scaledRadius, sin(angle) * scaledRadius)
 }
 
 private val DialConfig.strokeCap: StrokeCap
