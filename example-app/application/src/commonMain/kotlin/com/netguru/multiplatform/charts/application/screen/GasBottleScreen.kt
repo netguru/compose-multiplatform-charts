@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
 import com.netguru.multiplatform.charts.common.AppTheme
@@ -78,7 +78,7 @@ fun GasBottleChartScreen() {
                     GasBottle(
                         percentage = 100 * item.value / item.capacity,
                         modifier = Modifier.size(width = 200.dp, height = 300.dp),
-                        animation = ChartAnimation.Simple {
+                        animation = ChartDisplayAnimation.Simple {
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
                                 stiffness = Spring.StiffnessVeryLow

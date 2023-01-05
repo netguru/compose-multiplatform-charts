@@ -22,10 +22,10 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.OverlayInformation
 import com.netguru.multiplatform.charts.getAnimationAlphas
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 import com.netguru.multiplatform.charts.grid.YAxisTitleData
 import com.netguru.multiplatform.charts.grid.LineParameters
 import com.netguru.multiplatform.charts.grid.YAxisLabels
@@ -47,7 +47,7 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * @param config The parameters for chart appearance customization
  * @param xAxisMarkerLayout Composable to mark the values on the x-axis.
  * @param yAxisMarkerLayout Composable to mark the values on the y-axis.
- * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
+ * @param animation In the case of [ChartDisplayAnimation.Sequenced] items with the same index in each
  * category will animate together
  * values
  */
@@ -57,11 +57,11 @@ fun BarChart(
     modifier: Modifier = Modifier,
     colors: BarChartColors = ChartTheme.colors.barChartColors,
     config: BarChartConfig = BarChartConfig(),
-    xAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.XAxisMarkerLayout,
-    yAxisMarkerLayout: @Composable (value: Any) -> Unit = GridDefaults.YAxisMarkerLayout,
-    yAxisLabelLayout: (@Composable () -> Unit)? = GridDefaults.YAxisDataTitleLayout,
-    animation: ChartAnimation = ChartAnimation.Simple(),
-    overlayDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
+    xAxisMarkerLayout: @Composable (value: Any) -> Unit = ChartGridDefaults.XAxisMarkerLayout,
+    yAxisMarkerLayout: @Composable (value: Any) -> Unit = ChartGridDefaults.YAxisMarkerLayout,
+    yAxisLabelLayout: (@Composable () -> Unit)? = ChartGridDefaults.YAxisDataTitleLayout,
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
+    overlayDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit = ChartGridDefaults.TooltipDataEntryLabel,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
 
@@ -207,7 +207,7 @@ private fun BoxWithConstraintsScope.SelectedValueLabel(
                 maxHeight.toPx()
             )
         },
-        surfaceColor = colors.overlaySurface,
+        backgroundColor = colors.overlaySurface,
         touchOffsetVertical = LocalDensity.current.run { position.y!!.toDp() },
         touchOffsetHorizontal = 20.dp,
         content = {

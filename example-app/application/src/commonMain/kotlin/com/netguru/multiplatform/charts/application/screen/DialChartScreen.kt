@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -52,7 +52,7 @@ fun DialChartScreen() {
                 percentage = sliderValue,
                 modifier = Modifier
                     .fillMaxWidth(),
-                animation = ChartAnimation.Disabled,
+                animation = ChartDisplayAnimation.Disabled,
                 colors = DialColors(
                     progressBarBackgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
                     gridScaleColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
@@ -123,7 +123,7 @@ fun DialChartScreen() {
                 value = Float.POSITIVE_INFINITY,
                 modifier = Modifier
                     .fillMaxWidth(),
-                animation = ChartAnimation.Disabled,
+                animation = ChartDisplayAnimation.Disabled,
                 colors = DialColors(
                     progressBarBackgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
                     gridScaleColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
@@ -206,7 +206,7 @@ fun DialChartScreen() {
                 percentage = sliderValue,
                 modifier = Modifier
                     .fillMaxWidth(),
-                animation = ChartAnimation.Disabled,
+                animation = ChartDisplayAnimation.Disabled,
                 config = DialConfig(
                     thickness = 20.dp,
                     roundCorners = true,
@@ -242,7 +242,7 @@ fun DialChartScreen() {
                 percentage = Float.POSITIVE_INFINITY,
                 modifier = Modifier
                     .fillMaxWidth(),
-                animation = ChartAnimation.Disabled,
+                animation = ChartDisplayAnimation.Disabled,
                 config = DialConfig(
                     thickness = 20.dp,
                     roundCorners = true,
@@ -276,7 +276,7 @@ fun DialChartScreen() {
                 value = 17f,
                 minValue = -20f,
                 maxValue = 50f,
-                animation = ChartAnimation.Simple {
+                animation = ChartDisplayAnimation.Simple {
                     spring(
                         dampingRatio = Spring.DampingRatioMediumBouncy,
                         stiffness = Spring.StiffnessLow

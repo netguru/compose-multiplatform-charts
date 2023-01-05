@@ -19,7 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.getAnimationAlphas
 import kotlin.random.Random
 
@@ -28,7 +28,7 @@ import kotlin.random.Random
 internal fun PieChartLegend(
     data: List<PieChartData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     config: PieChartConfig = PieChartConfig(),
     legendItemLabel: @Composable (PieChartData) -> Unit = PieDefaults.LegendItemLabel,
 ) {

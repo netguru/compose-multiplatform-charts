@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.dial.scale.Scale
 import com.netguru.multiplatform.charts.dial.scale.ScalePositions
 import com.netguru.multiplatform.charts.dial.scale.drawScale
@@ -39,9 +39,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 import kotlin.math.PI
 import kotlin.math.sin
 
-/**
- * Aspect ratio for dial is 2:1 (width:height). We want to draw only half of the circle
- */
 private const val CIRCLE_ANGLE = 360f
 internal const val MIN_ANGLE = -40f
 internal const val MAX_ANGLE = 220f
@@ -60,7 +57,7 @@ internal fun getAspectRatio() = 1 / sin((MAX_ANGLE - MIN_ANGLE) / 4)
  * @param value Value to portray.
  * @param minValue Min value of the chart (will also be provided to [minAndMaxValueLabel])
  * @param maxValue Max value of the chart (will also be provided to [minAndMaxValueLabel])
- * @param animation Animation to use. [ChartAnimation.Sequenced] throws an
+ * @param animation Animation to use. [ChartDisplayAnimation.Sequenced] throws an
  * [kotlin.UnsupportedOperationException], since there is only one value to display.
  * @param colors Colors to be used for the chart. [DialColors]
  * @param config The parameters for chart appearance customization.
@@ -68,7 +65,7 @@ internal fun getAspectRatio() = 1 / sin((MAX_ANGLE - MIN_ANGLE) / 4)
  * left and right of the chart.
  * @param mainLabel Composable to show in the centre of the chart, showing the [value].
  *
- * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ * @throws kotlin.UnsupportedOperationException when [ChartDisplayAnimation.Sequenced] is used
  */
 @Composable
 fun Dial(
@@ -76,7 +73,7 @@ fun Dial(
     minValue: Float,
     maxValue: Float,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: DialColors = ChartTheme.colors.dialColors,
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MinAndMaxValueLabel,

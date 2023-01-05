@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -111,7 +111,7 @@ fun BarChartScreen() {
                         color = AppTheme.colors.secondaryText
                     )
                 },
-                animation = ChartAnimation.Sequenced()
+                animation = ChartDisplayAnimation.Sequenced()
             )
 
             HorizontalDivider()
@@ -130,7 +130,7 @@ fun BarChartScreen() {
                         color = AppTheme.colors.secondaryText
                     )
                 },
-                animation = ChartAnimation.Sequenced(),
+                animation = ChartDisplayAnimation.Sequenced(),
                 legendItemLabel = { name, unit ->
                     Text(
                         text = name + unit?.let { "\n($it)" }.orEmpty(),

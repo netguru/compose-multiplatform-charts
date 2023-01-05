@@ -2,7 +2,7 @@ package com.netguru.multiplatform.charts.dial
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.dial.scale.Scale
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
@@ -17,7 +17,7 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 fun PercentageDial(
     percentage: Float,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: DialColors = ChartTheme.colors.dialColors,
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MinAndMaxValueLabel,

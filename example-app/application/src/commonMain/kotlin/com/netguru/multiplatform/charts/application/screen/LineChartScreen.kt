@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -21,15 +21,13 @@ import com.netguru.multiplatform.charts.line.LineChart
 import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
 import com.netguru.multiplatform.charts.line.LineChartSeries
-import com.netguru.multiplatform.charts.line.OverlayData
-import com.netguru.multiplatform.charts.line.XAxisData
-import com.netguru.multiplatform.charts.line.YAxisData
+import com.netguru.multiplatform.charts.line.TooltipConfig
+import com.netguru.multiplatform.charts.line.XAxisConfig
+import com.netguru.multiplatform.charts.line.YAxisConfig
 import com.netguru.multiplatform.charts.vertical
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
 import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.asin
 import kotlin.math.sin
 
 @Composable
@@ -97,32 +95,28 @@ fun LineChartScreen() {
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                yAxisData = YAxisData(
-                    lineChartData = lineData,
-                ),
-                maxVerticalLines = 25,
-                xAxisData = XAxisData(
-                    markerLayout = {
-                        Text(
-                            fontSize = 12.sp,
-                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                            textAlign = TextAlign.Center,
-//                            modifier = Modifier
-//                                .padding(horizontal = 12.dp)
-                        )
-                    }
-                ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
-                        Text(
-                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
-                            style = MaterialTheme.typography.overline
-                        )
-                    }
-                ),
-                animation = ChartAnimation.Sequenced(),
-                drawPoints = true,
-                legendData = null,
+                data = lineData,
+//                maxVerticalLines = 25,
+//                xAxisOptions = XAxisOptions(
+//                    markerLayout = {
+//                        Text(
+//                            fontSize = 12.sp,
+//                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+//                            textAlign = TextAlign.Center,
+//                        )
+//                    }
+//                ),
+//                overlayOptions = OverlayOptions(
+//                    headerLabel = { it, _ ->
+//                        Text(
+//                            text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
+//                            style = MaterialTheme.typography.overline
+//                        )
+//                    }
+//                ),
+//                animation = ChartAnimation.Sequenced(),
+//                drawPoints = true,
+//                legendOptions = null,
             )
 
             HorizontalDivider()
@@ -131,28 +125,26 @@ fun LineChartScreen() {
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                yAxisData = YAxisData(
-                    lineChartData = lineData,
-                ),
-                maxVerticalLines = 5,
-                xAxisData = XAxisData(
+                data = lineData,
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             textAlign = TextAlign.Center
                         )
-                    }
+                    },
+                    maxVerticalLines = 5,
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             style = MaterialTheme.typography.overline
                         )
                     }
                 ),
-                animation = ChartAnimation.Sequenced()
+                displayAnimation = ChartDisplayAnimation.Sequenced()
             )
 
             HorizontalDivider()
@@ -161,57 +153,56 @@ fun LineChartScreen() {
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                yAxisData = YAxisData(
-                    lineChartData = LineChartData(
-                        series = listOf(
-                            LineChartSeries(
-                                dataName = "data 1",
-                                lineColor = Color(0xFFFFCC00),
-                                listOfPoints = listOf(
-                                    LineChartPoint(
-                                        x = DateTime.now().unixMillisLong,
-                                        y = 18f,
-                                    ),
-                                )
-                            ),
+                data = LineChartData(
+                    series = listOf(
+                        LineChartSeries(
+                            dataName = "data 1",
+                            lineColor = Color(0xFFFFCC00),
+                            listOfPoints = listOf(
+                                LineChartPoint(
+                                    x = DateTime.now().unixMillisLong,
+                                    y = 18f,
+                                ),
+                            )
                         ),
-                        dataUnit = "unit",
                     ),
-                    roundMinMaxClosestTo = 1f,
+                    dataUnit = "unit",
                 ),
-                maxVerticalLines = 5,
-                xAxisData = XAxisData(
+                yAxisConfig = YAxisConfig(
+                    roundMinMaxClosestTo = 1f
+                ),
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             textAlign = TextAlign.Center
                         )
-                    }
+                    },
+                    maxVerticalLines = 5,
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             style = MaterialTheme.typography.overline
                         )
                     }
                 ),
-                animation = ChartAnimation.Sequenced(),
-                legendData = null,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                legendConfig = null,
             )
 
             TitleText(text = "Line chart with only two data points, both with the same value, and null between them")
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                yAxisData = YAxisData(
-                    lineChartData = LineChartData(
-                        series = listOf(
-                            LineChartSeries(
-                                dataName = "data 1",
-                                lineColor = Color(0xFFFFCC00),
-                                listOfPoints = listOf(
+                data = LineChartData(
+                    series = listOf(
+                        LineChartSeries(
+                            dataName = "data 1",
+                            lineColor = Color(0xFFFFCC00),
+                            listOfPoints = listOf(
 //                                    LineChartPoint(
 //                                        x = DateTime.now().unixMillisLong,
 //                                        y = 18f,
@@ -225,49 +216,50 @@ fun LineChartScreen() {
 //                                        y = 18f,
 //                                    ),
 
-                                    LineChartPoint(x = 1660600800000, y = 36.0f),
-                                    LineChartPoint(x = 1660687200000, y = null),
-                                    LineChartPoint(x = 1660773600000, y = 76.5f),
-                                    LineChartPoint(x = 1660860000000, y = 83.7f),
-                                    LineChartPoint(x = 1660946400000, y = null),
-                                    LineChartPoint(x = 1661032800000, y = null),
-                                    LineChartPoint(x = 1661119200000, y = 216.0f)
-                                )
-                            ),
+                                LineChartPoint(x = 1660600800000, y = 36.0f),
+                                LineChartPoint(x = 1660687200000, y = null),
+                                LineChartPoint(x = 1660773600000, y = 76.5f),
+                                LineChartPoint(x = 1660860000000, y = 83.7f),
+                                LineChartPoint(x = 1660946400000, y = null),
+                                LineChartPoint(x = 1661032800000, y = null),
+                                LineChartPoint(x = 1661119200000, y = 216.0f)
+                            )
                         ),
-                        dataUnit = "unit",
                     ),
+                    dataUnit = "unit",
+                ),
+                yAxisConfig = YAxisConfig(
                     roundMinMaxClosestTo = 1f,
                 ),
-                maxVerticalLines = 10,
-                xAxisData = XAxisData(
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             textAlign = TextAlign.Center
                         )
-                    }
+                    },
+                    maxVerticalLines = 10,
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             style = MaterialTheme.typography.overline
                         )
                     }
                 ),
-                animation = ChartAnimation.Sequenced(),
-                legendData = null,
-                drawPoints = true,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                legendConfig = null,
+                shouldDrawValueDots = true,
             )
 
             TitleText(text = "Line chart with legend and with lots of data")
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                yAxisData = YAxisData(
-                    lineChartData = lineDataWithLotsOfPoints,
+                data = lineDataWithLotsOfPoints,
+                yAxisConfig = YAxisConfig(
                     yAxisTitleData = YAxisTitleData(
                         labelLayout = {
                             Text(
@@ -281,26 +273,26 @@ fun LineChartScreen() {
                     ),
                     roundMinMaxClosestTo = 0.1f,
                 ),
-                xAxisData = XAxisData(
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
                             text = DateTime.fromUnix(it as Long).format("HH:mm"),
                             textAlign = TextAlign.Center
                         )
-                    }
+                    },
+                    maxVerticalLines = 5,
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("HH:mm"),
                             style = MaterialTheme.typography.overline
                         )
                     }
                 ),
-                animation = ChartAnimation.Sequenced(),
-                drawPoints = true,
-                maxVerticalLines = 5,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                shouldDrawValueDots = true,
             )
         }
     }

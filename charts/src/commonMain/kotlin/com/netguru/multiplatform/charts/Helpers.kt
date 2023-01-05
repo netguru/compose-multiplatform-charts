@@ -64,27 +64,27 @@ fun Number.round(decimals: Int = 2): String {
 
 @Composable
 fun getAnimationAlphas(
-    animation: ChartAnimation,
+    animation: ChartDisplayAnimation,
     numberOfElementsToAnimate: Int,
     uniqueDatasetKey: Any,
 ): List<Float> {
     var animationPlayed by remember(uniqueDatasetKey) {
-        mutableStateOf(animation is ChartAnimation.Disabled)
+        mutableStateOf(animation is ChartDisplayAnimation.Disabled)
     }
     LaunchedEffect(uniqueDatasetKey) {
         animationPlayed = true
     }
 
     return when (animation) {
-        ChartAnimation.Disabled -> (1..numberOfElementsToAnimate).map { 1f }
-        is ChartAnimation.Simple -> (1..numberOfElementsToAnimate).map {
+        ChartDisplayAnimation.Disabled -> (1..numberOfElementsToAnimate).map { 1f }
+        is ChartDisplayAnimation.Simple -> (1..numberOfElementsToAnimate).map {
             animateFloatAsState(
                 targetValue = if (animationPlayed) 1f else 0f,
                 animationSpec = if (animationPlayed) animation.animationSpec() else tween(durationMillis = 0),
             ).value
         }
 
-        is ChartAnimation.Sequenced -> (1..numberOfElementsToAnimate).map {
+        is ChartDisplayAnimation.Sequenced -> (1..numberOfElementsToAnimate).map {
             animateFloatAsState(
                 targetValue = if (animationPlayed) 1f else 0f,
                 animationSpec = if (animationPlayed) animation.animationSpec(it) else tween(durationMillis = 0),

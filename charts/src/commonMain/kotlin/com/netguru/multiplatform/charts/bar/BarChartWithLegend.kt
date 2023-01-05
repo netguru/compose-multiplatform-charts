@@ -1,13 +1,12 @@
 package com.netguru.multiplatform.charts.bar
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 import com.netguru.multiplatform.charts.line.ChartLegend
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
@@ -23,12 +22,12 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 fun BarChartWithLegend(
     data: BarChartData,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: BarChartColors = ChartTheme.colors.barChartColors,
     config: BarChartConfig = BarChartConfig(),
-    xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisMarkerLayout,
-    yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisMarkerLayout,
-    legendItemLabel: @Composable (name: String, unit: String?) -> Unit = GridDefaults.LegendItemLabel,
+    xAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.XAxisMarkerLayout,
+    yAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.YAxisMarkerLayout,
+    legendItemLabel: @Composable (name: String, unit: String?) -> Unit = ChartGridDefaults.LegendItemLabel,
     columnMinWidth: Dp = 200.dp,
 ) {
     Column(modifier) {

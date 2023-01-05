@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.common.AppTheme
 import com.netguru.multiplatform.charts.common.HOUR_IN_MS
 import com.netguru.multiplatform.charts.common.WindowSize
@@ -22,14 +22,14 @@ import com.soywiz.klock.DateTime
 fun LineChartPreview() {
     AppTheme(windowSize = WindowSize.EXPANDED) {
         LineChart(
-            yAxisData = YAxisData(
+            yAxisConfig = YAxisData(
                 lineChartData = getLineChartSampleData(),
             ),
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
             maxVerticalLines = 10,
-            animation = ChartAnimation.Disabled,
+            displayAnimation = ChartDisplayAnimation.Disabled,
         )
     }
 }

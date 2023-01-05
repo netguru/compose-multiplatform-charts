@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.House
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -46,7 +46,7 @@ fun BubbleChartScreen() {
                 bubbles = bubbles,
                 modifier = Modifier
                     .size(300.dp),
-                animation = ChartAnimation.Sequenced(),
+                animation = ChartDisplayAnimation.Sequenced(),
             )
         }
     }

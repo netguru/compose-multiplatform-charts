@@ -32,50 +32,50 @@ import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import kotlin.math.abs
 
 @Composable
-internal fun LineChartOverlayInformation(
+internal fun LineChartTooltip(
     lineChartData: List<LineChartData>,
     positionX: Float,
     containerSize: Size,
     colors: LineChartColors,
     drawPoints: (points: List<SeriesAndClosestPoint>) -> Unit,
-    overlayData: OverlayData,
+    tooltipConfig: TooltipConfig,
     xAxisScale: XAxisScale,
 ) {
-    if (overlayData.showInterpolatedValues) {
+    if (tooltipConfig.showInterpolatedValues) {
         LineChartOverlayInformationWithInterpolatedValues(
             lineChartData = lineChartData,
             positionX = positionX,
             containerSize = containerSize,
             colors = colors,
-            overlayHeaderLayout = overlayData.overlayHeaderLabel,
-            overlayDataEntryLayout = overlayData.overlayDataEntryLabel,
-            touchOffsetHorizontal = overlayData.touchOffsetHorizontal,
-            touchOffsetVertical = overlayData.touchOffsetVertical,
-            overlayWidth = overlayData.overlayWidth,
-            overlayAlpha = overlayData.overlayAlpha,
+            overlayHeaderLayout = tooltipConfig.headerLabel,
+            overlayDataEntryLayout = tooltipConfig.dataEntryLabel,
+            touchOffsetHorizontal = tooltipConfig.touchOffsetHorizontal,
+            touchOffsetVertical = tooltipConfig.touchOffsetVertical,
+            overlayWidth = tooltipConfig.width,
+            overlayAlpha = tooltipConfig.alpha,
             xAxisScale = xAxisScale,
         )
     } else {
-        LineChartOverlayInformation(
+        LineChartTooltip(
             lineChartData = lineChartData,
             positionX = positionX,
             containerSize = containerSize,
             colors = colors,
-            overlayHeaderLayout = overlayData.overlayHeaderLabel,
-            overlayDataEntryLayout = overlayData.overlayDataEntryLabel,
+            overlayHeaderLayout = tooltipConfig.headerLabel,
+            overlayDataEntryLayout = tooltipConfig.dataEntryLabel,
             drawPoints = drawPoints,
-            highlightPointsCloserThan = overlayData.highlightPointsCloserThan,
-            touchOffsetHorizontal = overlayData.touchOffsetHorizontal,
-            touchOffsetVertical = overlayData.touchOffsetVertical,
-            overlayWidth = overlayData.overlayWidth,
-            overlayAlpha = overlayData.overlayAlpha,
+            highlightPointsCloserThan = tooltipConfig.highlightPointsCloserThan,
+            touchOffsetHorizontal = tooltipConfig.touchOffsetHorizontal,
+            touchOffsetVertical = tooltipConfig.touchOffsetVertical,
+            overlayWidth = tooltipConfig.width,
+            overlayAlpha = tooltipConfig.alpha,
             xAxisScale = xAxisScale,
         )
     }
 }
 
 @Composable
-private fun LineChartOverlayInformation(
+private fun LineChartTooltip(
     lineChartData: List<LineChartData>,
     xAxisScale: XAxisScale,
     positionX: Float,
@@ -147,7 +147,7 @@ private fun LineChartOverlayInformation(
         OverlayInformation(
             positionX = linePositionX,
             containerSize = containerSize,
-            surfaceColor = colors.overlaySurface,
+            backgroundColor = colors.overlaySurface,
             pointsToAvoid = pointsToAvoid,
             touchOffsetHorizontal = touchOffsetHorizontal,
             touchOffsetVertical = touchOffsetVertical,
@@ -256,7 +256,7 @@ private fun LineChartOverlayInformationWithInterpolatedValues(
         OverlayInformation(
             positionX = positionX,
             containerSize = containerSize,
-            surfaceColor = colors.overlaySurface,
+            backgroundColor = colors.overlaySurface,
             touchOffsetHorizontal = touchOffsetHorizontal,
             touchOffsetVertical = touchOffsetVertical,
             requiredOverlayWidth = overlayWidth,

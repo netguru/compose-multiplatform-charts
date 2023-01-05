@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.bubble.BubbleDefaults.MINIMUM_BUBBLE_RADIUS
 import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
@@ -38,7 +38,7 @@ import kotlin.random.Random
 fun BubbleChart(
     bubbles: List<Bubble>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     distanceBetweenCircles: Float = -10f,
     bubbleLabel: @Composable (Bubble) -> Unit = BubbleDefaults.BubbleLabel,
 ) {

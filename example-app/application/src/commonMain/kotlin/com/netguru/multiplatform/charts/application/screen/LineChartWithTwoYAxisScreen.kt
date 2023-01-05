@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -22,14 +22,12 @@ import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
 import com.netguru.multiplatform.charts.line.LineChartSeries
 import com.netguru.multiplatform.charts.line.LineChartWithTwoYAxisSets
-import com.netguru.multiplatform.charts.line.OverlayData
-import com.netguru.multiplatform.charts.line.XAxisData
-import com.netguru.multiplatform.charts.line.YAxisData
+import com.netguru.multiplatform.charts.line.TooltipConfig
+import com.netguru.multiplatform.charts.line.XAxisConfig
+import com.netguru.multiplatform.charts.line.YAxisConfig
 import com.netguru.multiplatform.charts.vertical
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
-import kotlin.math.PI
-import kotlin.math.sin
 
 @Composable
 fun LineChartWithTwoYAxisScreen() {
@@ -125,8 +123,8 @@ fun LineChartWithTwoYAxisScreen() {
 
             TitleText(text = "Line chart with two Y axis")
             LineChartWithTwoYAxisSets(
-                leftYAxisData = YAxisData(
-                    lineChartData = lineDataLeft,
+                leftYAxisData = lineDataLeft,
+                leftYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelLeft(it.toString())
                     },
@@ -143,8 +141,8 @@ fun LineChartWithTwoYAxisScreen() {
                     ),
                     roundMinMaxClosestTo = 1f,
                 ),
-                rightYAxisData = YAxisData(
-                    lineChartData = lineDataRight,
+                rightYAxisData = lineDataRight,
+                rightYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelRight(it.toString())
                     },
@@ -163,7 +161,7 @@ fun LineChartWithTwoYAxisScreen() {
                 ),
                 modifier = Modifier
                     .height(300.dp),
-                xAxisData = XAxisData(
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
@@ -172,18 +170,19 @@ fun LineChartWithTwoYAxisScreen() {
                         )
                     }
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("HH:mm"),
                             style = MaterialTheme.typography.overline
                         )
                     },
-                    overlayWidth = null,
+                    width = null,
+                    showInterpolatedValues = false,
                 ),
-                animation = ChartAnimation.Sequenced(),
-                drawPoints = true,
-                legendData = null,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                shouldDrawValueDots = true,
+                legendConfig = null,
             )
 
             HorizontalDivider()
@@ -191,8 +190,8 @@ fun LineChartWithTwoYAxisScreen() {
 
             TitleText(text = "Line chart with two Y axis")
             LineChartWithTwoYAxisSets(
-                leftYAxisData = YAxisData(
-                    lineChartData = lineDataLeft,
+                leftYAxisData = lineDataLeft,
+                leftYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelLeft(it.toString())
                     },
@@ -209,8 +208,8 @@ fun LineChartWithTwoYAxisScreen() {
                     ),
                     roundMinMaxClosestTo = 1f,
                 ),
-                rightYAxisData = YAxisData(
-                    lineChartData = lineDataRight,
+                rightYAxisData = lineDataRight,
+                rightYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelRight(it.toString())
                     },
@@ -230,7 +229,7 @@ fun LineChartWithTwoYAxisScreen() {
                 ),
                 modifier = Modifier
                     .height(300.dp),
-                xAxisData = XAxisData(
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
@@ -239,8 +238,8 @@ fun LineChartWithTwoYAxisScreen() {
                         )
                     }
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             style = MaterialTheme.typography.overline
@@ -249,9 +248,10 @@ fun LineChartWithTwoYAxisScreen() {
                     showInterpolatedValues = false,
                     showEnlargedPointOnLine = true,
                 ),
-                animation = ChartAnimation.Sequenced(),
-                drawPoints = true,
-                legendData = null,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                shouldDrawValueDots = true,
+                legendConfig = null,
+                shouldInterpolateOverNullValues = false,
             )
 
             HorizontalDivider()
@@ -260,8 +260,8 @@ fun LineChartWithTwoYAxisScreen() {
             LineChartWithTwoYAxisSets(
                 modifier = Modifier
                     .height(300.dp),
-                leftYAxisData = YAxisData(
-                    lineChartData = lineDataLeft,
+                leftYAxisData = lineDataLeft,
+                leftYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelLeft(it.toString())
                     },
@@ -278,8 +278,8 @@ fun LineChartWithTwoYAxisScreen() {
                     ),
                     roundMinMaxClosestTo = 1f,
                 ),
-                rightYAxisData = YAxisData(
-                    lineChartData = lineDataRight,
+                rightYAxisData = lineDataRight,
+                rightYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelRight(it.toString())
                     },
@@ -296,26 +296,26 @@ fun LineChartWithTwoYAxisScreen() {
                     ),
                     roundMinMaxClosestTo = 1f,
                 ),
-                xAxisData = XAxisData(
+                xAxisConfig = XAxisConfig(
                     markerLayout = {
                         Text(
                             fontSize = 12.sp,
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             textAlign = TextAlign.Center
                         )
-                    }
+                    },
+                    maxVerticalLines = 5,
                 ),
-                overlayData = OverlayData(
-                    overlayHeaderLabel = { it, _ ->
+                tooltipConfig = TooltipConfig(
+                    headerLabel = { it, _ ->
                         Text(
                             text = DateTime.fromUnix(it as Long).format("yyyy-MM-dd"),
                             style = MaterialTheme.typography.overline
                         )
                     }
                 ),
-                animation = ChartAnimation.Sequenced(),
-                drawPoints = true,
-                maxVerticalLines = 5,
+                displayAnimation = ChartDisplayAnimation.Sequenced(),
+                shouldDrawValueDots = true,
             )
         }
     }

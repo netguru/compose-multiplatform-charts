@@ -1,5 +1,6 @@
 package com.netguru.multiplatform.charts.line
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -25,10 +27,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.grid.DrawXAxisMarkers
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 import com.netguru.multiplatform.charts.grid.LineParameters
 import com.netguru.multiplatform.charts.grid.YAxisLabels
 import com.netguru.multiplatform.charts.grid.YAxisTitleData
@@ -36,71 +38,67 @@ import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
 import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
 import com.netguru.multiplatform.charts.grid.drawChartGrid
 import com.netguru.multiplatform.charts.grid.measureChartGrid
-import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
 /**
- * Classic line chart with some shade below the line in the same color (albeit with a lot of
- * transparency) as the line and floating balloon on touch/click to show values for that particular
- * x-axis value.
+ * Classic line chart with some shade below the line in the same color as the line (albeit with a lot of transparency)
+ * and tooltip on touch/click to show values for that particular x-axis value.
  *
- * Color, shape and whether the line is dashed for each of the lines is specified in the
- * [LegendItemData] class.
+ * Color, shape and whether the line is dashed for each of the lines is specified in the [LegendItemData] instance
+ * inside [LineChartData].
  *
- * @param lineChartData Data to portray
- * @param colors Colors used are [ChartColors.grid], [ChartColors.surface] and
- * [ChartColors.overlayLine].
- * @param xAxisMarkerLayout Composable to mark the values on the x-axis.
- * @param yAxisMarkerLayout Composable to mark the values on the y-axis.
- * @param overlayHeaderLabel Composable to show the current x-axis value on the overlay balloon
- * @param overlayDataEntryLabel Composable to show the value of each line in the overlay balloon
- * for that specific x-axis value
- * @param animation Animation to use
- * @param maxVerticalLines Max number of lines, representing the x-axis values
- * @param maxHorizontalLines Max number of lines, representing the y-axis values
- * @param roundMinMaxClosestTo Number to which min and max range will be rounded to
+ * @param data Data to display
+ * @param modifier Compose modifier
+ * @param yAxisConfig Configuration for the Y axis
+ * @param xAxisConfig Configuration for the X axis. If null, X axis is not displayed
+ * @param legendConfig Config for the legend. If null, legend is not displayed
+ * @param colors Colors used for grid, background, tooltip line color and tooltip background color
+ * @param tooltipConfig Configuration for the tooltip. If null, tooltip is not shown
+ * @param displayAnimation Animation to use to show the lines
+ * @param shouldDrawValueDots Whether there should be a dot on the chart line for each non-null Y value
+ * @param shouldInterpolateOverNullValues Whether chart line should be interpolated between two non-null Y values if
+ * there is at least one null Y value between them. Setting to false interrupts the line and starts drawing at the next
+ * non-null value
  */
 @Composable
 fun LineChart(
-    yAxisData: YAxisData,
+    data: LineChartData,
     modifier: Modifier = Modifier,
-    colors: LineChartColors = ChartTheme.colors.lineChartColors,
-    overlayData: OverlayData? = OverlayData(),
-    xAxisData: XAxisData? = XAxisData(),
-    animation: ChartAnimation = ChartAnimation.Simple(),
-    maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    drawPoints: Boolean = false,
-    legendData: LegendData? = LegendData(),
+    yAxisConfig: YAxisConfig = YAxisConfig(),
+    xAxisConfig: XAxisConfig? = XAxisConfig(),
+    legendConfig: LegendConfig? = LegendConfig(),
+    colors: LineChartColors = LineChartDefaults.lineChartColors(),
+    tooltipConfig: TooltipConfig? = TooltipConfig(),
+    displayAnimation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
+    shouldDrawValueDots: Boolean = false,
+    shouldInterpolateOverNullValues: Boolean = true,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
-    val horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET
 
-    val alpha = getAnimationAlphas(animation, yAxisData.lineChartData.series.size, yAxisData.lineChartData)
+    val alpha = getAnimationAlphas(displayAnimation, data.series.size, data)
 
     Column(
         modifier = modifier
     ) {
-        if (yAxisData.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top) {
-            yAxisData.yAxisTitleData.labelLayout()
+        if (yAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top) {
+            yAxisConfig.yAxisTitleData.labelLayout()
         }
         Row(modifier = Modifier.weight(1f)) {
-            if (yAxisData.markerLayout != null) {
+            if (yAxisConfig.markerLayout != null) {
                 YAxisLabels(
                     horizontalGridLines = horizontalGridLines,
-                    yAxisMarkerLayout = yAxisData.markerLayout,
-                    yAxisTitleData = yAxisData.yAxisTitleData,
+                    yAxisMarkerLayout = yAxisConfig.markerLayout,
+                    yAxisTitleData = yAxisConfig.yAxisTitleData,
                     modifier = Modifier
                         .padding(end = 8.dp)
                 )
             }
 
-            val numberOfXAxisEntries by remember(yAxisData.lineChartData) {
+            val numberOfXAxisEntries by remember(data) {
                 derivedStateOf {
-                    yAxisData
-                        .lineChartData
+                    data
                         .series
                         .map {
                             it.listOfPoints
@@ -117,25 +115,30 @@ fun LineChart(
                     mutableStateOf(emptyList())
                 }
                 val xAxisScale = TimestampXAxisScale(
-                    min = yAxisData.lineChartData.minX,
-                    max = yAxisData.lineChartData.maxX,
-                    maxTicksCount = (minOf(
-                        maxVerticalLines, numberOfXAxisEntries
-                    ) - 1).coerceAtLeast(1),
-                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                    min = data.minX,
+                    max = data.maxX,
+                    maxTicksCount = (
+                        minOf(
+                            xAxisConfig?.maxVerticalLines ?: ChartGridDefaults.NUMBER_OF_GRID_LINES,
+                            numberOfXAxisEntries
+                        ) - 1
+                        )
+                        .coerceAtLeast(1),
+                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo ?: ChartGridDefaults.ROUND_X_AXIS_MIN_MAX_CLOSEST_TO,
                 )
                 BoxWithConstraints(
                     modifier = Modifier
+                        .background(colors.surface)
                         .fillMaxWidth()
                         .weight(1f)
                         .drawBehind {
                             val lines = measureChartGrid(
                                 xAxisScale = xAxisScale,
                                 yAxisScale = YAxisScaleDynamic(
-                                    min = yAxisData.lineChartData.minY,
-                                    max = yAxisData.lineChartData.maxY,
-                                    maxTickCount = maxHorizontalLines - 1,
-                                    roundClosestTo = yAxisData.roundMinMaxClosestTo,
+                                    min = data.minY,
+                                    max = data.maxY,
+                                    maxTickCount = yAxisConfig.maxHorizontalLines - 1,
+                                    roundClosestTo = yAxisConfig.roundMinMaxClosestTo,
                                 ),
                             )
                             verticalGridLines = lines.verticalLines
@@ -147,16 +150,15 @@ fun LineChart(
 
                             drawLineChart(
                                 xAxisScale = xAxisScale,
-                                lineChartData = yAxisData.lineChartData,
-                                graphTopPadding = horizontalLinesOffset,
-                                graphBottomPadding = horizontalLinesOffset,
+                                lineChartData = data,
                                 alpha = alpha,
-                                drawPoints = drawPoints,
+                                drawPoints = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw,
+                                shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )
                         }
                         .then(
-                            if (overlayData != null) {
+                            if (tooltipConfig != null) {
                                 // Touch input
                                 Modifier
                                     .pointerInput(Unit) {
@@ -201,10 +203,9 @@ fun LineChart(
                             }
                         ),
                     content = {
-                        // Overlay
-                        if (overlayData != null) {
-                            LineChartOverlayInformation(
-                                lineChartData = listOf(yAxisData.lineChartData),
+                        if (tooltipConfig != null) {
+                            LineChartTooltip(
+                                lineChartData = listOf(data),
                                 positionX = touchPositionX,
                                 containerSize = with(LocalDensity.current) {
                                     Size(
@@ -216,18 +217,18 @@ fun LineChart(
                                 drawPoints = {
                                     pointsToDraw = it
                                 },
-                                overlayData = overlayData,
+                                tooltipConfig = tooltipConfig,
                                 xAxisScale = xAxisScale,
                             )
                         }
                     }
                 )
 
-                if (xAxisData != null) {
+                if (xAxisConfig != null) {
                     Box(Modifier.fillMaxWidth()) {
                         DrawXAxisMarkers(
                             lineParams = verticalGridLines,
-                            xAxisData = xAxisData,
+                            xAxisConfig = xAxisConfig,
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
@@ -236,23 +237,39 @@ fun LineChart(
             }
         }
 
-        if (legendData != null) {
+        if (legendConfig != null) {
             ChartLegend(
-                legendData = yAxisData.lineChartData.legendData,
-                animation = animation,
-                legendItemLabel = legendData.legendItemLabel,
-                columnMinWidth = legendData.columnMinWidth,
+                legendData = data.legendData,
+                animation = displayAnimation,
+                legendItemLabel = legendConfig.legendItemLabel,
+                columnMinWidth = legendConfig.columnMinWidth,
             )
         }
     }
 }
 
 private fun shouldIgnoreTouchInput(event: PointerEvent): Boolean {
-    if (event.changes.isEmpty() ||
+    if (
+        event.changes.isEmpty() ||
         (event.type != PointerEventType.Move && event.type != PointerEventType.Press)
     ) {
         return true
     }
 
     return false
+}
+
+object LineChartDefaults {
+    @Composable
+    fun lineChartColors(
+        backgroundColor: Color = ChartTheme.colors.surface,
+        gridColor: Color = ChartTheme.colors.grid,
+        overlayLineColor: Color = ChartTheme.colors.overlayLine,
+        overlayBackgroundColor: Color = ChartTheme.colors.surface,
+    ): LineChartColors = LineChartColors(
+        surface = backgroundColor,
+        grid = gridColor,
+        overlayLine = overlayLineColor,
+        overlaySurface = overlayBackgroundColor,
+    )
 }

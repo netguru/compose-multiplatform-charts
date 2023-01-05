@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 internal fun OverlayInformation(
     positionX: Float?,
     containerSize: Size,
-    surfaceColor: Color,
+    backgroundColor: Color,
     touchOffsetVertical: Dp,
     touchOffsetHorizontal: Dp,
     requiredOverlayWidth: Dp?,
@@ -107,7 +107,7 @@ internal fun OverlayInformation(
             )
             .alpha(overlayAlpha)
             .clip(RoundedCornerShape(10.dp))
-            .background(surfaceColor)
+            .background(backgroundColor)
             .padding(8.dp)
             .then(
                 if (requiredOverlayWidth != null) {

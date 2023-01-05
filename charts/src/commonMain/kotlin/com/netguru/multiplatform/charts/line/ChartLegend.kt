@@ -25,18 +25,18 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.bar.BarChartConfig
 import com.netguru.multiplatform.charts.getAnimationAlphas
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 
 @Composable
 fun ChartLegend(
     legendData: List<LegendItemData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     config: BarChartConfig = BarChartConfig(),
-    legendItemLabel: @Composable (name: String, unit: String?) -> Unit = GridDefaults.LegendItemLabel,
+    legendItemLabel: @Composable (name: String, unit: String?) -> Unit = ChartGridDefaults.LegendItemLabel,
     columnMinWidth: Dp = 200.dp,
 ) {
     val alpha = getAnimationAlphas(

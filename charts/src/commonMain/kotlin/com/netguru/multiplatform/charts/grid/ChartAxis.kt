@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.line.XAxisData
+import com.netguru.multiplatform.charts.line.XAxisConfig
 import kotlin.math.roundToInt
 
 data class YAxisTitleData(
@@ -108,7 +108,7 @@ internal fun Modifier.alignCenterToOffsetHorizontal(
 @Composable
 internal fun DrawXAxisMarkers(
     lineParams: List<LineParameters>,
-    xAxisData: XAxisData,
+    xAxisConfig: XAxisConfig,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -118,7 +118,7 @@ internal fun DrawXAxisMarkers(
             modifier = Modifier,
             content = {
                 lineParams.forEach {
-                    xAxisData.markerLayout(it.value.toLong())
+                    xAxisConfig.markerLayout(it.value.toLong())
                 }
             },
         ) { measurables, constraints ->
@@ -133,7 +133,7 @@ internal fun DrawXAxisMarkers(
                 val placeablesLeftToPlace = if (placeables.size > 1) {
                     placeables.last().let {
                         val xPos =
-                            lineParams.last().position.roundToInt() - if (xAxisData.alignFirstAndLastToChartEdges) {
+                            lineParams.last().position.roundToInt() - if (xAxisConfig.alignFirstAndLastToChartEdges) {
                                 it.width
                             } else {
                                 it.width / 2
@@ -156,13 +156,13 @@ internal fun DrawXAxisMarkers(
 
                 placeablesLeftToPlace.forEachIndexed { index, placeable ->
                     val xPos =
-                        lineParams[index].position.roundToInt() - if (index == 0 && xAxisData.alignFirstAndLastToChartEdges) {
+                        lineParams[index].position.roundToInt() - if (index == 0 && xAxisConfig.alignFirstAndLastToChartEdges) {
                             0
                         } else {
                             (placeable.width / 2)
                         }
                     val xPosEnd = xPos + placeable.width
-                    if (!xAxisData.hideMarkersWhenOverlapping || (xPos > leftEdge && xPosEnd < rightEdge) || index == 0) {
+                    if (!xAxisConfig.hideMarkersWhenOverlapping || (xPos > leftEdge && xPosEnd < rightEdge) || index == 0) {
                         placeable.placeRelative(
                             x = xPos,
                             y = 0,

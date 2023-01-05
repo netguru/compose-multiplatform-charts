@@ -1,7 +1,20 @@
 package com.netguru.multiplatform.charts.line
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -11,114 +24,115 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.getAnimationAlphas
-import com.netguru.multiplatform.charts.grid.*
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
+import com.netguru.multiplatform.charts.grid.DrawXAxisMarkers
+import com.netguru.multiplatform.charts.grid.LineParameters
+import com.netguru.multiplatform.charts.grid.YAxisLabels
+import com.netguru.multiplatform.charts.grid.YAxisTitleData
 import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
 import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
 import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleStatic
-import com.netguru.multiplatform.charts.theme.ChartColors
-import com.netguru.multiplatform.charts.theme.ChartTheme
+import com.netguru.multiplatform.charts.grid.drawChartGrid
+import com.netguru.multiplatform.charts.grid.measureChartGrid
 
 /**
- * Classic line chart with some shade below the line in the same color (albeit with a lot of
- * transparency) as the line and floating balloon on touch/click to show values for that particular
- * x-axis value.
+ * Classic line chart with some shade below the line in the same color as the line (albeit with a lot of transparency)
+ * and tooltip on touch/click to show values for that particular x-axis value but with the option to show two different
+ * Y-axis scales (one on each side of the chart).
  *
- * Color, shape and whether the line is dashed for each of the lines is specified in the
- * [LegendItemData] class.
+ * Color, shape and whether the line is dashed for each of the lines is specified in the [LegendItemData] instance
+ * inside each [LineChartData].
  *
- * If the [lineChartDataRightAxis] param is null, ordinary [LineChart] is used with the data and
- * settings for the left Y-axis.
- *
- * @param lineChartDataLeftAxis Data to portray on the left Y axis
- * @param lineChartDataRightAxis Data to portray on the right Y axis
- * @param colors Colors used are [ChartColors.grid], [ChartColors.surface] and
- * [ChartColors.overlayLine].
- * @param xAxisLabel Composable to mark the values on the x-axis.
- * @param leftYAxisMarkerLayout Composable to mark the values on the left y-axis.
- * @param rightYAxisMarkerLayout Composable to mark the values on the right y-axis.
- * @param overlayHeaderLabel Composable to show the current x-axis value on the overlay balloon
- * @param overlayDataEntryLabel Composable to show the value of each line in the overlay balloon
- * for that specific x-axis value
- * @param animation Animation to use
- * @param maxVerticalLines Max number of lines, representing the x-axis values
- * @param maxHorizontalLines Max number of lines, representing the y-axis values
- * @param roundLeftMinMaxClosestTo Number to which min and max range on the left will be rounded to
- * @param roundRightMinMaxClosestTo Number to which min and max range on the right will be rounded to
+ * @param leftYAxisData Data to display with scale on the left side
+ * @param rightYAxisData Data to display with scale on the right side. If null, classic [LineChart] is used.
+ * @param modifier Compose modifier
+ * @param leftYAxisConfig Configuration for the left Y axis
+ * @param rightYAxisConfig Configuration for the right Y axis
+ * @param xAxisConfig Configuration for the X axis. If null, X axis is not displayed
+ * @param legendConfig Config for the legend. If null, legend is not displayed
+ * @param colors Colors used for grid, background, tooltip line color and tooltip background color
+ * @param tooltipConfig Configuration for the tooltip. If null, tooltip is not shown
+ * @param displayAnimation Animation to use to show the lines
+ * @param shouldDrawValueDots Whether there should be a dot on the chart line for each non-null Y value
+ * @param shouldInterpolateOverNullValues Whether chart line should be interpolated between two non-null Y values if
+ * there is at least one null Y value between them. Setting to false interrupts the line and starts drawing at the next
+ * non-null value
  */
 @Composable
 fun LineChartWithTwoYAxisSets(
-    leftYAxisData: YAxisData,
-    rightYAxisData: YAxisData?,
+    leftYAxisData: LineChartData,
+    rightYAxisData: LineChartData?,
     modifier: Modifier = Modifier,
-    colors: LineChartColors = ChartTheme.colors.lineChartColors,
-    overlayData: OverlayData? = OverlayData(),
-    xAxisData: XAxisData? = XAxisData(),
-    animation: ChartAnimation = ChartAnimation.Simple(),
-    maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    drawPoints: Boolean = false,
-    legendData: LegendData? = LegendData()
+    leftYAxisConfig: YAxisConfig = YAxisConfig(),
+    rightYAxisConfig: YAxisConfig = YAxisConfig(),
+    xAxisConfig: XAxisConfig? = XAxisConfig(),
+    legendConfig: LegendConfig? = LegendConfig(),
+    colors: LineChartColors = LineChartDefaults.lineChartColors(),
+    tooltipConfig: TooltipConfig? = TooltipConfig(),
+    displayAnimation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
+    shouldDrawValueDots: Boolean = false,
+    shouldInterpolateOverNullValues: Boolean = true,
 ) {
     if (rightYAxisData != null) {
         LineChartWithTwoYAxisSetsLayout(
             leftYAxisData = leftYAxisData,
             rightYAxisData = rightYAxisData,
             modifier = modifier,
+            leftYAxisConfig = leftYAxisConfig,
+            rightYAxisConfig = rightYAxisConfig,
+            xAxisConfig = xAxisConfig,
+            legendConfig = legendConfig,
             colors = colors,
-            xAxisData = xAxisData,
-            overlayData = overlayData,
-            animation = animation,
-            maxVerticalLines = maxVerticalLines,
-            maxHorizontalLines = maxHorizontalLines,
-            drawPoints = drawPoints,
-            legendData = legendData,
+            tooltipConfig = tooltipConfig,
+            displayAnimation = displayAnimation,
+            shouldDrawValueDots = shouldDrawValueDots,
+            shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
         )
     } else {
         LineChart(
-            yAxisData = leftYAxisData,
+            data = leftYAxisData,
             modifier = modifier,
+            yAxisConfig = leftYAxisConfig,
+            xAxisConfig = xAxisConfig,
+            legendConfig = legendConfig,
             colors = colors,
-            xAxisData = xAxisData,
-            overlayData = overlayData,
-            animation = animation,
-            maxVerticalLines = maxVerticalLines,
-            maxHorizontalLines = maxHorizontalLines,
-            drawPoints = drawPoints,
-            legendData = legendData,
+            tooltipConfig = tooltipConfig,
+            displayAnimation = displayAnimation,
+            shouldDrawValueDots = shouldDrawValueDots,
+            shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
         )
     }
 }
 
 @Composable
 private fun LineChartWithTwoYAxisSetsLayout(
-    leftYAxisData: YAxisData,
-    rightYAxisData: YAxisData,
+    leftYAxisData: LineChartData,
+    rightYAxisData: LineChartData,
     modifier: Modifier,
+    leftYAxisConfig: YAxisConfig,
+    rightYAxisConfig: YAxisConfig,
+    xAxisConfig: XAxisConfig?,
+    legendConfig: LegendConfig?,
     colors: LineChartColors,
-    xAxisData: XAxisData?,
-    overlayData: OverlayData?,
-    animation: ChartAnimation,
-    maxVerticalLines: Int,
-    maxHorizontalLines: Int,
-    drawPoints: Boolean,
-    legendData: LegendData?,
+    tooltipConfig: TooltipConfig?,
+    displayAnimation: ChartDisplayAnimation,
+    shouldDrawValueDots: Boolean,
+    shouldInterpolateOverNullValues: Boolean,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var leftYAxisMarks by remember { mutableStateOf(emptyList<LineParameters>()) }
     var rightYAxisMarks by remember { mutableStateOf(emptyList<LineParameters>()) }
-    val horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET
 
     val alphas = getAnimationAlphas(
-        animation = animation,
-        numberOfElementsToAnimate = leftYAxisData.lineChartData.series.size + rightYAxisData.lineChartData.series.size,
+        animation = displayAnimation,
+        numberOfElementsToAnimate = leftYAxisData.series.size + rightYAxisData.series.size,
         uniqueDatasetKey = LineChartData(
-            series = leftYAxisData.lineChartData.series + rightYAxisData.lineChartData.series,
+            series = leftYAxisData.series + rightYAxisData.series,
             dataUnit = null,
         ),
     )
@@ -133,8 +147,8 @@ private fun LineChartWithTwoYAxisSetsLayout(
     Column(
         modifier = modifier,
     ) {
-        if (leftYAxisData.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top ||
-            rightYAxisData.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top
+        if (leftYAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top ||
+            rightYAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -142,26 +156,26 @@ private fun LineChartWithTwoYAxisSetsLayout(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                leftYAxisData.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
-                rightYAxisData.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
+                leftYAxisConfig.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
+                rightYAxisConfig.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
             }
         }
         Row(modifier = Modifier.weight(1f)) {
-            if (leftYAxisData.markerLayout != null) {
+            if (leftYAxisConfig.markerLayout != null) {
                 YAxisLabels(
                     horizontalGridLines = leftYAxisMarks,
-                    yAxisMarkerLayout = leftYAxisData.markerLayout,
-                    yAxisTitleData = leftYAxisData.yAxisTitleData,
+                    yAxisMarkerLayout = leftYAxisConfig.markerLayout,
+                    yAxisTitleData = leftYAxisConfig.yAxisTitleData,
                     modifier = Modifier
                         .padding(end = 8.dp)
                 )
             }
 
-            val numberOfXAxisEntries by remember(leftYAxisData.lineChartData, rightYAxisData.lineChartData) {
+            val numberOfXAxisEntries by remember(leftYAxisData, rightYAxisData) {
                 derivedStateOf {
-                    (leftYAxisData.lineChartData.series +
-                            rightYAxisData.lineChartData.series
-                            )
+                    (leftYAxisData.series +
+                        rightYAxisData.series
+                        )
                         .map {
                             it.listOfPoints
                         }
@@ -177,12 +191,16 @@ private fun LineChartWithTwoYAxisSetsLayout(
                     mutableStateOf(emptyList())
                 }
                 val xAxisScale = TimestampXAxisScale(
-                    min = minOf(leftYAxisData.lineChartData.minX, rightYAxisData.lineChartData.minX),
-                    max = maxOf(leftYAxisData.lineChartData.maxX, rightYAxisData.lineChartData.maxX),
-                    maxTicksCount = (minOf(
-                        maxVerticalLines, numberOfXAxisEntries
-                    ) - 1).coerceAtLeast(1),
-                    roundClosestTo = xAxisData?.roundMinMaxClosestTo
+                    min = minOf(leftYAxisData.minX, rightYAxisData.minX),
+                    max = maxOf(leftYAxisData.maxX, rightYAxisData.maxX),
+                    maxTicksCount = (
+                        minOf(
+                            xAxisConfig?.maxVerticalLines ?: ChartGridDefaults.NUMBER_OF_GRID_LINES,
+                            numberOfXAxisEntries
+                        ) - 1
+                        )
+                        .coerceAtLeast(1),
+                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo
                 )
                 BoxWithConstraints(
                     Modifier
@@ -193,8 +211,8 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 xAxisScale = xAxisScale,
                                 yAxisScale = YAxisScaleStatic(
                                     min = 0f,
-                                    max = maxHorizontalLines.toFloat(),
-                                    maxTickCount = maxHorizontalLines - 1,
+                                    max = leftYAxisConfig.maxHorizontalLines.toFloat(),
+                                    maxTickCount = leftYAxisConfig.maxHorizontalLines - 1,
                                     roundClosestTo = 1f,
                                 ),
                             ).also {
@@ -205,13 +223,13 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 xAxisScale = TimestampXAxisScale(
                                     min = 0,
                                     max = 0,
-                                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo,
                                 ),
                                 yAxisScale = YAxisScaleDynamic(
-                                    min = leftYAxisData.lineChartData.minY,
-                                    max = leftYAxisData.lineChartData.maxY,
-                                    maxTickCount = maxHorizontalLines - 1,
-                                    roundClosestTo = leftYAxisData.roundMinMaxClosestTo,
+                                    min = leftYAxisData.minY,
+                                    max = leftYAxisData.maxY,
+                                    maxTickCount = leftYAxisConfig.maxHorizontalLines - 1,
+                                    roundClosestTo = leftYAxisConfig.roundMinMaxClosestTo,
                                 )
                             )
                                 .horizontalLines
@@ -228,13 +246,13 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 xAxisScale = TimestampXAxisScale(
                                     min = 0,
                                     max = 0,
-                                    roundClosestTo = xAxisData?.roundMinMaxClosestTo,
+                                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo,
                                 ),
                                 yAxisScale = YAxisScaleDynamic(
-                                    min = rightYAxisData.lineChartData.minY,
-                                    max = rightYAxisData.lineChartData.maxY,
-                                    maxTickCount = maxHorizontalLines - 1,
-                                    roundClosestTo = rightYAxisData.roundMinMaxClosestTo,
+                                    min = rightYAxisData.minY,
+                                    max = rightYAxisData.maxY,
+                                    maxTickCount = rightYAxisConfig.maxHorizontalLines - 1,
+                                    roundClosestTo = rightYAxisConfig.roundMinMaxClosestTo,
                                 )
                             )
                                 .horizontalLines
@@ -254,34 +272,32 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 // we have to join those points so that the x-values align properly. Otherwise, in case when
                                 // datasets would not start and end at the same x value, they would still be drawn from the
                                 // same start and end point, making (at least) one of them drawn incorrectly
-                                lineChartData = leftYAxisData.lineChartData.addNoYValuePointsFrom(rightYAxisData.lineChartData),
-                                graphTopPadding = horizontalLinesOffset,
-                                graphBottomPadding = horizontalLinesOffset,
+                                lineChartData = leftYAxisData.addNoYValuePointsFrom(rightYAxisData),
                                 alpha = alphas,
-                                drawPoints = drawPoints,
+                                drawPoints = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw.filter {
-                                    leftYAxisData.lineChartData.series.contains(
+                                    leftYAxisData.series.contains(
                                         it.lineChartSeries
                                     )
                                 },
                                 xAxisScale = xAxisScale,
+                                shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )
 
                             drawLineChart(
                                 // we have to join those points so that the x-values align properly. Otherwise, in case when
                                 // datasets would not start and end at the same x value, they would still be drawn from the
                                 // same start and end point, making (at least) one of them drawn incorrectly
-                                lineChartData = rightYAxisData.lineChartData.addNoYValuePointsFrom(leftYAxisData.lineChartData),
-                                graphTopPadding = horizontalLinesOffset,
-                                graphBottomPadding = horizontalLinesOffset,
+                                lineChartData = rightYAxisData.addNoYValuePointsFrom(leftYAxisData),
                                 alpha = alphas,
-                                drawPoints = drawPoints,
+                                drawPoints = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw.filter {
-                                    rightYAxisData.lineChartData.series.contains(
+                                    rightYAxisData.series.contains(
                                         it.lineChartSeries
                                     )
                                 },
                                 xAxisScale = xAxisScale,
+                                shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )
                         }
                         // Touch input
@@ -310,9 +326,9 @@ private fun LineChartWithTwoYAxisSetsLayout(
                         },
                     content = {
                         // Overlay
-                        if (overlayData != null) {
-                            LineChartOverlayInformation(
-                                lineChartData = listOf(leftYAxisData.lineChartData, rightYAxisData.lineChartData),
+                        if (tooltipConfig != null) {
+                            LineChartTooltip(
+                                lineChartData = listOf(leftYAxisData, rightYAxisData),
                                 positionX = touchPositionX,
                                 containerSize = with(LocalDensity.current) {
                                     Size(
@@ -324,18 +340,18 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 drawPoints = {
                                     pointsToDraw = it
                                 },
-                                overlayData = overlayData,
+                                tooltipConfig = tooltipConfig,
                                 xAxisScale = xAxisScale,
                             )
                         }
                     }
                 )
 
-                if (xAxisData != null) {
+                if (xAxisConfig != null) {
                     Box(Modifier.fillMaxWidth()) {
                         DrawXAxisMarkers(
                             lineParams = verticalGridLines,
-                            xAxisData = xAxisData,
+                            xAxisConfig = xAxisConfig,
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
@@ -343,23 +359,23 @@ private fun LineChartWithTwoYAxisSetsLayout(
                 }
             }
 
-            if (rightYAxisData.markerLayout != null) {
+            if (rightYAxisConfig.markerLayout != null) {
                 YAxisLabels(
                     horizontalGridLines = rightYAxisMarks,
-                    yAxisMarkerLayout = rightYAxisData.markerLayout,
-                    yAxisTitleData = rightYAxisData.yAxisTitleData,
+                    yAxisMarkerLayout = rightYAxisConfig.markerLayout,
+                    yAxisTitleData = rightYAxisConfig.yAxisTitleData,
                     modifier = Modifier
                         .padding(start = 8.dp)
                 )
             }
         }
 
-        if (legendData != null) {
+        if (legendConfig != null) {
             ChartLegend(
-                legendData = leftYAxisData.lineChartData.legendData + rightYAxisData.lineChartData.legendData,
-                animation = animation,
-                legendItemLabel = legendData.legendItemLabel,
-                columnMinWidth = legendData.columnMinWidth,
+                legendData = leftYAxisData.legendData + rightYAxisData.legendData,
+                animation = displayAnimation,
+                legendItemLabel = legendConfig.legendItemLabel,
+                columnMinWidth = legendConfig.columnMinWidth,
             )
         }
     }

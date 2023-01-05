@@ -10,9 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.netguru.multiplatform.charts.vertical
 
-internal object GridDefaults {
+internal object ChartGridDefaults {
 
-    val HORIZONTAL_LINES_OFFSET = 0.dp
     const val NUMBER_OF_GRID_LINES = 5
     const val ROUND_Y_AXIS_MIN_MAX_CLOSEST_TO = 10f
     const val ROUND_X_AXIS_MIN_MAX_CLOSEST_TO = 15 * 60 * 1000L // 15 minutes
@@ -43,7 +42,7 @@ internal object GridDefaults {
         labelPosition = YAxisTitleData.LabelPosition.Left,
     )
 
-    val OverlayHeaderLabel: @Composable (value: Any, dataUnit: String?) -> Unit = { value, dataUnit ->
+    val TooltipHeaderLabel: @Composable (value: Any, dataUnit: String?) -> Unit = { value, dataUnit ->
         Text(
             text = value.toString() + dataUnit?.let { " $it" }.orEmpty(),
             modifier = Modifier.fillMaxWidth(),
@@ -52,7 +51,7 @@ internal object GridDefaults {
         )
     }
 
-    val OverlayDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit =
+    val TooltipDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit =
         { dataName, dataNameShort, dataUnit, value ->
             Text(
                 text = "$dataName${dataNameShort?.let { " ($it)" }.orEmpty()}: $value" + dataUnit?.let { " $it" }

@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.pie.PieDefaults.FULL_CIRCLE_DEGREES
@@ -36,17 +36,17 @@ data class PieChartData(val name: String, val value: Double, val color: Color)
  * [PieChartWithLegend]
  *
  * @param data Data to show
- * @param animation Animation to use. [ChartAnimation.Sequenced] is currently not supported and will
+ * @param animation Animation to use. [ChartDisplayAnimation.Sequenced] is currently not supported and will
  * @param config The parameters for chart appearance customization
  * throw an [kotlin.UnsupportedOperationException] if used.
  *
- * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ * @throws kotlin.UnsupportedOperationException when [ChartDisplayAnimation.Sequenced] is used
  */
 @Composable
 fun PieChart(
     data: List<PieChartData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     config: PieChartConfig = PieChartConfig(),
 ) {
     val maxAngle = getAnimationAlphas(
