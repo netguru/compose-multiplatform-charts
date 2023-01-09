@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.IntOffset
-import com.netguru.multiplatform.charts.dial.DialConfig
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -19,18 +18,17 @@ import kotlin.math.sin
 
 internal fun DrawScope.drawScale(
     color: Color,
-    config: DialConfig,
-    markType: MarkType,
+    scaleConfig: ScaleConfig,
     calculatedAngles: List<ScalePositions.ScaleItem>,
 ) {
-    when (markType) {
+    when (scaleConfig.markType) {
         MarkType.Line -> {
             for (angle in calculatedAngles as List<ScalePositions.ScaleItem.Line>) {
                 drawLine(
                     color = color,
                     start = angle.startOffset,
                     end = angle.endOffset,
-                    strokeWidth = config.scaleLineWidth.toPx(),
+                    strokeWidth = scaleConfig.scaleLineWidth.toPx(),
                     cap = StrokeCap.Round
                 )
             }
@@ -43,7 +41,7 @@ internal fun DrawScope.drawScale(
                 pointMode = PointMode.Points,
                 color = color,
                 cap = StrokeCap.Round,
-                strokeWidth = config.scaleLineLength.toPx(),
+                strokeWidth = scaleConfig.scaleLineLength.toPx(),
             )
         }
     }
@@ -51,32 +49,33 @@ internal fun DrawScope.drawScale(
 
 @Composable
 fun drawScaleLabels(
-    scale: Scale,
+    scaleConfig: ScaleConfig,
     provideLabels: List<ScalePositions.ScaleItem>,
 ) {
-    provideLabels.forEachIndexed { index, it ->
-        Box(
-            modifier = Modifier
-                .layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
+    provideLabels
+        .filter { it.showLabel }
+        .forEach { scaleItem ->
+            Box(
+                modifier = Modifier
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
 
-                    val topLeft = when (it) {
-                        is ScalePositions.ScaleItem.Dot -> it.offset
-                        is ScalePositions.ScaleItem.Line -> it.startOffset
-                    } - Offset(
-                        x = cos(it.angle / 2).pow(2f) * (placeable.width),
-                        y = ((sin(it.angle) / 2) + (1 / 2f)) * placeable.height,
-                    )
+                        val topLeft = when (scaleItem) {
+                            is ScalePositions.ScaleItem.Dot -> scaleItem.offset
+                            is ScalePositions.ScaleItem.Line -> scaleItem.startOffset
+                        } - Offset(
+                            x = cos(scaleItem.angle / 2).pow(2f) * placeable.width,
+                            y = ((sin(scaleItem.angle) / 2) + (1 / 2f)) * placeable.height,
+                        )
 
-                    layout(placeable.width, placeable.height) {
-                        placeable.place(IntOffset(topLeft.x.roundToInt(), topLeft.y.roundToInt()))
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(IntOffset(topLeft.x.roundToInt(), topLeft.y.roundToInt()))
+                        }
                     }
+            ) {
+                if (scaleItem.showLabel && scaleConfig.scaleLabelLayout != null) {
+                    scaleConfig.scaleLabelLayout.invoke(scaleItem.value)
                 }
-        ) {
-            when (scale) {
-                is Scale.Linear -> scale.scaleLabel?.invoke("")
-                is Scale.NonLinear -> scale.scaleLabel?.invoke(scale.scalePoints[index].label)
             }
         }
-    }
 }

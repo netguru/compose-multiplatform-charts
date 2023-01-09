@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -29,22 +28,18 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import com.netguru.multiplatform.charts.ChartDisplayAnimation
-import com.netguru.multiplatform.charts.dial.scale.Scale
+import com.netguru.multiplatform.charts.dial.scale.ScaleConfig
 import com.netguru.multiplatform.charts.dial.scale.ScalePositions
 import com.netguru.multiplatform.charts.dial.scale.drawScale
 import com.netguru.multiplatform.charts.dial.scale.drawScaleLabels
 import com.netguru.multiplatform.charts.getAnimationAlphas
+import com.netguru.multiplatform.charts.line.Progression
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.theme.ChartTheme
 import kotlin.math.PI
-import kotlin.math.sin
+import kotlin.math.roundToInt
 
 private const val CIRCLE_ANGLE = 360f
-internal const val MIN_ANGLE = -40f
-internal const val MAX_ANGLE = 220f
-internal const val START_ANGLE = MIN_ANGLE + 180f
-
-internal fun getAspectRatio() = 1 / sin((MAX_ANGLE - MIN_ANGLE) / 4)
 
 /**
  * Draws a half-circle and colors the part of it differently to represent the value.
@@ -59,7 +54,7 @@ internal fun getAspectRatio() = 1 / sin((MAX_ANGLE - MIN_ANGLE) / 4)
  * @param maxValue Max value of the chart (will also be provided to [minAndMaxValueLabel])
  * @param animation Animation to use. [ChartDisplayAnimation.Sequenced] throws an
  * [kotlin.UnsupportedOperationException], since there is only one value to display.
- * @param colors Colors to be used for the chart. [DialColors]
+ * @param colors Colors to be used for the chart. [DialChartColors]
  * @param config The parameters for chart appearance customization.
  * @param minAndMaxValueLabel Composable to represent the [minValue] and [maxValue] on the bottom
  * left and right of the chart.
@@ -74,12 +69,13 @@ fun Dial(
     maxValue: Float,
     modifier: Modifier = Modifier,
     animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
-    colors: DialColors = ChartTheme.colors.dialColors,
+    colors: DialChartColors = DialChartDefaults.dialChartColors(),
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MinAndMaxValueLabel,
     mainLabel: @Composable (value: Float) -> Unit = DialDefaults.MainLabel,
     indicator: (@Composable () -> Unit)? = null,
-    scale: Scale = Scale.Linear(null),
+    scaleConfig: ScaleConfig? = ScaleConfig.LinearProgressionConfig(),
+    progression: Progression = Progression.Linear,
 ) {
     val animatedScale = getAnimationAlphas(
         animation = animation,
@@ -89,152 +85,159 @@ fun Dial(
 
     val targetProgress = value.coerceIn(minValue..maxValue) * animatedScale
 
-    Box(modifier = modifier) {
-        Column(modifier = Modifier.align(Alignment.Center)) {
+    Column(modifier = modifier) {
 
-            val fullAngle = MAX_ANGLE - MIN_ANGLE
-            val sweepAngle = when (scale) {
-                is Scale.Linear -> {
-                    targetProgress.mapValueToDifferentRange(
-                        minValue,
-                        maxValue,
-                        0f,
-                        fullAngle
-                    )
-                }
-
-                is Scale.NonLinear -> {
-                    if (targetProgress.isNaN()) {
-                        val range = scale.scalePoints.first() to scale.scalePoints[1]
-
-                        minValue.mapValueToDifferentRange(
-                            range.first.value,
-                            range.second.value,
-                            /*MIN_ANGLE + */(fullAngle * range.first.position),
-                            fullAngle * range.second.position,
-                        )
-
-                    } else {
-                        scale
-                            .scalePoints
-                            .zipWithNext()
-                            .firstOrNull {
-                                targetProgress in it.first.value..it.second.value
-                            }
-                            ?.let { range ->
-                                targetProgress.mapValueToDifferentRange(
-                                    range.first.value,
-                                    range.second.value,
-                                    fullAngle * range.first.position,
-                                    fullAngle * range.second.position,
-                                )
-                            }
-                            ?: run {
-                                val isSmaller = targetProgress < scale.scalePoints.minOf { it.value }
-                                if (isSmaller) {
-                                    0f
-                                } else {
-                                    fullAngle
-                                }
-                            }
-                    }
-                }
-            }
-
-            val density = LocalDensity.current
-            var angles by remember {
-                mutableStateOf(
-                    ScalePositions(
-                        containerWidth = 0f,
-                        containerCenterX = 0f,
-                        offsets = emptyList(),
-                    )
+        val fullAngle = config.fullAngleInDegrees
+        val sweepAngle = when (progression) {
+            Progression.Linear -> {
+                targetProgress.mapValueToDifferentRange(
+                    minValue,
+                    maxValue,
+                    0f,
+                    fullAngle
                 )
             }
-            BoxWithConstraints(
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(getAspectRatio())
-                    .drawBehind {
-                        drawProgressBar(
-                            value = targetProgress,
-                            sweepAngle = sweepAngle,
-                            minValue = minValue,
-                            maxValue = maxValue,
-                            config = config,
-                            progressBarColor = colors.progressBarColor,
-                            progressBarBackgroundColor = colors.progressBarBackgroundColor,
-                        )
 
-                        if (config.displayScale) {
-                            val scaleCenter = Offset(
-                                center.x,
-                                size.width / 2 - (config.scaleLineWidth.toPx() / 2f)
+            is Progression.NonLinear -> {
+                if (targetProgress.isNaN()) {
+                    val range = progression.anchorPoints.first() to progression.anchorPoints[1]
+
+                    minValue.mapValueToDifferentRange(
+                        range.first.value,
+                        range.second.value,
+                        fullAngle * range.first.position,
+                        fullAngle * range.second.position,
+                    )
+
+                } else {
+                    progression
+                        .anchorPoints
+                        .zipWithNext()
+                        .firstOrNull {
+                            targetProgress in it.first.value..it.second.value
+                        }
+                        ?.let { range ->
+                            targetProgress.mapValueToDifferentRange(
+                                range.first.value,
+                                range.second.value,
+                                fullAngle * range.first.position,
+                                fullAngle * range.second.position,
                             )
-                            if (!angles.calculatedFor(size.width, scaleCenter.x)) {
-                                angles = ScalePositions(
-                                    containerWidth = size.width,
-                                    containerCenterX = scaleCenter.x,
-                                    offsets = scale.calculateAngles(config, density, size.width, scaleCenter)
-                                )
+                        }
+                        ?: run {
+                            val isSmaller = targetProgress < progression.anchorPoints.minOf { it.value }
+                            if (isSmaller) {
+                                0f
+                            } else {
+                                fullAngle
                             }
-                            drawScale(
-                                color = colors.gridScaleColor,
-                                config = config,
-                                markType = scale.markType,
-                                calculatedAngles = angles.offsets,
+                        }
+                }
+            }
+        }
+
+        val density = LocalDensity.current
+        var angles by remember {
+            mutableStateOf(
+                ScalePositions(
+                    containerWidth = 0f,
+                    containerCenterX = 0f,
+                    scaleItems = emptyList(),
+                )
+            )
+        }
+        BoxWithConstraints(
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(config.aspectRatio)
+                .drawBehind {
+                    drawProgressBar(
+                        value = targetProgress,
+                        sweepAngle = sweepAngle,
+                        minValue = minValue,
+                        maxValue = maxValue,
+                        config = config,
+                        progressBarColor = colors.progressBarColor,
+                        progressBarBackgroundColor = colors.progressBarBackgroundColor,
+                    )
+
+                    if (scaleConfig != null) {
+                        val scaleCenter = Offset(
+                            center.x,
+                            size.width / 2 - (scaleConfig.scaleLineWidth.toPx() / 2f)
+                        )
+                        if (!angles.calculatedFor(size.width, scaleCenter.x)) {
+                            angles = ScalePositions(
+                                containerWidth = size.width,
+                                containerCenterX = scaleCenter.x,
+                                scaleItems = scaleConfig.calculateProgressionMarkersPositions(
+                                    config = config,
+                                    progression = progression,
+                                    density = density,
+                                    width = size.width,
+                                    center = scaleCenter,
+                                    minValue = minValue,
+                                    maxValue = maxValue,
+                                )
+                            )
+                        }
+                        drawScale(
+                            color = colors.gridScaleColor,
+                            scaleConfig = scaleConfig,
+                            calculatedAngles = angles.scaleItems,
+                        )
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(
+                                x = maxWidth.roundToPx() / 2 - placeable.width / 2,
+                                y = (maxHeight.roundToPx() / 2.5).roundToInt(),
                             )
                         }
                     }
             ) {
+                mainLabel(value)
+            }
+
+            if (scaleConfig != null) {
+                drawScaleLabels(scaleConfig, angles.scaleItems)
+            }
+
+            if (indicator != null) {
                 Box(
                     modifier = Modifier
+                        .width(maxWidth / 2)
                         .layout { measurable, constraints ->
                             val placeable = measurable.measure(constraints)
                             layout(placeable.width, placeable.height) {
-                                placeable.place(
-                                    x = maxWidth.roundToPx() / 2 - placeable.width / 2,
-                                    y = maxWidth.roundToPx() / 2 - placeable.height / 2
-                                )
+                                placeable.place(0, maxWidth.roundToPx() / 2 - placeable.height / 2)
                             }
                         }
-                ) {
-                    mainLabel(value)
-                }
-
-                drawScaleLabels(scale, angles.offsets)
-
-                if (indicator != null) {
-                    Box(
-                        modifier = Modifier
-                            .width(maxWidth / 2)
-                            .layout { measurable, constraints ->
-                                val placeable = measurable.measure(constraints)
-                                layout(placeable.width, placeable.height) {
-                                    placeable.place(0, maxWidth.roundToPx() / 2 - placeable.height / 2)
-                                }
-                            }
-                            .graphicsLayer(
-                                rotationZ = sweepAngle + MIN_ANGLE,
-                                transformOrigin = TransformOrigin(
-                                    pivotFractionX = 1f,
-                                    pivotFractionY = 0.5f,
-                                )
+                        .graphicsLayer(
+                            rotationZ = config.minAngle + sweepAngle,
+                            transformOrigin = TransformOrigin(
+                                pivotFractionX = 1f,
+                                pivotFractionY = 0.5f,
                             )
-                    ) {
-                        indicator()
-                    }
+                        )
+                ) {
+                    indicator()
                 }
             }
-            if (minAndMaxValueLabel != null) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    minAndMaxValueLabel(minValue)
-                    minAndMaxValueLabel(maxValue)
-                }
+        }
+        if (minAndMaxValueLabel != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                minAndMaxValueLabel(minValue)
+                minAndMaxValueLabel(maxValue)
             }
         }
     }
@@ -256,7 +259,7 @@ private fun DrawScope.drawProgressBar(
     val arcPadding = if (config.roundCorners) thicknessInDegrees / 2f else 0f
     val topLeftOffset = Offset(thickness / 2f, thickness / 2f)
     // Arc has to be drawn on 2 * height space because we want only half of the circle
-    val arcSize = Size(size.width - thickness, size.height * getAspectRatio() - thickness)
+    val arcSize = Size(size.width - thickness, size.height * config.aspectRatio - thickness)
     val style = Stroke(
         width = thickness,
         cap = config.strokeCap,
@@ -272,8 +275,8 @@ private fun DrawScope.drawProgressBar(
     if (value < maxValue || !value.isFinite()) {
         drawArc(
             color = progressBarBackgroundColor,
-            startAngle = MIN_ANGLE + 180 + joinStyle.startAnglePadding(sweepAngle, arcPadding),
-            sweepAngle = ((MAX_ANGLE - MIN_ANGLE) - joinStyle.sweepAnglePadding(sweepAngle, arcPadding))
+            startAngle = config.startAngle + joinStyle.startAnglePadding(sweepAngle, arcPadding),
+            sweepAngle = (config.fullAngleInDegrees - joinStyle.sweepAnglePadding(sweepAngle, arcPadding))
                 .coerceAtLeast(0f),
             useCenter = false,
             style = style,
@@ -293,7 +296,7 @@ private fun DrawScope.drawProgressBar(
                             y = size.height,
                         ),
                     ),
-                    startAngle = START_ANGLE + arcPadding,
+                    startAngle = config.startAngle + arcPadding,
                     sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
@@ -311,7 +314,7 @@ private fun DrawScope.drawProgressBar(
                             y = size.height,
                         ),
                     ),
-                    startAngle = START_ANGLE + arcPadding,
+                    startAngle = config.startAngle + arcPadding,
                     sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
@@ -323,7 +326,7 @@ private fun DrawScope.drawProgressBar(
             is DialProgressColors.SingleColor -> {
                 drawArc(
                     color = progressBarColor.color,
-                    startAngle = START_ANGLE + arcPadding,
+                    startAngle = config.startAngle + arcPadding,
                     sweepAngle = (sweepAngle - (2f * arcPadding)).coerceAtLeast(0f),
                     useCenter = false,
                     style = style,
@@ -348,4 +351,18 @@ private fun DialJoinStyle.sweepAnglePadding(sweepAngle: Float, arcPadding: Float
     is DialJoinStyle.Joined -> sweepAngle + (2f * arcPadding)
     is DialJoinStyle.Overlapped -> 2f * arcPadding
     is DialJoinStyle.WithDegreeGap -> sweepAngle + (degrees + (2f * arcPadding))
+}
+
+object DialChartDefaults {
+    @Composable
+    fun dialChartColors(
+        progressBarColor: DialProgressColors = DialProgressColors.SingleColor(ChartTheme.colors.primary),
+        progressBarBackgroundColor: Color = ChartTheme.colors.grid,
+        gridScaleColor: Color = ChartTheme.colors.grid,
+    ): DialChartColors = DialChartColors(
+        progressBarColor = progressBarColor,
+        progressBarBackgroundColor = progressBarBackgroundColor,
+        gridScaleColor = gridScaleColor,
+    )
+
 }

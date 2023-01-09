@@ -24,6 +24,7 @@ import com.netguru.multiplatform.charts.line.LineChartSeries
 import com.netguru.multiplatform.charts.line.TooltipConfig
 import com.netguru.multiplatform.charts.line.XAxisConfig
 import com.netguru.multiplatform.charts.line.YAxisConfig
+import com.netguru.multiplatform.charts.toRadians
 import com.netguru.multiplatform.charts.vertical
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
@@ -64,7 +65,7 @@ fun LineChartScreen() {
                     dataName = "lots of data",
                     lineColor = Color(0xFFFFCC00),
                     listOfPoints = (1..(24 * 14)).filter { it % 8 == 0 }.map { point ->
-                        val sine = sin(point.toFloat() * PI / 180).toFloat()
+                        val sine = sin(point.toFloat().toRadians())
                         LineChartPoint(
                             x = now.minus(TimeSpan(point * 5 * 60 * 1000.0)).unixMillisLong,
                             y = sine + 1.05f,
@@ -75,7 +76,7 @@ fun LineChartScreen() {
                     dataName = "lots of data 2",
                     lineColor = Color(0xFF32ADE6),
                     listOfPoints = (1..(24 * 14)).filter { it % 8 == 0 }.map { point ->
-                        val sine = sin(point.toFloat() * PI / 180).toFloat()
+                        val sine = sin(point.toFloat().toRadians())
                         LineChartPoint(
                             x = now.minus(TimeSpan(point * 5 * 60 * 1000.0)).unixMillisLong,
                             y = sine,

@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.layout
+import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -104,3 +105,5 @@ fun Modifier.vertical() =
                 )
             }
         }
+
+fun Float.toRadians() = this * PI.toFloat() / 180f

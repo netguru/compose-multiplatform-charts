@@ -5,21 +5,27 @@ import androidx.compose.ui.geometry.Offset
 data class ScalePositions(
     val containerWidth: Float,
     val containerCenterX: Float,
-    val offsets: List<ScaleItem>,
+    val scaleItems: List<ScaleItem>,
 ) {
     sealed class ScaleItem(
         val angle: Float,
+        val showLabel: Boolean,
+        val value: Float,
     ) {
         class Dot(
             angle: Float,
+            showLabel: Boolean,
+            value: Float,
             val offset: Offset,
-        ) : ScaleItem(angle)
+        ) : ScaleItem(angle, showLabel, value)
 
         class Line(
             angle: Float,
+            showLabel: Boolean,
+            value: Float,
             val startOffset: Offset,
             val endOffset: Offset,
-        ) : ScaleItem(angle)
+        ) : ScaleItem(angle, showLabel, value)
     }
 
     fun calculatedFor(width: Float, centerX: Float): Boolean {
