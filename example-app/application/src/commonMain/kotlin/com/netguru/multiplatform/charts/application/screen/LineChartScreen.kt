@@ -17,6 +17,7 @@ import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
 import com.netguru.multiplatform.charts.common.HorizontalDivider
 import com.netguru.multiplatform.charts.grid.YAxisTitleData
+import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
 import com.netguru.multiplatform.charts.line.LineChart
 import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
@@ -28,7 +29,6 @@ import com.netguru.multiplatform.charts.toRadians
 import com.netguru.multiplatform.charts.vertical
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.TimeSpan
-import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
@@ -47,7 +47,7 @@ fun LineChartScreen() {
                     listOfPoints = (1..20).map { point ->
                         LineChartPoint(
                             x = DateTime.now().minus(TimeSpan(point * 24 * 60 * 60 * 1000.0)).unixMillisLong,
-                            y = (1..15).random().toFloat(),
+                            y = (1..15).random().toFloat() - 5,
                         )
                     },
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 10f), 0f).takeIf { seriesNumber == 2 }
@@ -118,6 +118,13 @@ fun LineChartScreen() {
 //                animation = ChartAnimation.Sequenced(),
 //                drawPoints = true,
 //                legendOptions = null,
+                yAxisConfig = YAxisConfig(
+                    scale = YAxisScaleDynamic(
+                        chartData = lineData,
+                        maxNumberOfHorizontalLines = 5,
+                        roundMarkersToMultiplicationOf = 2f,
+                    )
+                )
             )
 
             HorizontalDivider()
@@ -151,26 +158,30 @@ fun LineChartScreen() {
             HorizontalDivider()
 
             TitleText(text = "Line chart with only one data point")
+            val data = LineChartData(
+                series = listOf(
+                    LineChartSeries(
+                        dataName = "data 1",
+                        lineColor = Color(0xFFFFCC00),
+                        listOfPoints = listOf(
+                            LineChartPoint(
+                                x = DateTime.now().unixMillisLong,
+                                y = 18f,
+                            ),
+                        )
+                    ),
+                ),
+                dataUnit = "unit",
+            )
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                data = LineChartData(
-                    series = listOf(
-                        LineChartSeries(
-                            dataName = "data 1",
-                            lineColor = Color(0xFFFFCC00),
-                            listOfPoints = listOf(
-                                LineChartPoint(
-                                    x = DateTime.now().unixMillisLong,
-                                    y = 18f,
-                                ),
-                            )
-                        ),
-                    ),
-                    dataUnit = "unit",
-                ),
+                data = data,
                 yAxisConfig = YAxisConfig(
-                    roundMinMaxClosestTo = 1f
+                    scale = YAxisScaleDynamic(
+                        chartData = data,
+                        roundMarkersToMultiplicationOf = 1f,
+                    )
                 ),
                 xAxisConfig = XAxisConfig(
                     markerLayout = {
@@ -195,42 +206,33 @@ fun LineChartScreen() {
             )
 
             TitleText(text = "Line chart with only two data points, both with the same value, and null between them")
+            val data1 = LineChartData(
+                series = listOf(
+                    LineChartSeries(
+                        dataName = "data 1",
+                        lineColor = Color(0xFFFFCC00),
+                        listOfPoints = listOf(
+                            LineChartPoint(x = 1660600800000, y = 36.0f),
+                            LineChartPoint(x = 1660687200000, y = null),
+                            LineChartPoint(x = 1660773600000, y = 76.5f),
+                            LineChartPoint(x = 1660860000000, y = 83.7f),
+                            LineChartPoint(x = 1660946400000, y = null),
+                            LineChartPoint(x = 1661032800000, y = null),
+                            LineChartPoint(x = 1661119200000, y = 216.0f)
+                        )
+                    ),
+                ),
+                dataUnit = "unit",
+            )
             LineChart(
                 modifier = Modifier
                     .height(300.dp),
-                data = LineChartData(
-                    series = listOf(
-                        LineChartSeries(
-                            dataName = "data 1",
-                            lineColor = Color(0xFFFFCC00),
-                            listOfPoints = listOf(
-//                                    LineChartPoint(
-//                                        x = DateTime.now().unixMillisLong,
-//                                        y = 18f,
-//                                    ),
-//                                    LineChartPoint(
-//                                        x = DateTime.now().unixMillisLong + 1 * 24 * 60 * 60 * 1000L,
-//                                        y = null,
-//                                    ),
-//                                    LineChartPoint(
-//                                        x = DateTime.now().unixMillisLong + 2 * 24 * 60 * 60 * 1000L,
-//                                        y = 18f,
-//                                    ),
-
-                                LineChartPoint(x = 1660600800000, y = 36.0f),
-                                LineChartPoint(x = 1660687200000, y = null),
-                                LineChartPoint(x = 1660773600000, y = 76.5f),
-                                LineChartPoint(x = 1660860000000, y = 83.7f),
-                                LineChartPoint(x = 1660946400000, y = null),
-                                LineChartPoint(x = 1661032800000, y = null),
-                                LineChartPoint(x = 1661119200000, y = 216.0f)
-                            )
-                        ),
-                    ),
-                    dataUnit = "unit",
-                ),
+                data = data1,
                 yAxisConfig = YAxisConfig(
-                    roundMinMaxClosestTo = 1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = data1,
+                        roundMarkersToMultiplicationOf = 1f,
+                    )
                 ),
                 xAxisConfig = XAxisConfig(
                     markerLayout = {
@@ -272,7 +274,10 @@ fun LineChartScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Right,
                     ),
-                    roundMinMaxClosestTo = 0.1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataWithLotsOfPoints,
+                        roundMarkersToMultiplicationOf = 0.1f
+                    )
                 ),
                 xAxisConfig = XAxisConfig(
                     markerLayout = {

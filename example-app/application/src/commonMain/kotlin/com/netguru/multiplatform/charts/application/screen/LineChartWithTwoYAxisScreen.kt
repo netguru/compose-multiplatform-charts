@@ -18,6 +18,7 @@ import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
 import com.netguru.multiplatform.charts.common.HorizontalDivider
 import com.netguru.multiplatform.charts.grid.YAxisTitleData
+import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
 import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
 import com.netguru.multiplatform.charts.line.LineChartSeries
@@ -139,9 +140,13 @@ fun LineChartWithTwoYAxisScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Left,
                     ),
-                    roundMinMaxClosestTo = 1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataLeft,
+                        roundMarkersToMultiplicationOf = null,
+                        forceShowingValueZeroLine = false,
+                    ),
                 ),
-                rightYAxisData = lineDataRight,
+                rightYAxisData = null,//lineDataRight,
                 rightYAxisConfig = YAxisConfig(
                     markerLayout = {
                         yAxisLabelRight(it.toString())
@@ -157,7 +162,11 @@ fun LineChartWithTwoYAxisScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Right,
                     ),
-                    roundMinMaxClosestTo = 0.1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataRight,
+                        roundMarkersToMultiplicationOf = 0.1f,
+                        forceShowingValueZeroLine = false,
+                    ),
                 ),
                 modifier = Modifier
                     .height(300.dp),
@@ -183,6 +192,7 @@ fun LineChartWithTwoYAxisScreen() {
                 displayAnimation = ChartDisplayAnimation.Sequenced(),
                 shouldDrawValueDots = true,
                 legendConfig = null,
+                shouldInterpolateOverNullValues = false,
             )
 
             HorizontalDivider()
@@ -206,7 +216,10 @@ fun LineChartWithTwoYAxisScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Top,
                     ),
-                    roundMinMaxClosestTo = 1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataLeft,
+                        roundMarkersToMultiplicationOf = 1f,
+                    ),
                 ),
                 rightYAxisData = lineDataRight,
                 rightYAxisConfig = YAxisConfig(
@@ -225,7 +238,10 @@ fun LineChartWithTwoYAxisScreen() {
                         labelPosition = YAxisTitleData.LabelPosition.Top,
 //                        labelPosition = YAxisTitleData.LabelPosition.Right,
                     ),
-                    roundMinMaxClosestTo = 0.1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataRight,
+                        roundMarkersToMultiplicationOf = 0.1f,
+                    ),
                 ),
                 modifier = Modifier
                     .height(300.dp),
@@ -276,7 +292,10 @@ fun LineChartWithTwoYAxisScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Right,
                     ),
-                    roundMinMaxClosestTo = 1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataLeft,
+                        roundMarkersToMultiplicationOf = 1f,
+                    ),
                 ),
                 rightYAxisData = lineDataRight,
                 rightYAxisConfig = YAxisConfig(
@@ -294,7 +313,10 @@ fun LineChartWithTwoYAxisScreen() {
                         },
                         labelPosition = YAxisTitleData.LabelPosition.Right,
                     ),
-                    roundMinMaxClosestTo = 1f,
+                    scale = YAxisScaleDynamic(
+                        chartData = lineDataRight,
+                        roundMarkersToMultiplicationOf = 1f,
+                    ),
                 ),
                 xAxisConfig = XAxisConfig(
                     markerLayout = {

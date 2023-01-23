@@ -14,29 +14,33 @@ class LineWithLegendTest : ScreenshotTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-//    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
-//    fun mixedValues_defaultUI() {
-//        checkComposable(composeRule) {
-//            LineChartWithLegend(
-//                lineChartData = Data.generateLineData(3),
-//            )
-//        }
-//    }
-//
-//    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
-//    fun mixedValues_customUI() {
-//        checkComposable(composeRule) {
-//            LineChartWithLegend(
-//                lineChartData = Data.generateLineData(3),
-//                legendItemLabel = {
-//                    Column(
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        Text(text = it)
-//                        Text(text = "line")
-//                    }
-//                }
-//            )
-//        }
-//    }
+    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
+    fun mixedValues_defaultUI() {
+        checkComposable(composeRule) {
+            LineChart(
+                data = Data.generateLineData(3),
+            )
+        }
+    }
+
+    @Test // removed due to: https://github.com/pedrovgs/Shot/issues/265
+    fun mixedValues_customUI() {
+        checkComposable(composeRule) {
+            LineChart(
+                data = Data.generateLineData(3),
+                legendConfig = LegendConfig(
+                    legendItemLabel = { name, unit ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = name)
+                            if (unit != null) {
+                                Text(text = unit)
+                            }
+                        }
+                    }
+                ),
+            )
+        }
+    }
 }

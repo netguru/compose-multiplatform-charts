@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.netguru.multiplatform.charts.grid.axisscale.x.XAxisScale
 import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScale
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
+import kotlin.math.sign
 
 fun DrawScope.drawChartGrid(
     grid: ChartGrid,
@@ -19,12 +20,6 @@ fun DrawScope.drawChartGrid(
             strokeWidth = 1f,
         )
     }
-    drawLine(
-        color = color,
-        start = Offset(0f, grid.zeroPosition.position),
-        end = Offset(size.width, grid.zeroPosition.position),
-        strokeWidth = 1f,
-    )
     grid.verticalLines.forEach {
         drawLine(
             color = color,
@@ -80,21 +75,45 @@ private fun measureHorizontalLines(
 ): List<LineParameters> {
     val horizontalLines = mutableListOf<LineParameters>()
 
-    if (axisScale.max == axisScale.min || axisScale.tick == 0f) {
-        return listOf(
-            LineParameters(
-                position = axisScale.max.mapValueToDifferentRange(
-                    0f,
-                    axisScale.max,
-                    startPosition,
-                    endPosition
+    if (axisScale.max == axisScale.min || axisScale.step == 0f) {
+        return if(axisScale.max.sign != axisScale.min.sign) {
+            listOf(
+                LineParameters(
+                    position = axisScale.max.mapValueToDifferentRange(
+                        0f,
+                        axisScale.max,
+                        startPosition,
+                        endPosition
+                    ),
+                    value = axisScale.max,
                 ),
-                value = axisScale.max,
-            ),
-        )
+                LineParameters(
+                    position = axisScale.min.mapValueToDifferentRange(
+                        axisScale.min,
+                        0f,
+                        startPosition,
+                        endPosition
+                    ),
+                    value = axisScale.min,
+                ),
+            )
+
+        } else {
+            listOf(
+                LineParameters(
+                    position = axisScale.max.mapValueToDifferentRange(
+                        0f,
+                        axisScale.max,
+                        startPosition,
+                        endPosition
+                    ),
+                    value = axisScale.max,
+                ),
+            )
+        }
     }
 
-    val valueStep = axisScale.tick
+    val valueStep = axisScale.step
     var currentValue = axisScale.min
 
     while (currentValue in axisScale.min..axisScale.max) {

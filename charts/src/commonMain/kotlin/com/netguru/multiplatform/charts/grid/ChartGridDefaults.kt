@@ -4,17 +4,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
+import com.netguru.multiplatform.charts.line.YAxisConfig
 import com.netguru.multiplatform.charts.vertical
 
 internal object ChartGridDefaults {
 
     const val NUMBER_OF_GRID_LINES = 5
-    const val ROUND_Y_AXIS_MIN_MAX_CLOSEST_TO = 10f
-    const val ROUND_X_AXIS_MIN_MAX_CLOSEST_TO = 15 * 60 * 1000L // 15 minutes
+    const val ROUND_Y_AXIS_MARKERS_CLOSEST_TO = 10f
+    const val ROUND_X_AXIS_MARKERS_CLOSEST_TO = 15 * 60 * 1000L // 15 minutes
 
     val YAxisMarkerLayout: @Composable (value: Any) -> Unit = { value ->
         Text(
@@ -37,7 +39,7 @@ internal object ChartGridDefaults {
         )
     }
 
-    val YAxisDataTitleYAxisData: YAxisTitleData = YAxisTitleData(
+    val YAxisDataTitle: YAxisTitleData = YAxisTitleData(
         labelLayout = YAxisDataTitleLayout,
         labelPosition = YAxisTitleData.LabelPosition.Left,
     )
@@ -70,6 +72,15 @@ internal object ChartGridDefaults {
     val LegendItemLabel: @Composable (name: String, unit: String?) -> Unit = { name, unit ->
         Text(
             text = name + unit?.let { " ($it)" }.orEmpty(),
+        )
+    }
+
+    @Composable
+    fun yAxisConfig(data: GridChartData) = remember(data) {
+        YAxisConfig(
+            scale = YAxisScaleDynamic(
+                chartData = data,
+            )
         )
     }
 }

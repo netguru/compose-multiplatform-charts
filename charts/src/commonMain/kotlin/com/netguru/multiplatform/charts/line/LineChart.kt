@@ -25,7 +25,6 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.getAnimationAlphas
@@ -35,7 +34,6 @@ import com.netguru.multiplatform.charts.grid.LineParameters
 import com.netguru.multiplatform.charts.grid.YAxisLabels
 import com.netguru.multiplatform.charts.grid.YAxisTitleData
 import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
-import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
 import com.netguru.multiplatform.charts.grid.drawChartGrid
 import com.netguru.multiplatform.charts.grid.measureChartGrid
 import com.netguru.multiplatform.charts.theme.ChartTheme
@@ -64,7 +62,7 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 fun LineChart(
     data: LineChartData,
     modifier: Modifier = Modifier,
-    yAxisConfig: YAxisConfig = YAxisConfig(),
+    yAxisConfig: YAxisConfig = ChartGridDefaults.yAxisConfig(data),
     xAxisConfig: XAxisConfig? = XAxisConfig(),
     legendConfig: LegendConfig? = LegendConfig(),
     colors: LineChartColors = LineChartDefaults.lineChartColors(),
@@ -124,7 +122,8 @@ fun LineChart(
                         ) - 1
                         )
                         .coerceAtLeast(1),
-                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo ?: ChartGridDefaults.ROUND_X_AXIS_MIN_MAX_CLOSEST_TO,
+                    roundClosestTo = xAxisConfig?.roundMarkersToMultiplicationOf
+                        ?: ChartGridDefaults.ROUND_X_AXIS_MARKERS_CLOSEST_TO,
                 )
                 BoxWithConstraints(
                     modifier = Modifier
@@ -134,15 +133,10 @@ fun LineChart(
                         .drawBehind {
                             val lines = measureChartGrid(
                                 xAxisScale = xAxisScale,
-                                yAxisScale = YAxisScaleDynamic(
-                                    min = data.minY,
-                                    max = data.maxY,
-                                    maxTickCount = yAxisConfig.maxHorizontalLines - 1,
-                                    roundClosestTo = yAxisConfig.roundMinMaxClosestTo,
-                                ),
+                                yAxisScale = yAxisConfig.scale,
                             )
                             verticalGridLines = lines.verticalLines
-                            horizontalGridLines = lines.horizontalLines + lines.zeroPosition
+                            horizontalGridLines = lines.horizontalLines
                             drawChartGrid(
                                 grid = lines,
                                 color = colors.grid,
@@ -150,9 +144,10 @@ fun LineChart(
 
                             drawLineChart(
                                 xAxisScale = xAxisScale,
+                                yAxisScale = yAxisConfig.scale,
                                 lineChartData = data,
                                 alpha = alpha,
-                                drawPoints = shouldDrawValueDots,
+                                drawDots = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw,
                                 shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )

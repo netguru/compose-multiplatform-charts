@@ -67,8 +67,8 @@ fun LineChartWithTwoYAxisSets(
     leftYAxisData: LineChartData,
     rightYAxisData: LineChartData?,
     modifier: Modifier = Modifier,
-    leftYAxisConfig: YAxisConfig = YAxisConfig(),
-    rightYAxisConfig: YAxisConfig = YAxisConfig(),
+    leftYAxisConfig: YAxisConfig = ChartGridDefaults.yAxisConfig(leftYAxisData),
+    rightYAxisConfig: YAxisConfig? = rightYAxisData?.let { ChartGridDefaults.yAxisConfig(it) },
     xAxisConfig: XAxisConfig? = XAxisConfig(),
     legendConfig: LegendConfig? = LegendConfig(),
     colors: LineChartColors = LineChartDefaults.lineChartColors(),
@@ -114,7 +114,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
     rightYAxisData: LineChartData,
     modifier: Modifier,
     leftYAxisConfig: YAxisConfig,
-    rightYAxisConfig: YAxisConfig,
+    rightYAxisConfig: YAxisConfig?,
     xAxisConfig: XAxisConfig?,
     legendConfig: LegendConfig?,
     colors: LineChartColors,
@@ -148,7 +148,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
         modifier = modifier,
     ) {
         if (leftYAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top ||
-            rightYAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top
+            rightYAxisConfig?.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -157,7 +157,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                     .fillMaxWidth()
             ) {
                 leftYAxisConfig.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
-                rightYAxisConfig.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
+                rightYAxisConfig?.yAxisTitleData?.labelLayout?.invoke() ?: Spacer(Modifier.size(1.dp))
             }
         }
         Row(modifier = Modifier.weight(1f)) {
@@ -200,7 +200,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                         ) - 1
                         )
                         .coerceAtLeast(1),
-                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo
+                    roundClosestTo = xAxisConfig?.roundMarkersToMultiplicationOf
                 )
                 BoxWithConstraints(
                     Modifier
@@ -210,61 +210,57 @@ private fun LineChartWithTwoYAxisSetsLayout(
                             val lines = measureChartGrid(
                                 xAxisScale = xAxisScale,
                                 yAxisScale = YAxisScaleStatic(
-                                    min = 0f,
-                                    max = leftYAxisConfig.maxHorizontalLines.toFloat(),
-                                    maxTickCount = leftYAxisConfig.maxHorizontalLines - 1,
-                                    roundClosestTo = 1f,
+                                    min = minOf(leftYAxisData.minY, rightYAxisData.minY),
+                                    max = maxOf(leftYAxisData.maxY, rightYAxisData.maxY),
+                                    numberOfHorizontalLines = minOf(
+                                        leftYAxisConfig.scale.numberOfHorizontalLines,
+                                        rightYAxisConfig?.scale?.numberOfHorizontalLines ?: Int.MAX_VALUE
+                                    )
                                 ),
                             ).also {
                                 verticalGridLines = it.verticalLines
                             }
 
-                            leftYAxisMarks = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(
-                                    min = 0,
-                                    max = 0,
-                                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo,
-                                ),
-                                yAxisScale = YAxisScaleDynamic(
-                                    min = leftYAxisData.minY,
-                                    max = leftYAxisData.maxY,
-                                    maxTickCount = leftYAxisConfig.maxHorizontalLines - 1,
-                                    roundClosestTo = leftYAxisConfig.roundMinMaxClosestTo,
+                            if (leftYAxisConfig.markerLayout != null) {
+                                leftYAxisMarks = measureChartGrid(
+                                    xAxisScale = TimestampXAxisScale(
+                                        min = 0,
+                                        max = 0,
+                                        roundClosestTo = xAxisConfig?.roundMarkersToMultiplicationOf,
+                                    ),
+                                    yAxisScale = leftYAxisConfig.scale
                                 )
-                            )
-                                .horizontalLines
-                                .let {
-                                    val containsZeroValue =
-                                        it.firstOrNull { line -> line.position == lines.zeroPosition.position } != null
-                                    if (containsZeroValue) {
-                                        it
-                                    } else {
-                                        it + lines.zeroPosition
-                                    }
-                                }
-                            rightYAxisMarks = measureChartGrid(
-                                xAxisScale = TimestampXAxisScale(
-                                    min = 0,
-                                    max = 0,
-                                    roundClosestTo = xAxisConfig?.roundMinMaxClosestTo,
-                                ),
-                                yAxisScale = YAxisScaleDynamic(
-                                    min = rightYAxisData.minY,
-                                    max = rightYAxisData.maxY,
-                                    maxTickCount = rightYAxisConfig.maxHorizontalLines - 1,
-                                    roundClosestTo = rightYAxisConfig.roundMinMaxClosestTo,
+                                    .horizontalLines
+//                                    .let {
+//                                        val containsZeroValue =
+//                                            it.firstOrNull { line -> line.position == lines.zeroPosition.position } != null
+//                                        if (containsZeroValue) {
+//                                            it
+//                                        } else {
+//                                            it + lines.zeroPosition
+//                                        }
+//                                    }
+                            }
+                            if (rightYAxisConfig?.markerLayout != null) {
+                                rightYAxisMarks = measureChartGrid(
+                                    xAxisScale = TimestampXAxisScale(
+                                        min = 0,
+                                        max = 0,
+                                        roundClosestTo = xAxisConfig?.roundMarkersToMultiplicationOf,
+                                    ),
+                                    yAxisScale = rightYAxisConfig.scale
                                 )
-                            )
-                                .horizontalLines
-                                .let {
-                                    val containsZeroValue =
-                                        it.firstOrNull { line -> line.position == lines.zeroPosition.position } != null
-                                    if (containsZeroValue) {
-                                        it
-                                    } else {
-                                        it + lines.zeroPosition
-                                    }
-                                }
+                                    .horizontalLines
+//                                    .let {
+//                                        val containsZeroValue =
+//                                            it.firstOrNull { line -> line.position == lines.zeroPosition.position } != null
+//                                        if (containsZeroValue) {
+//                                            it
+//                                        } else {
+//                                            it + lines.zeroPosition
+//                                        }
+//                                    }
+                            }
 
                             drawChartGrid(lines, colors.grid)
 
@@ -274,13 +270,14 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 // same start and end point, making (at least) one of them drawn incorrectly
                                 lineChartData = leftYAxisData.addNoYValuePointsFrom(rightYAxisData),
                                 alpha = alphas,
-                                drawPoints = shouldDrawValueDots,
+                                drawDots = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw.filter {
                                     leftYAxisData.series.contains(
                                         it.lineChartSeries
                                     )
                                 },
                                 xAxisScale = xAxisScale,
+                                yAxisScale = leftYAxisConfig.scale,
                                 shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )
 
@@ -290,13 +287,15 @@ private fun LineChartWithTwoYAxisSetsLayout(
                                 // same start and end point, making (at least) one of them drawn incorrectly
                                 lineChartData = rightYAxisData.addNoYValuePointsFrom(leftYAxisData),
                                 alpha = alphas,
-                                drawPoints = shouldDrawValueDots,
+                                drawDots = shouldDrawValueDots,
                                 selectedPointsForDrawing = pointsToDraw.filter {
                                     rightYAxisData.series.contains(
                                         it.lineChartSeries
                                     )
                                 },
                                 xAxisScale = xAxisScale,
+
+                                yAxisScale = rightYAxisConfig?.scale ?: YAxisScaleDynamic(rightYAxisData),
                                 shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
                             )
                         }
@@ -359,7 +358,7 @@ private fun LineChartWithTwoYAxisSetsLayout(
                 }
             }
 
-            if (rightYAxisConfig.markerLayout != null) {
+            if (rightYAxisConfig?.markerLayout != null) {
                 YAxisLabels(
                     horizontalGridLines = rightYAxisMarks,
                     yAxisMarkerLayout = rightYAxisConfig.markerLayout,

@@ -1,102 +1,136 @@
 package com.netguru.multiplatform.charts.grid.axisscale.y
 
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.log10
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
+import com.netguru.multiplatform.charts.grid.GridChartData
+import com.netguru.multiplatform.charts.roundToMultiplicationOf
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.sign
 
 class YAxisScaleDynamic(
-    min: Float,
-    max: Float,
-    maxTickCount: Int,
-    roundClosestTo: Float,
+    chartData: GridChartData,
+    maxNumberOfHorizontalLines: Int = ChartGridDefaults.NUMBER_OF_GRID_LINES,
+    roundMarkersToMultiplicationOf: Float? = ChartGridDefaults.ROUND_Y_AXIS_MARKERS_CLOSEST_TO,
+    forceShowingValueZeroLine: Boolean = false,
 ) : YAxisScale {
-    override val tick: Float
+    override val step: Float
     override val min: Float
     override val max: Float
+    override val numberOfHorizontalLines: Int
 
-    init {
 
-        if (roundClosestTo <= 0) {
-            throw IllegalArgumentException("roundClosestTo must be a positive number")
-        }
-
+    private fun roundToMultiplicationOf(numberToRound: Float, multiplicandBase: Float, ceiling: Boolean): Float {
         var moveDecimalPointBy = 0
-        var tempClosestTo = roundClosestTo
-        if (roundClosestTo < 1) {
-            while (tempClosestTo.rem(1) > 0) {
-                tempClosestTo *= 10
+        if (multiplicandBase < 1) {
+            var tmp = multiplicandBase
+            while (tmp.rem(1) > 0) {
+                tmp *= 10
                 moveDecimalPointBy++
             }
         }
 
-        this.min = if (min.isNaN()) {
+        return numberToRound
+            .times(10f.pow(moveDecimalPointBy))
+            .roundToMultiplicationOf(
+                multiplicand = multiplicandBase
+                    .times(10f.pow(moveDecimalPointBy)),
+                roundToCeiling = ceiling,
+            )
+            .div(10f.pow(moveDecimalPointBy))
+    }
+
+    init {
+        if (maxNumberOfHorizontalLines <= 0) {
+            throw IllegalArgumentException("maxNumberOfHorizontalLines must be positive")
+        }
+        if (roundMarkersToMultiplicationOf != null && roundMarkersToMultiplicationOf <= 0) {
+            throw IllegalArgumentException("roundMarkersToMultiplicationOf must be either null or a positive number")
+        }
+        val validMin = if (chartData.minY.isNaN()) {
             0f
         } else {
-            min
-                .times(10f.pow(moveDecimalPointBy))
-                .getClosest(
-                    n = roundClosestTo
-                        .times(10f.pow(moveDecimalPointBy)),
-                    ceil = false,
-                )
-                .div(10f.pow(moveDecimalPointBy))
-
+            chartData.minY
         }
-        this.max = if (max.isNaN()) {
+        val validMax = if (chartData.maxY.isNaN()) {
             0f
         } else {
-            max
-                .times(10f.pow(moveDecimalPointBy))
-                .getClosest(
-                    n = roundClosestTo
-                        .times(10f.pow(moveDecimalPointBy)),
-                    ceil = true,
-                )
-                .div(10f.pow(moveDecimalPointBy))
+            chartData.maxY
         }
 
-        val range = niceNum(this.max - this.min, false)
-        this.tick = niceNum(range / (maxTickCount), true)
-    }
-
-    private fun Float.getClosest(n: Float, ceil: Boolean) = when {
-        this > 0f -> ((this + n - 1) / n).ceilOrFloor(ceil) * n
-        this < 0f -> ((this - n + 1) / n).ceilOrFloor(ceil) * n
-        else -> 0f
-    }
-
-    private fun Float.ceilOrFloor(ceil: Boolean): Float = if (ceil) {
-        ceil(this)
-    } else {
-        floor(this)
-    }
-
-    /**
-     * Returns a "nice" number approximately equal to range.
-     * Rounds the number if round = true Takes the ceiling if round = false.
-     *
-     * @param range the data range
-     * @param round whether to round the result
-     * @return a "nice" number to be used for the data range
-     */
-    private fun niceNum(range: Float, round: Boolean): Float {
-        /** nice, rounded fraction  */
-        val exponent: Float = floor(log10(range))
-
-        /** exponent of range  */
-        val fraction = range / 10.0f.pow(exponent)
-
-        /** fractional part of range  */
-        val niceFraction: Float = if (round) {
-            if (fraction < 1.5) 1.0f else if (fraction < 3) 2.0f else if (fraction < 7) 5.0f else 10.0f
+        this.step = if (maxNumberOfHorizontalLines == 1) {
+            0f
         } else {
-            if (fraction <= 1) 1.0f else if (fraction <= 2) 2.0f else if (fraction <= 5) 5.0f else 10.0f
+            val maxDiffToShowLinesFor = if (validMax.sign == validMin.sign) {
+                validMax - validMin
+            } else {
+                max(validMax, -validMin)
+            }
+            (maxDiffToShowLinesFor / maxNumberOfHorizontalLines)
+                .let {
+                    if (roundMarkersToMultiplicationOf == null) {
+                        it
+                    } else {
+                        roundToMultiplicationOf(it, roundMarkersToMultiplicationOf, true)
+                    }
+                }
         }
-        return niceFraction * 10.0f.pow(exponent)
+
+        this.min = run {
+            val roundedMin = if (step == 0f) {
+                if (roundMarkersToMultiplicationOf == null) {
+                    // do not round
+                    validMin
+                } else {
+                    roundToMultiplicationOf(validMin, roundMarkersToMultiplicationOf, false)
+                }
+            } else {
+                roundToMultiplicationOf(validMin, step, false)
+            }
+
+            if (roundedMin > 0 && forceShowingValueZeroLine) {
+                0f
+            } else {
+                roundedMin
+            }
+        }
+
+        this.max = run {
+            val roundedMax = if (step == 0f) {
+                if (roundMarkersToMultiplicationOf == null) {
+                    // do not round
+                    validMax
+                } else {
+                    roundToMultiplicationOf(validMax, roundMarkersToMultiplicationOf, true)
+                }
+            } else {
+                roundToMultiplicationOf(validMax, step, true)
+            }
+
+            if (roundedMax < 0 && forceShowingValueZeroLine) {
+                0f
+            } else {
+                roundedMax
+            }
+        }
+
+        this.numberOfHorizontalLines = if (step == 0f) {
+            if (min.sign == max.sign) {
+                1
+            } else {
+                2
+            }
+        } else {
+            if (min.sign == max.sign) {
+                ((max - min) / step).roundToInt()
+            } else {
+                (max / step).roundToInt() + (-min / step).roundToInt()
+            }
+        }
     }
 
     override fun toString(): String {
-        return "min: $min, max: $max, tick: $tick"
+        return "min: $min, max: $max, step: $step"
     }
 }

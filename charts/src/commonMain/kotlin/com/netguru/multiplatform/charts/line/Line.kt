@@ -11,14 +11,16 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
+import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScale
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 
 internal fun DrawScope.drawLineChart(
     lineChartData: LineChartData,
     alpha: List<Float>,
-    drawPoints: Boolean,
+    drawDots: Boolean,
     selectedPointsForDrawing: List<SeriesAndClosestPoint>,
     xAxisScale: TimestampXAxisScale,
+    yAxisScale: YAxisScale,
     shouldInterpolateOverNullValues: Boolean,
 ) {
     // calculate path
@@ -46,7 +48,13 @@ internal fun DrawScope.drawLineChart(
             }
         }
 
-        val shouldSetZeroAsMinValue = unfilteredData.listOfPoints.filter { it.y != null }.distinctBy { it.y }.size == 1
+        val (shouldSetZeroAsMinValue, shouldSetZeroAsMaxValue) = unfilteredData
+            .listOfPoints
+            .filter { it.y != null }
+            .distinctBy { it.y }
+            .takeIf { it.size == 1 }
+            ?.let { (it.first().y!! > 0) to (it.first().y!! < 0) }
+            ?: (false to false)
 
         filteredLists
             .map { unfilteredData.copy(listOfPoints = it) }
@@ -57,10 +65,11 @@ internal fun DrawScope.drawLineChart(
                 val mappedPoints =
                     mapDataToPixels(
                         xAxisScale = xAxisScale,
-                        lineChartData = lineChartData,
+                        yAxisScale = yAxisScale,
                         currentSeries = data,
                         canvasSize = size,
                         shouldSetZeroAsMinValue = shouldSetZeroAsMinValue,
+                        shouldSetZeroAsMaxValue = shouldSetZeroAsMaxValue,
                     )
                 val connectionPoints = calculateConnectionPointsForBezierCurve(mappedPoints)
 
@@ -83,8 +92,8 @@ internal fun DrawScope.drawLineChart(
                         }
                     }
 
-                if (mappedPoints.size == 1 || drawPoints) {
-                    val pointSize = data.lineWidth.toPx().times(if (drawPoints) 3f else 2f)
+                if (mappedPoints.size == 1 || drawDots) {
+                    val pointSize = data.lineWidth.toPx().times(if (drawDots) 3f else 2f)
                     val widthThePointsTake = mappedPoints.maxOf { it.x } - mappedPoints.minOf { it.x }
                     val isEnoughSpace =
                         (mappedPoints.size - 2 /* this 2 is a magic number, it just works better with it */) * pointSize * 1.5 < widthThePointsTake
@@ -160,11 +169,12 @@ internal fun DrawScope.drawLineChart(
 }
 
 private fun mapDataToPixels(
-    lineChartData: LineChartData,
     currentSeries: LineChartSeries,
     canvasSize: Size,
     shouldSetZeroAsMinValue: Boolean,
+    shouldSetZeroAsMaxValue: Boolean,
     xAxisScale: TimestampXAxisScale,
+    yAxisScale: YAxisScale,
 ): List<PointF> {
     val mappedPoints = currentSeries.listOfPoints.map {
         val x = it.x.mapValueToDifferentRange(
@@ -174,8 +184,8 @@ private fun mapDataToPixels(
             outMax = canvasSize.width.toLong()
         ).toFloat()
         val y = it.y?.mapValueToDifferentRange(
-            inMin = if (shouldSetZeroAsMinValue) 0f else lineChartData.minY,
-            inMax = lineChartData.maxY,
+            inMin = if (shouldSetZeroAsMinValue) 0f else yAxisScale.min,
+            inMax = if (shouldSetZeroAsMaxValue) 0f else yAxisScale.max,
             outMin = canvasSize.height,
             outMax = 0f,
         )

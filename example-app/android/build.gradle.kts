@@ -44,5 +44,7 @@ android {
 }
 
 shot {
-    tolerance = 2.0 // 2% tolerance, needed for testing on different devices
+//    tolerance is needed when tests were recorded on a machine with Intel processor and executed on an Apple's M1 (or M2?)
+//    based machine (or vice versa). Here is more about it: https://github.com/pedrovgs/Shot/issues/265
+//    tolerance = 0.5 // 0.5%
 }

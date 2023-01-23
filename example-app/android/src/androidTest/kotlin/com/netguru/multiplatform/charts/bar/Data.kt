@@ -54,7 +54,8 @@ internal object Data {
 
     fun generateData(nOfCategories: Int, nOfEntries: Int, valueTypes: ValueTypes): BarChartData {
         return BarChartData(
-            categories = generateCategories(nOfCategories, nOfEntries, valueTypes)
+            categories = generateCategories(nOfCategories, nOfEntries, valueTypes),
+            unit = "unit",
         )
     }
 }

@@ -64,8 +64,8 @@ class BarWithLegendTest : ScreenshotTest {
                         Text(text = "units")
                     }
                 },
-                legendItemLabel = {
-                    Text(text = "Custom label for: $it")
+                legendItemLabel = { name, unit ->
+                    Text(text = "Custom label for: $name")
                 }
             )
         }

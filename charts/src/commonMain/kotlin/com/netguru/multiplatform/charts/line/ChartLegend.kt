@@ -50,9 +50,7 @@ fun ChartLegend(
     ) {
         val cols = maxOf((maxWidth / columnMinWidth).toInt(), 1)
         val rows = legendData.chunked(cols)
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        LazyColumn {
             itemsIndexed(rows) { rowIndex, legendRowItems ->
                 Row(
                     Modifier.height(IntrinsicSize.Min),

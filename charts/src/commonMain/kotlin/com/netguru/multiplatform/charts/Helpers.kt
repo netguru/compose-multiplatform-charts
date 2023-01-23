@@ -12,8 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.layout
 import kotlin.math.PI
+import kotlin.math.absoluteValue
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 internal fun Double.mapValueToDifferentRange(
     inMin: Double,
@@ -107,3 +111,28 @@ fun Modifier.vertical() =
         }
 
 fun Float.toRadians() = this * PI.toFloat() / 180f
+
+fun Float.roundToMultiplicationOf(multiplicand: Float, roundToCeiling: Boolean): Float {
+    if (this == 0f) {
+        return 0f
+    }
+    if (multiplicand <= 0) {
+        throw IllegalArgumentException("multiplicand must be positive!")
+    }
+
+    fun Float.ceilOrFloor(ceil: Boolean): Float = if (ceil) {
+        ceil(this)
+    } else {
+        floor(this)
+    }
+
+    val round = when (sign) {
+        -1f -> !roundToCeiling
+        1f -> roundToCeiling
+        else -> throw IllegalStateException("If `this == 0f` this line should never be reached")
+    }
+
+    val closest = (absoluteValue / multiplicand).ceilOrFloor(round) * multiplicand
+
+    return sign * closest
+}

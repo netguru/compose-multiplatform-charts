@@ -22,40 +22,40 @@ class DialTest : ScreenshotTest {
 
     @Test
     fun range_0_100_value_50_UI_default() {
-        checkComposable(composeRule) { Dial(value = 50, minValue = 0, maxValue = 100) }
+        checkComposable(composeRule) { Dial(value = 50f, minValue = 0f, maxValue = 100f,) }
     }
 
     @Test
     fun range_0_100_value_0_UI_default() {
-        checkComposable(composeRule) { Dial(value = 0, minValue = 0, maxValue = 100) }
+        checkComposable(composeRule) { Dial(value = 0f, minValue = 0f, maxValue = 100f,) }
     }
 
     @Test
     fun range_0_100_value_100_UI_default() {
-        checkComposable(composeRule) { Dial(value = 100, minValue = 0, maxValue = 100) }
+        checkComposable(composeRule) { Dial(value = 100f, minValue = 0f, maxValue = 100f,) }
     }
 
     @Test
     fun range_0_100_value_minus50_UI_default() {
-        checkComposable(composeRule) { Dial(value = -50, minValue = 0, maxValue = 100) }
+        checkComposable(composeRule) { Dial(value = -50f, minValue = 0f, maxValue = 100f,) }
     }
 
     @Test
     fun range_0_100_value_150_UI_default() {
-        checkComposable(composeRule) { Dial(value = 150, minValue = 0, maxValue = 100) }
+        checkComposable(composeRule) { Dial(value = 150f, minValue = 0f, maxValue = 100f,) }
     }
 
     @Test
     fun range_0_100_value_69_UI_custom_colors_and_labels() {
         checkComposable(composeRule) {
             Dial(
-                value = 69,
-                minValue = 0,
-                maxValue = 100,
-                colors = ChartDefaults.chartColors(
-                    primary = Color.Blue,
-                    grid = Color.Magenta,
-                ).dialColors,
+                value = 69f,
+                minValue = 0f,
+                maxValue = 100f,
+                colors = DialChartDefaults.dialChartColors(
+                    progressBarColor = DialProgressColors.SingleColor(Color.Blue),
+                    gridScaleColor = Color.Magenta,
+                ),
                 minAndMaxValueLabel = {
                     Text(
                         text = it.toString(),
@@ -80,9 +80,9 @@ class DialTest : ScreenshotTest {
     fun range_0_100_value_69_UI_no_labels() {
         checkComposable(composeRule) {
             Dial(
-                value = 69,
-                minValue = 0,
-                maxValue = 100,
+                value = 69f,
+                minValue = 0f,
+                maxValue = 100f,
                 minAndMaxValueLabel = { },
                 mainLabel = { }
             )

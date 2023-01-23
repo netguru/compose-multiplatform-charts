@@ -27,6 +27,7 @@ fun BarChartWithLegend(
     config: BarChartConfig = BarChartConfig(),
     xAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.XAxisMarkerLayout,
     yAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.YAxisMarkerLayout,
+    yAxisLabelLayout: (@Composable () -> Unit)? = null,
     legendItemLabel: @Composable (name: String, unit: String?) -> Unit = ChartGridDefaults.LegendItemLabel,
     columnMinWidth: Dp = 200.dp,
 ) {
@@ -39,6 +40,7 @@ fun BarChartWithLegend(
             config = config,
             xAxisMarkerLayout = xAxisLabel,
             yAxisMarkerLayout = yAxisLabel,
+            yAxisLabelLayout = yAxisLabelLayout,
         )
         ChartLegend(
             legendData = data.legendData,

@@ -59,7 +59,7 @@ fun BarChart(
     config: BarChartConfig = BarChartConfig(),
     xAxisMarkerLayout: @Composable (value: Any) -> Unit = ChartGridDefaults.XAxisMarkerLayout,
     yAxisMarkerLayout: @Composable (value: Any) -> Unit = ChartGridDefaults.YAxisMarkerLayout,
-    yAxisLabelLayout: (@Composable () -> Unit)? = ChartGridDefaults.YAxisDataTitleLayout,
+    yAxisLabelLayout: (@Composable () -> Unit)? = null,
     animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     overlayDataEntryLabel: @Composable (dataName: String, dataNameShort: String?, dataUnit: String?, value: Any) -> Unit = ChartGridDefaults.TooltipDataEntryLabel,
 ) {
@@ -120,10 +120,10 @@ fun BarChart(
                         }
                 ) {
                     val yAxisScale = YAxisScaleDynamic(
-                        min = data.minY,
-                        max = data.maxY,
-                        maxTickCount = config.maxHorizontalLinesCount,
-                        roundClosestTo = config.roundMinMaxClosestTo,
+                        chartData = data,
+                        maxNumberOfHorizontalLines = config.maxHorizontalLinesCount,
+                        roundMarkersToMultiplicationOf = config.roundMinMaxClosestTo,
+                        forceShowingValueZeroLine = true,
                     )
                     val grid = measureChartGrid(
                         xAxisScale = FixedTicksXAxisScale(
