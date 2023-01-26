@@ -48,18 +48,7 @@ sealed class ScaleConfig(
         scaleLineLength: Dp = DialDefaults.SCALE_STROKE_LENGTH,
         scaleLabelLayout: (@Composable (Float) -> Unit)? = null,
         markType: MarkType = MarkType.Line,
-    ) : ScaleConfig(scalePadding, scaleLineWidth, scaleLineLength, scaleLabelLayout, markType) {
-        /**
-         * @param value Value that this point represents
-         * @param position position on the scale in "percentage" in range [0, 1]
-         * @param label to display next to the point
-         */
-        data class ScalePoint(
-            val value: Float,
-            val position: Float,
-            val label: String,
-        )
-    }
+    ) : ScaleConfig(scalePadding, scaleLineWidth, scaleLineLength, scaleLabelLayout, markType)
 
     fun calculateProgressionMarkersPositions(
         config: DialConfig,
@@ -71,11 +60,11 @@ sealed class ScaleConfig(
         maxValue: Float,
     ): List<ScalePositions.ScaleItem> {
         val scaleLineLength =
-            with(density) { (scaleLineLength.toPx() / center.x).coerceAtMost(MAX_LINE_LENGTH) } // todo remove this constant?
+            with(density) { (scaleLineLength.toPx() / center.x).coerceAtMost(MAX_LINE_LENGTH) } // todo remove this constant
         val scalePadding = with(density) { (config.thickness.toPx() + scalePadding.toPx()) / center.x }
         val startRadiusFactor = 1 - scalePadding - scaleLineLength
         val endRadiusFactor = startRadiusFactor + scaleLineLength
-        val smallLineRadiusFactor = scaleLineLength * MINOR_SCALE_LENGTH_FACTOR // todo remove this constant?
+        val smallLineRadiusFactor = scaleLineLength * MINOR_SCALE_LENGTH_FACTOR // todo move this to params
         val scaleMultiplier = width / 2f
 
         return when (this) {

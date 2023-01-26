@@ -12,6 +12,10 @@ import com.netguru.multiplatform.charts.line.Progression
  *
  * @see Dial
  */
+@Deprecated(
+    message = "The default Dial param values are the same as the ones for PercentageDial",
+    replaceWith = ReplaceWith("Dial(value = percentage, modifier = modifier, animation = animation, colors = colors, config = config, minAndMaxValueLabel = minAndMaxValueLabel, mainLabel = mainLabel, indicator = indicator)")
+)
 @Composable
 fun PercentageDial(
     percentage: Float,

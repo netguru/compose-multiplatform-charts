@@ -65,14 +65,14 @@ private const val CIRCLE_ANGLE = 360f
 @Composable
 fun Dial(
     value: Float,
-    minValue: Float,
-    maxValue: Float,
+    minValue: Float = 0f,
+    maxValue: Float = 100f,
     modifier: Modifier = Modifier,
     animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: DialChartColors = DialChartDefaults.dialChartColors(),
     config: DialConfig = DialConfig(),
     minAndMaxValueLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MinAndMaxValueLabel,
-    mainLabel: @Composable (value: Float) -> Unit = DialDefaults.MainLabel,
+    mainLabel: (@Composable (value: Float) -> Unit)? = DialDefaults.MainLabel,
     indicator: (@Composable () -> Unit)? = null,
     scaleConfig: ScaleConfig? = ScaleConfig.LinearProgressionConfig(),
     progression: Progression = Progression.Linear,
@@ -189,19 +189,21 @@ fun Dial(
                     }
                 }
         ) {
-            Box(
-                modifier = Modifier
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(
-                                x = maxWidth.roundToPx() / 2 - placeable.width / 2,
-                                y = (maxHeight.roundToPx() / 2.5).roundToInt(),
-                            )
+            if (mainLabel != null) {
+                Box(
+                    modifier = Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.place(
+                                    x = maxWidth.roundToPx() / 2 - placeable.width / 2,
+                                    y = (maxHeight.roundToPx() / 2.5).roundToInt(),
+                                )
+                            }
                         }
-                    }
-            ) {
-                mainLabel(value)
+                ) {
+                    mainLabel(value)
+                }
             }
 
             if (scaleConfig != null) {
@@ -288,9 +290,21 @@ private fun DrawScope.drawProgressBar(
     if (value >= minValue) {
         when (progressBarColor) {
             is DialProgressColors.Gradient -> {
+                // we need to map those colors into range [0.5, 1.0] because drawing of the sweepGradient always starts
+                // at 3 o'clock and advances clockwise until it reaches 3 o'clock again.
+                // For the same reason, centre of the gradient is set to bottom edge. This might result in a weird color
+                // transition (not aligned with centre of the dial), but at least there is no jump of colors at
+                // 3 o'clock position. Trying to get sweepGradient to draw from [0.5, >1.0] does not work. It simply
+                // stops at 1.0 (100%)
+                val step = 0.5f / (progressBarColor.colors.size - 1)
+                val colorStops = progressBarColor.colors
+                    .mapIndexed { index, color ->
+                        val stop = 0.5f + (index * step)
+                        stop to color
+                    }
                 drawArc(
                     brush = Brush.sweepGradient(
-                        colors = progressBarColor.colors,
+                        colorStops = colorStops.toTypedArray(),
                         center = Offset(
                             x = size.width / 2,
                             y = size.height,
@@ -306,9 +320,20 @@ private fun DrawScope.drawProgressBar(
             }
 
             is DialProgressColors.GradientWithStops -> {
+                // we need to map those colors into range [0.5, 1.0] because drawing of the sweepGradient always starts
+                // at 3 o'clock and advances clockwise until it reaches 3 o'clock again.
+                // For the same reason, centre of the gradient is set to bottom edge. This might result in a weird color
+                // transition (not aligned with centre of the dial), but at least there is no jump of colors at
+                // 3 o'clock position. Trying to get sweepGradient to draw from [0.5, > 1.0] does not work. It simply
+                // stops at 1.0 (100%)
+                val mappedColorStops = progressBarColor
+                    .colorStops
+                    .map {
+                        (it.first / 2f) + 0.5f to it.second
+                    }
                 drawArc(
                     brush = Brush.sweepGradient(
-                        colorStops = progressBarColor.colorStops.toTypedArray(),
+                        colorStops = mappedColorStops.toTypedArray(),
                         center = Offset(
                             x = size.width / 2,
                             y = size.height,

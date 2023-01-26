@@ -36,7 +36,6 @@ import com.netguru.multiplatform.charts.dial.DialChartColors
 import com.netguru.multiplatform.charts.dial.DialConfig
 import com.netguru.multiplatform.charts.dial.DialJoinStyle
 import com.netguru.multiplatform.charts.dial.DialProgressColors
-import com.netguru.multiplatform.charts.dial.PercentageDial
 import com.netguru.multiplatform.charts.dial.scale.MarkType
 import com.netguru.multiplatform.charts.dial.scale.ScaleConfig
 import com.netguru.multiplatform.charts.line.Progression
@@ -58,8 +57,8 @@ fun DialChartScreen() {
         ) {
             item {
                 PresentedItem(text = "Percentage dial") {
-                    PercentageDial(
-                        percentage = sliderValue,
+                    Dial(
+                        value = sliderValue,
                         modifier = commonModifier,
                         animation = ChartDisplayAnimation.Disabled,
                         colors = DialChartColors(
@@ -77,6 +76,7 @@ fun DialChartScreen() {
                             roundCorners = true,
                             joinStyle = DialJoinStyle.Overlapped,
                         ),
+                        minAndMaxValueLabel = null,
                         mainLabel = {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -104,7 +104,6 @@ fun DialChartScreen() {
                                     .rotate(-90f)
                             )
                         },
-                        minAndMaxValueLabel = null,
                     )
                 }
             }
@@ -118,17 +117,17 @@ fun DialChartScreen() {
                         colors = DialChartColors(
                             progressBarBackgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
                             gridScaleColor = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                            progressBarColor = DialProgressColors.GradientWithStops(
+                            progressBarColor = DialProgressColors.Gradient(
                                 listOf(
-                                    0.5f to Color.Red,
-                                    1f to Color.Green,
+                                    Color.Red,
+                                    Color.Green,
                                 )
                             )
                         ),
                         config = DialConfig(
                             thickness = 20.dp,
                             roundCorners = true,
-                            joinStyle = DialJoinStyle.Overlapped,
+                            joinStyle = DialJoinStyle.WithDegreeGap(15f),
                         ),
                         progression = Progression.NonLinear(
                             anchorPoints = listOf(
@@ -208,7 +207,7 @@ fun DialChartScreen() {
                         config = DialConfig(
                             thickness = 20.dp,
                             roundCorners = true,
-                            joinStyle = DialJoinStyle.Overlapped,
+                            joinStyle = DialJoinStyle.Joined,
                         ),
                         progression = Progression.NonLinear(
                             anchorPoints = listOf(

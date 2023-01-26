@@ -27,7 +27,7 @@ data class DialConfig(
     val aspectRatio: Float = run {
         // diameter is equal to 1f since we are calculating aspect ratio
         // formulas can be found here: https://www.mathopenref.com/sagitta.html
-        val arcLength = (fullAngleInDegrees / 360f) * Math.PI
+        val arcLength = (fullAngleInDegrees / 360f) * Math.PI.toFloat()
         val halfChordLength = 0.5f * sin(arcLength)
         val sagitta = if (fullAngleInDegrees <= 180f) {
             0.5f - sqrt(0.25f - halfChordLength.pow(2))
@@ -35,7 +35,7 @@ data class DialConfig(
             0.5f + sqrt(0.25f - halfChordLength.pow(2))
         }
 
-        1f / sagitta.toFloat()
+        1f / sagitta
     }
 }
 
