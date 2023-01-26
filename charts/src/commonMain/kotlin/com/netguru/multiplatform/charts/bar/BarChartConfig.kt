@@ -2,7 +2,7 @@ package com.netguru.multiplatform.charts.bar
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 
 /**
  * The customization parameters for [BarChart]
@@ -18,6 +18,6 @@ data class BarChartConfig(
     val thickness: Dp = BarChartDefaults.BAR_THICKNESS,
     val cornerRadius: Dp = BarChartDefaults.BAR_CORNER_RADIUS,
     val barsSpacing: Dp = BarChartDefaults.BAR_HORIZONTAL_SPACING,
-    val maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    val roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
+    val maxHorizontalLinesCount: Int = ChartGridDefaults.NUMBER_OF_GRID_LINES,
+    val roundMinMaxClosestTo: Float = ChartGridDefaults.ROUND_Y_AXIS_MARKERS_CLOSEST_TO,
 )

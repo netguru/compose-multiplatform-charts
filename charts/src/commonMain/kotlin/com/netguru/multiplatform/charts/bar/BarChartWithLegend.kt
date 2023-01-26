@@ -3,8 +3,10 @@ package com.netguru.multiplatform.charts.bar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 import com.netguru.multiplatform.charts.line.ChartLegend
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
@@ -20,12 +22,14 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
 fun BarChartWithLegend(
     data: BarChartData,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: BarChartColors = ChartTheme.colors.barChartColors,
     config: BarChartConfig = BarChartConfig(),
-    xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
-    yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
-    legendItemLabel: @Composable (String) -> Unit = GridDefaults.LegendItemLabel,
+    xAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.XAxisMarkerLayout,
+    yAxisLabel: @Composable (value: Any) -> Unit = ChartGridDefaults.YAxisMarkerLayout,
+    yAxisLabelLayout: (@Composable () -> Unit)? = null,
+    legendItemLabel: @Composable (name: String, unit: String?) -> Unit = ChartGridDefaults.LegendItemLabel,
+    columnMinWidth: Dp = 200.dp,
 ) {
     Column(modifier) {
         BarChart(
@@ -34,14 +38,16 @@ fun BarChartWithLegend(
             animation = animation,
             colors = colors,
             config = config,
-            xAxisLabel = xAxisLabel,
-            yAxisLabel = yAxisLabel,
+            xAxisMarkerLayout = xAxisLabel,
+            yAxisMarkerLayout = yAxisLabel,
+            yAxisLabelLayout = yAxisLabelLayout,
         )
         ChartLegend(
             legendData = data.legendData,
             animation = animation,
             config = config,
             legendItemLabel = legendItemLabel,
+            columnMinWidth = columnMinWidth,
         )
     }
 }

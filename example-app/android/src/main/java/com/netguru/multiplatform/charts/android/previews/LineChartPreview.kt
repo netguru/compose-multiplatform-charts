@@ -1,32 +1,44 @@
 package com.netguru.multiplatform.charts.android.previews
 
+import android.graphics.PathEffect
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.common.AppTheme
 import com.netguru.multiplatform.charts.common.HOUR_IN_MS
 import com.netguru.multiplatform.charts.common.WindowSize
+import com.netguru.multiplatform.charts.grid.axisscale.y.YAxisScaleDynamic
+import com.netguru.multiplatform.charts.line.LineChart
 import com.netguru.multiplatform.charts.line.LineChartData
 import com.netguru.multiplatform.charts.line.LineChartPoint
 import com.netguru.multiplatform.charts.line.LineChartSeries
-import com.netguru.multiplatform.charts.line.LineChartWithLegend
+import com.netguru.multiplatform.charts.line.XAxisConfig
+import com.netguru.multiplatform.charts.line.YAxisConfig
 import com.soywiz.klock.DateTime
 
 @Preview(showBackground = true, widthDp = 600)
 @Composable
 fun LineChartPreview() {
     AppTheme(windowSize = WindowSize.EXPANDED) {
-        LineChartWithLegend(
+        val data = getLineChartSampleData()
+        LineChart(
+            data = data,
+            yAxisConfig = YAxisConfig(
+                scale = YAxisScaleDynamic(
+                    chartData = data,
+                )
+            ),
+            xAxisConfig = XAxisConfig(
+                maxVerticalLines = 10,
+            ),
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
-            lineChartData = getLineChartSampleData(),
-            maxVerticalLines = 10,
-            animation = ChartAnimation.Disabled,
+            displayAnimation = ChartDisplayAnimation.Disabled,
         )
     }
 }
@@ -40,7 +52,6 @@ private fun getLineChartSampleData(): LineChartData {
         LineChartSeries(
             "Solar",
             lineColor = AppTheme.colors.yellow,
-            dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 0f),
                 LineChartPoint(1L * HOUR_IN_MS + startTime, 1f),
@@ -55,7 +66,6 @@ private fun getLineChartSampleData(): LineChartData {
         LineChartSeries(
             "Grid",
             lineColor = AppTheme.colors.green,
-            dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 3f),
                 LineChartPoint(1L * HOUR_IN_MS + startTime, 2f),
@@ -69,7 +79,6 @@ private fun getLineChartSampleData(): LineChartData {
         LineChartSeries(
             "Fossil",
             lineColor = AppTheme.colors.blue,
-            dashedLine = false,
             listOfPoints = listOf(
                 LineChartPoint(0L * HOUR_IN_MS + startTime, 1f),
                 LineChartPoint(1L * HOUR_IN_MS + startTime, 3f),
@@ -82,5 +91,6 @@ private fun getLineChartSampleData(): LineChartData {
 
     return LineChartData(
         series = list,
+        dataUnit = null,
     )
 }

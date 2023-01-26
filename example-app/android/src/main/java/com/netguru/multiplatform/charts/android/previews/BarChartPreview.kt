@@ -82,5 +82,6 @@ fun barChartSampleData(): BarChartData {
                 )
             ),
         ),
+        unit = "unit",
     )
 }

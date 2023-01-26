@@ -8,6 +8,7 @@ import com.netguru.multiplatform.charts.theme.ChartColors
 data class BarChartColors(
     val grid: Color,
     val surface: Color,
+    val overlaySurface: Color = surface,
 )
 
 val ChartColors.barChartColors

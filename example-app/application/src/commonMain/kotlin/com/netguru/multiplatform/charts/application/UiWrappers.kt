@@ -9,8 +9,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.netguru.multiplatform.charts.common.AppTheme
 
@@ -24,6 +26,7 @@ fun TitleText(
         color = AppTheme.colors.primaryText,
         fontSize = 40.sp,
         fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center,
         modifier = modifier,
     )
 }
@@ -36,6 +39,19 @@ fun SpacedColumn(
         verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.grid_4),
         content = content,
     )
+}
+
+@Composable
+fun PresentedItem(
+    text: String,
+    content: @Composable () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        TitleText(text)
+        content()
+    }
 }
 
 @Composable

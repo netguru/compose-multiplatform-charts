@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.bubble
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,9 +17,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.bubble.BubbleDefaults.MINIMUM_BUBBLE_RADIUS
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import kotlin.math.min
 import kotlin.random.Random
@@ -39,7 +38,7 @@ import kotlin.random.Random
 fun BubbleChart(
     bubbles: List<Bubble>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     distanceBetweenCircles: Float = -10f,
     bubbleLabel: @Composable (Bubble) -> Unit = BubbleDefaults.BubbleLabel,
 ) {
@@ -47,22 +46,11 @@ fun BubbleChart(
         return
     }
 
-    val animationPlayed = StartAnimation(animation, bubbles)
-    val animatedScale = when (animation) {
-        ChartAnimation.Disabled -> bubbles.indices.map { 1f }
-        is ChartAnimation.Simple -> bubbles.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> bubbles.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec(it)
-            ).value
-        }
-    }
+    val animatedScale = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = bubbles.size,
+        uniqueDatasetKey = bubbles,
+    )
 
     BoxWithConstraints(modifier = modifier) {
         val size = min(maxWidth.value, maxHeight.value)

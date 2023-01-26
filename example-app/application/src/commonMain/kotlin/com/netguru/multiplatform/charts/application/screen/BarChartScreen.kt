@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.ScrollableScreen
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
@@ -87,6 +87,7 @@ fun BarChartScreen() {
                 )
             ),
         ),
+        unit = "unit",
     )
 
     ScrollableScreen {
@@ -95,7 +96,7 @@ fun BarChartScreen() {
             BarChart(
                 data = data,
                 modifier = Modifier.height(500.dp),
-                yAxisLabel = {
+                yAxisMarkerLayout = {
                     Text(
                         text = it.toString(),
                         color = AppTheme.colors.secondaryText,
@@ -103,14 +104,14 @@ fun BarChartScreen() {
                         modifier = Modifier.fillMaxWidth()
                     )
                 },
-                xAxisLabel = {
+                xAxisMarkerLayout = {
                     Text(
                         text = it.toString(),
                         modifier = Modifier.padding(top = AppTheme.dimens.grid_2_5),
                         color = AppTheme.colors.secondaryText
                     )
                 },
-                animation = ChartAnimation.Sequenced()
+                animation = ChartDisplayAnimation.Sequenced()
             )
 
             HorizontalDivider()
@@ -129,10 +130,10 @@ fun BarChartScreen() {
                         color = AppTheme.colors.secondaryText
                     )
                 },
-                animation = ChartAnimation.Sequenced(),
-                legendItemLabel = {
+                animation = ChartDisplayAnimation.Sequenced(),
+                legendItemLabel = { name, unit ->
                     Text(
-                        text = it,
+                        text = name + unit?.let { "\n($it)" }.orEmpty(),
                         modifier = Modifier.padding(vertical = 10.dp)
                     )
                 }

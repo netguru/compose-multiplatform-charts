@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.gasbottle
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -18,8 +17,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
@@ -32,34 +31,26 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * [ChartColors.emptyGasBottle] based on the 'fullness' of the cylinder.
  *
  * @param percentage Value to portray
- * @param animation Animation to use. [ChartAnimation.Sequenced] throws an
+ * @param animation Animation to use. [ChartDisplayAnimation.Sequenced] throws an
  * [kotlin.UnsupportedOperationException], since there is only one value to display.
  * @param colors Allows to specify full and empty bottle color
  *
- * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ * @throws kotlin.UnsupportedOperationException when [ChartDisplayAnimation.Sequenced] is used
  */
 @Composable
 fun GasBottle(
     percentage: Float,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     colors: GasBottleColors = ChartTheme.colors.gasBottleColors,
 ) {
-    val animationPlayed = StartAnimation(animation, percentage)
-    val targetProgress = when (animation) {
-        ChartAnimation.Disabled -> {
-            percentage
-        }
-        is ChartAnimation.Simple -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) percentage else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> {
-            throw UnsupportedOperationException("As GasBottle chart only shows one value, ChartAnimation.Sequenced is not supported!")
-        }
-    }
+    val animationPercentage = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = 1,
+        uniqueDatasetKey = percentage,
+    ).first()
+
+    val targetProgress = percentage * animationPercentage
 
     val gasTank = rememberVectorPainter(image = GasTank)
     Box(modifier = modifier, contentAlignment = Alignment.Center) {

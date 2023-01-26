@@ -57,6 +57,7 @@ import com.netguru.multiplatform.charts.application.screen.BubbleChartScreen
 import com.netguru.multiplatform.charts.application.screen.DialChartScreen
 import com.netguru.multiplatform.charts.application.screen.GasBottleChartScreen
 import com.netguru.multiplatform.charts.application.screen.LineChartScreen
+import com.netguru.multiplatform.charts.application.screen.LineChartWithTwoYAxisScreen
 import com.netguru.multiplatform.charts.application.screen.PieChartScreen
 import com.netguru.multiplatform.charts.common.AppTheme
 import com.netguru.multiplatform.charts.common.AppTheme.drawables
@@ -127,6 +128,7 @@ private fun HomeContent(state: NavigationState, dispatch: (AppAction) -> Unit) {
                     NavigationState.Tab.DIAL -> DialChartScreen()
                     NavigationState.Tab.GAS_BOTTLE -> GasBottleChartScreen()
                     NavigationState.Tab.LINE -> LineChartScreen()
+                    NavigationState.Tab.LINE_WITH_TWO_Y_AXIS -> LineChartWithTwoYAxisScreen()
                     NavigationState.Tab.PIE -> PieChartScreen()
                 }
             }
@@ -242,6 +244,7 @@ private fun TopHomeDrawer(state: NavigationState, dispatch: (AppAction) -> Unit)
             NavigationState.Tab.DIAL,
             NavigationState.Tab.GAS_BOTTLE,
             NavigationState.Tab.LINE,
+            NavigationState.Tab.LINE_WITH_TWO_Y_AXIS,
             NavigationState.Tab.PIE,
         ).forEach { tab ->
             HomeDrawerButton(

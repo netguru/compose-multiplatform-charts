@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 
 /**
  * Version of [PieChart] with legend.
@@ -22,7 +22,7 @@ import com.netguru.multiplatform.charts.ChartAnimation
 fun PieChartWithLegend(
     pieChartData: List<PieChartData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     config: PieChartConfig = PieChartConfig(),
     legendItemLabel: @Composable (PieChartData) -> Unit = PieDefaults.LegendItemLabel,
 ) {

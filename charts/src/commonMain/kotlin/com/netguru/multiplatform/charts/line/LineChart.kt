@@ -1,218 +1,270 @@
 package com.netguru.multiplatform.charts.line
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
-import com.netguru.multiplatform.charts.grid.GridDefaults
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
+import com.netguru.multiplatform.charts.getAnimationAlphas
+import com.netguru.multiplatform.charts.grid.DrawXAxisMarkers
+import com.netguru.multiplatform.charts.grid.ChartGridDefaults
 import com.netguru.multiplatform.charts.grid.LineParameters
 import com.netguru.multiplatform.charts.grid.YAxisLabels
-import com.netguru.multiplatform.charts.grid.alignCenterToOffsetHorizontal
-import com.netguru.multiplatform.charts.grid.axisscale.TimestampXAxisScale
-import com.netguru.multiplatform.charts.grid.axisscale.YAxisScale
+import com.netguru.multiplatform.charts.grid.YAxisTitleData
+import com.netguru.multiplatform.charts.grid.axisscale.x.TimestampXAxisScale
 import com.netguru.multiplatform.charts.grid.drawChartGrid
 import com.netguru.multiplatform.charts.grid.measureChartGrid
-import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
-val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
-
 /**
- * Classic line chart with some shade below the line in the same color (albeit with a lot of
- * transparency) as the line and floating balloon on touch/click to show values for that particular
- * x-axis value.
+ * Classic line chart with some shade below the line in the same color as the line (albeit with a lot of transparency)
+ * and tooltip on touch/click to show values for that particular x-axis value.
  *
- * Color, shape and whether the line is dashed for each of the lines is specified in the
- * [LegendItemData] class. Even though that this class is used, this particular composable does not
- * show the legend. For this, [LineChartWithLegend] must be used.
+ * Color, shape and whether the line is dashed for each of the lines is specified in the [LegendItemData] instance
+ * inside [LineChartData].
  *
- * @param lineChartData Data to portray
- * @param colors Colors used are [ChartColors.grid], [ChartColors.surface] and
- * [ChartColors.overlayLine].
- * @param xAxisLabel Composable to mark the values on the x-axis.
- * @param yAxisLabel Composable to mark the values on the y-axis.
- * @param overlayHeaderLabel Composable to show the current x-axis value on the overlay balloon
- * @param overlayDataEntryLabel Composable to show the value of each line in the overlay balloon
- * for that specific x-axis value
- * @param animation Animation to use
- * @param maxVerticalLines Max number of lines, representing the x-axis values
- * @param maxHorizontalLines Max number of lines, representing the y-axis values
- * @param roundMinMaxClosestTo Number to which min and max range will be rounded to
+ * @param data Data to display
+ * @param modifier Compose modifier
+ * @param yAxisConfig Configuration for the Y axis
+ * @param xAxisConfig Configuration for the X axis. If null, X axis is not displayed
+ * @param legendConfig Config for the legend. If null, legend is not displayed
+ * @param colors Colors used for grid, background, tooltip line color and tooltip background color
+ * @param tooltipConfig Configuration for the tooltip. If null, tooltip is not shown
+ * @param displayAnimation Animation to use to show the lines
+ * @param shouldDrawValueDots Whether there should be a dot on the chart line for each non-null Y value
+ * @param shouldInterpolateOverNullValues Whether chart line should be interpolated between two non-null Y values if
+ * there is at least one null Y value between them. Setting to false interrupts the line and starts drawing at the next
+ * non-null value
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LineChart(
-    lineChartData: LineChartData,
+    data: LineChartData,
     modifier: Modifier = Modifier,
-    colors: LineChartColors = ChartTheme.colors.lineChartColors,
-    xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
-    yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
-    overlayHeaderLabel: @Composable (value: Any) -> Unit = GridDefaults.OverlayHeaderLabel,
-    overlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
-    animation: ChartAnimation = ChartAnimation.Simple(),
-    maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
-    roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
+    yAxisConfig: YAxisConfig = ChartGridDefaults.yAxisConfig(data),
+    xAxisConfig: XAxisConfig? = XAxisConfig(),
+    legendConfig: LegendConfig? = LegendConfig(),
+    colors: LineChartColors = LineChartDefaults.lineChartColors(),
+    tooltipConfig: TooltipConfig? = TooltipConfig(),
+    displayAnimation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
+    shouldDrawValueDots: Boolean = false,
+    shouldInterpolateOverNullValues: Boolean = true,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
-    val horizontalLinesOffset: Dp = GridDefaults.HORIZONTAL_LINES_OFFSET
 
-    val animationPlayed = StartAnimation(animation, lineChartData)
+    val alpha = getAnimationAlphas(displayAnimation, data.series.size, data)
 
-    val alpha = when (animation) {
-        ChartAnimation.Disabled -> lineChartData.series.indices.map { 1f }
-        is ChartAnimation.Simple -> lineChartData.series.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
+    Column(
+        modifier = modifier
+    ) {
+        if (yAxisConfig.yAxisTitleData?.labelPosition == YAxisTitleData.LabelPosition.Top) {
+            yAxisConfig.yAxisTitleData.labelLayout()
         }
-        is ChartAnimation.Sequenced -> lineChartData.series.indices.map {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) 1f else 0f,
-                animationSpec = animation.animationSpec(it)
-            ).value
-        }
-    }
-
-    Row(modifier = modifier) {
-        YAxisLabels(
-            horizontalGridLines = horizontalGridLines,
-            yAxisMarkerLayout = yAxisLabel,
-        )
-
-        Spacer(modifier = Modifier.size(4.dp, 0.dp))
-
-        // main chart
-        Column(Modifier.fillMaxSize()) {
-            BoxWithConstraints(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .drawBehind {
-                        val lines = measureChartGrid(
-                            xAxisScale = TimestampXAxisScale(
-                                min = lineChartData.minX,
-                                max = lineChartData.maxX,
-                                maxTicksCount = maxVerticalLines - 1
-
-                            ),
-                            yAxisScale = YAxisScale(
-                                min = lineChartData.minY,
-                                max = lineChartData.maxY,
-                                maxTickCount = maxHorizontalLines - 1,
-                                roundClosestTo = roundMinMaxClosestTo,
-                            ),
-                            horizontalLinesOffset = horizontalLinesOffset
-                        )
-                        verticalGridLines = lines.verticalLines
-                        horizontalGridLines = lines.horizontalLines
-                        drawChartGrid(lines, colors.grid)
-
-                        drawLineChart(
-                            lineChartData = lineChartData,
-                            graphTopPadding = horizontalLinesOffset,
-                            graphBottomPadding = horizontalLinesOffset,
-                            alpha = alpha,
-                        )
-                    }
-                    // Touch input
-                    .pointerInput(Unit) {
-                        while (true) {
-                            awaitPointerEventScope {
-                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-
-                                touchPositionX = if (
-                                    shouldIgnoreTouchInput(
-                                        event = event,
-                                        containerSize = size
-                                    )
-                                ) {
-                                    -1f
-                                } else {
-                                    event.changes[0].position.x
-                                }
-
-                                event.changes.any {
-                                    it.consume()
-                                    true
-                                }
-                            }
-                        }
-                    }
-            ) {
-                // Overlay
-                LineChartOverlayInformation(
-                    lineChartData = lineChartData,
-                    positionX = touchPositionX,
-                    containerSize = with(LocalDensity.current) {
-                        Size(
-                            maxWidth.toPx(),
-                            maxHeight.toPx()
-                        )
-                    },
-                    colors = colors,
-                    overlayHeaderLayout = overlayHeaderLabel,
-                    overlayDataEntryLayout = overlayDataEntryLabel,
+        Row(modifier = Modifier.weight(1f)) {
+            if (yAxisConfig.markerLayout != null) {
+                YAxisLabels(
+                    horizontalGridLines = horizontalGridLines,
+                    yAxisMarkerLayout = yAxisConfig.markerLayout,
+                    yAxisTitleData = yAxisConfig.yAxisTitleData,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
                 )
             }
 
-            Box(Modifier.fillMaxWidth()) {
-                for (gridLine in verticalGridLines) {
-                    Box(
-                        modifier = Modifier
-                            .alignCenterToOffsetHorizontal(gridLine.position)
-                    ) {
-                        xAxisLabel(gridLine.value.toLong())
+            val numberOfXAxisEntries by remember(data) {
+                derivedStateOf {
+                    data
+                        .series
+                        .map {
+                            it.listOfPoints
+                        }
+                        .maxOf {
+                            it.size
+                        }
+                }
+            }
+
+            // main chart
+            Column(Modifier.fillMaxSize()) {
+                var pointsToDraw: List<SeriesAndClosestPoint> by remember {
+                    mutableStateOf(emptyList())
+                }
+                val xAxisScale = TimestampXAxisScale(
+                    min = data.minX,
+                    max = data.maxX,
+                    maxTicksCount = (
+                        minOf(
+                            xAxisConfig?.maxVerticalLines ?: ChartGridDefaults.NUMBER_OF_GRID_LINES,
+                            numberOfXAxisEntries
+                        ) - 1
+                        )
+                        .coerceAtLeast(1),
+                    roundClosestTo = xAxisConfig?.roundMarkersToMultiplicationOf
+                        ?: ChartGridDefaults.ROUND_X_AXIS_MARKERS_CLOSEST_TO,
+                )
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .background(colors.surface)
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .drawBehind {
+                            val lines = measureChartGrid(
+                                xAxisScale = xAxisScale,
+                                yAxisScale = yAxisConfig.scale,
+                            )
+                            verticalGridLines = lines.verticalLines
+                            horizontalGridLines = lines.horizontalLines
+                            drawChartGrid(
+                                grid = lines,
+                                color = colors.grid,
+                            )
+
+                            drawLineChart(
+                                xAxisScale = xAxisScale,
+                                yAxisScale = yAxisConfig.scale,
+                                lineChartData = data,
+                                alpha = alpha,
+                                drawDots = shouldDrawValueDots,
+                                selectedPointsForDrawing = pointsToDraw,
+                                shouldInterpolateOverNullValues = shouldInterpolateOverNullValues,
+                            )
+                        }
+                        .then(
+                            if (tooltipConfig != null) {
+                                // Touch input
+                                Modifier
+                                    .pointerInput(Unit) {
+                                        while (true) {
+                                            awaitPointerEventScope {
+                                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+
+                                                touchPositionX = if (
+                                                    shouldIgnoreTouchInput(
+                                                        event = event
+                                                    )
+                                                ) {
+                                                    -1f
+                                                } else {
+                                                    event.changes[0].position.x
+                                                }
+
+                                                event.changes.any {
+                                                    it.consume()
+                                                    true
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .pointerInput(Unit) {
+                                        while (true) {
+                                            awaitPointerEventScope {
+                                                val event = awaitPointerEvent(PointerEventPass.Main)
+                                                if (
+                                                    event.changes.all { it.changedToUp() } ||
+                                                    event.changes.any {
+                                                        it.isOutOfBounds(size, extendedTouchPadding)
+                                                    }
+                                                ) {
+                                                    touchPositionX = -1f
+                                                }
+                                            }
+                                        }
+                                    }
+                            } else {
+                                Modifier
+                            }
+                        ),
+                    content = {
+                        if (tooltipConfig != null) {
+                            LineChartTooltip(
+                                lineChartData = listOf(data),
+                                positionX = touchPositionX,
+                                containerSize = with(LocalDensity.current) {
+                                    Size(
+                                        maxWidth.toPx(),
+                                        maxHeight.toPx()
+                                    )
+                                },
+                                colors = colors,
+                                drawPoints = {
+                                    pointsToDraw = it
+                                },
+                                tooltipConfig = tooltipConfig,
+                                xAxisScale = xAxisScale,
+                            )
+                        }
+                    }
+                )
+
+                if (xAxisConfig != null) {
+                    Box(Modifier.fillMaxWidth()) {
+                        DrawXAxisMarkers(
+                            lineParams = verticalGridLines,
+                            xAxisConfig = xAxisConfig,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
                     }
                 }
             }
         }
+
+        if (legendConfig != null) {
+            ChartLegend(
+                legendData = data.legendData,
+                animation = displayAnimation,
+                legendItemLabel = legendConfig.legendItemLabel,
+                columnMinWidth = legendConfig.columnMinWidth,
+            )
+        }
     }
 }
 
-private fun shouldIgnoreTouchInput(event: PointerEvent, containerSize: IntSize): Boolean {
-    if (event.changes.isEmpty() ||
-        event.type != PointerEventType.Move
+private fun shouldIgnoreTouchInput(event: PointerEvent): Boolean {
+    if (
+        event.changes.isEmpty() ||
+        (event.type != PointerEventType.Move && event.type != PointerEventType.Press)
     ) {
         return true
     }
-    if (event.changes[0].position.x < 0 ||
-        event.changes[0].position.x > containerSize.width
-    ) {
-        return true
-    }
-    if (event.changes[0].position.y < 0 ||
-        event.changes[0].position.y > containerSize.height
-    ) {
-        return true
-    }
+
     return false
+}
+
+object LineChartDefaults {
+    @Composable
+    fun lineChartColors(
+        backgroundColor: Color = ChartTheme.colors.surface,
+        gridColor: Color = ChartTheme.colors.grid,
+        overlayLineColor: Color = ChartTheme.colors.overlayLine,
+        overlayBackgroundColor: Color = ChartTheme.colors.surface,
+    ): LineChartColors = LineChartColors(
+        surface = backgroundColor,
+        grid = gridColor,
+        overlayLine = overlayLineColor,
+        overlaySurface = overlayBackgroundColor,
+    )
 }

@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
 import com.netguru.multiplatform.charts.application.SpacedColumn
 import com.netguru.multiplatform.charts.application.TitleText
 import com.netguru.multiplatform.charts.common.AppTheme
@@ -51,7 +51,7 @@ fun GasBottleChartScreen() {
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(),
-            cells = GridCells.Fixed(numberOfCols),
+            columns = GridCells.Fixed(numberOfCols),
             contentPadding = PaddingValues(AppTheme.dimens.grid_4),
         ) {
             item(span = { GridItemSpan(numberOfCols) }) {
@@ -78,7 +78,7 @@ fun GasBottleChartScreen() {
                     GasBottle(
                         percentage = 100 * item.value / item.capacity,
                         modifier = Modifier.size(width = 200.dp, height = 300.dp),
-                        animation = ChartAnimation.Simple {
+                        animation = ChartDisplayAnimation.Simple {
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
                                 stiffness = Spring.StiffnessVeryLow

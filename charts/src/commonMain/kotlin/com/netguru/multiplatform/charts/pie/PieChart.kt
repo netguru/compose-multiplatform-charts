@@ -1,6 +1,5 @@
 package com.netguru.multiplatform.charts.pie
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -18,8 +17,8 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
-import com.netguru.multiplatform.charts.ChartAnimation
-import com.netguru.multiplatform.charts.StartAnimation
+import com.netguru.multiplatform.charts.ChartDisplayAnimation
+import com.netguru.multiplatform.charts.getAnimationAlphas
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
 import com.netguru.multiplatform.charts.pie.PieDefaults.FULL_CIRCLE_DEGREES
 import com.netguru.multiplatform.charts.pie.PieDefaults.START_ANGLE
@@ -37,34 +36,24 @@ data class PieChartData(val name: String, val value: Double, val color: Color)
  * [PieChartWithLegend]
  *
  * @param data Data to show
- * @param animation Animation to use. [ChartAnimation.Sequenced] is currently not supported and will
+ * @param animation Animation to use. [ChartDisplayAnimation.Sequenced] is currently not supported and will
  * @param config The parameters for chart appearance customization
  * throw an [kotlin.UnsupportedOperationException] if used.
  *
- * @throws kotlin.UnsupportedOperationException when [ChartAnimation.Sequenced] is used
+ * @throws kotlin.UnsupportedOperationException when [ChartDisplayAnimation.Sequenced] is used
  */
 @Composable
 fun PieChart(
     data: List<PieChartData>,
     modifier: Modifier = Modifier,
-    animation: ChartAnimation = ChartAnimation.Simple(),
+    animation: ChartDisplayAnimation = ChartDisplayAnimation.Simple(),
     config: PieChartConfig = PieChartConfig(),
 ) {
-    val animationPlayed = StartAnimation(animation, data)
-    val maxAngle = when (animation) {
-        ChartAnimation.Disabled -> {
-            1f
-        }
-        is ChartAnimation.Simple -> {
-            animateFloatAsState(
-                targetValue = if (animationPlayed) FULL_CIRCLE_DEGREES else 0f,
-                animationSpec = animation.animationSpec()
-            ).value
-        }
-        is ChartAnimation.Sequenced -> {
-            throw UnsupportedOperationException("ChartAnimation.Sequenced is currently not supported for PieChart!")
-        }
-    }
+    val maxAngle = getAnimationAlphas(
+        animation = animation,
+        numberOfElementsToAnimate = 1,
+        uniqueDatasetKey = data,
+    ).first() * FULL_CIRCLE_DEGREES
 
     val sumOfData by remember(data) {
         mutableStateOf(data.sumOf { it.value })
