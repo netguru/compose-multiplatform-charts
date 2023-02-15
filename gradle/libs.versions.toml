@@ -36,7 +36,8 @@ shot = "5.14.1"
 ktlint = "10.2.1"
 
 # Project
-project-group = "com.netguru.multiplatform"
+project-group = "com.netguru"
+project-artifact = "multiplatform-charts"
 project-version = "1.0.0"
 project-name = "Compose Multiplatform Charts"
 project-description = "Charts library for Kotlin multiplatform applications"

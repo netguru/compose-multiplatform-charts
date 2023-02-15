@@ -40,6 +40,7 @@ fun Project.publishingSetup() {
 
         publications.withType(MavenPublication::class.java) {
             pom {
+                artifactId = libs.versions.project.artifact.get()
                 name.set(libs.versions.project.name.get())
                 description.set(libs.versions.project.description.get())
                 url.set(libs.versions.project.url.get())
