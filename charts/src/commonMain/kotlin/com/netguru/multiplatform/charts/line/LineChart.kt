@@ -62,6 +62,7 @@ val dashedPathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 5f), 0f)
  * @param animation Animation to use
  * @param maxVerticalLines Max number of lines, representing the x-axis values
  * @param maxHorizontalLines Max number of lines, representing the y-axis values
+ * @param roundMinMaxClosestTo Number to which min and max range will be rounded to
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -76,6 +77,7 @@ fun LineChart(
     animation: ChartAnimation = ChartAnimation.Simple(),
     maxVerticalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
     maxHorizontalLines: Int = GridDefaults.NUMBER_OF_GRID_LINES,
+    roundMinMaxClosestTo: Int = GridDefaults.ROUND_MIN_MAX_CLOSEST_TO,
 ) {
     var touchPositionX by remember { mutableStateOf(-1f) }
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
@@ -125,7 +127,8 @@ fun LineChart(
                             yAxisScale = YAxisScale(
                                 min = lineChartData.minY,
                                 max = lineChartData.maxY,
-                                maxTickCount = maxHorizontalLines - 1
+                                maxTickCount = maxHorizontalLines - 1,
+                                roundClosestTo = roundMinMaxClosestTo,
                             ),
                             horizontalLinesOffset = horizontalLinesOffset
                         )
@@ -166,7 +169,7 @@ fun LineChart(
                     }
             ) {
                 // Overlay
-                OverlayInformation(
+                LineChartOverlayInformation(
                     lineChartData = lineChartData,
                     positionX = touchPositionX,
                     containerSize = with(LocalDensity.current) {

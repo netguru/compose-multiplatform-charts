@@ -3,6 +3,8 @@ package com.netguru.multiplatform.charts.bar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.netguru.multiplatform.charts.ChartAnimation
+import com.netguru.multiplatform.charts.OverlayInformation
 import com.netguru.multiplatform.charts.StartAnimation
 import com.netguru.multiplatform.charts.grid.GridDefaults
 import com.netguru.multiplatform.charts.grid.LineParameters
@@ -26,6 +33,7 @@ import com.netguru.multiplatform.charts.grid.axisscale.FixedTicksXAxisScale
 import com.netguru.multiplatform.charts.grid.axisscale.YAxisScale
 import com.netguru.multiplatform.charts.grid.drawChartGrid
 import com.netguru.multiplatform.charts.grid.measureChartGrid
+import com.netguru.multiplatform.charts.line.PointF
 import com.netguru.multiplatform.charts.theme.ChartColors
 import com.netguru.multiplatform.charts.theme.ChartTheme
 
@@ -40,7 +48,6 @@ import com.netguru.multiplatform.charts.theme.ChartTheme
  * @param yAxisLabel Composable to mark the values on the y-axis.
  * @param animation In the case of [ChartAnimation.Sequenced] items with the same index in each
  * category will animate together
- * @param maxHorizontalLinesCount Max number of lines that are allowed to draw for marking y-axis
  * values
  */
 @Composable
@@ -52,7 +59,7 @@ fun BarChart(
     xAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.XAxisLabel,
     yAxisLabel: @Composable (value: Any) -> Unit = GridDefaults.YAxisLabel,
     animation: ChartAnimation = ChartAnimation.Simple(),
-    maxHorizontalLinesCount: Int = GridDefaults.NUMBER_OF_GRID_LINES,
+    overlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit = GridDefaults.OverlayDataEntryLabel,
 ) {
     val verticalLinesCount = remember(data) { data.maxX.toInt() + 1 }
     val horizontalLinesOffset =
@@ -62,6 +69,8 @@ fun BarChart(
 
     var verticalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
     var horizontalGridLines by remember { mutableStateOf(emptyList<LineParameters>()) }
+    var chartBars by remember { mutableStateOf(emptyList<BarChartBar>()) }
+    var selectedBar by remember { mutableStateOf<Pair<PointF, BarChartBar>?>(null) }
 
     val valueScale = when (animation) {
         ChartAnimation.Disabled -> data.categories.first().entries.indices.map { 1f }
@@ -86,46 +95,73 @@ fun BarChart(
         )
 
         Spacer(modifier = Modifier.size(width = 4.dp, height = 0.dp))
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            val gridColor = colors.grid
-            Canvas(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                val grid = measureChartGrid(
-                    xAxisScale = FixedTicksXAxisScale(
-                        min = data.minX,
-                        max = data.maxX,
-                        tickCount = verticalLinesCount - 1
-                    ),
-                    yAxisScale = YAxisScale(
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                val gridColor = colors.grid
+                Canvas(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .pointerInput(Unit) {
+                            while (true) {
+                                awaitPointerEventScope {
+                                    val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                                    event.changes.forEach { inputChange ->
+                                        selectedBar = chartBars.firstOrNull {
+                                            inputChange.position.x in it.width &&
+                                                inputChange.position.y in it.height
+                                        }?.let {
+                                            PointF(
+                                                inputChange.position.x,
+                                                inputChange.position.y
+                                            ) to it
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                ) {
+                    val yAxisScale = YAxisScale(
                         min = data.minY,
                         max = data.maxY,
-                        maxTickCount = maxHorizontalLinesCount - 1
-                    ),
-                    horizontalLinesOffset = horizontalLinesOffset
-                )
-                verticalGridLines = grid.verticalLines
-                horizontalGridLines = grid.horizontalLines
+                        maxTickCount = config.maxHorizontalLinesCount,
+                        roundClosestTo = config.roundMinMaxClosestTo,
+                    )
+                    val grid = measureChartGrid(
+                        xAxisScale = FixedTicksXAxisScale(
+                            min = data.minX,
+                            max = data.maxX,
+                            tickCount = verticalLinesCount - 1
+                        ),
+                        yAxisScale = yAxisScale,
+                        horizontalLinesOffset = horizontalLinesOffset
+                    )
+                    verticalGridLines = grid.verticalLines
+                    horizontalGridLines = grid.horizontalLines
 
-                drawChartGrid(grid, gridColor)
-                drawBarChart(
-                    data = data,
-                    config = config,
-                    yAxisUpperValue = grid.horizontalLines.last().value.toFloat(),
-                    yAxisLowerValue = grid.horizontalLines.first().value.toFloat(),
-                    verticalPadding = horizontalLinesOffset.toPx(),
-                    valueScale = valueScale,
+                    drawChartGrid(grid, gridColor)
+                    chartBars = drawBarChart(
+                        data = data,
+                        config = config,
+                        yAxisUpperValue = yAxisScale.max,
+                        yAxisLowerValue = yAxisScale.min,
+                        valueScale = valueScale,
+                        yAxisZeroPosition = grid.zeroPosition.position,
+                    )
+                }
+
+                XAxisLabels(
+                    labels = data.categories.map { it.name },
+                    verticalGridLines = verticalGridLines,
+                    xAxisMarkerLayout = xAxisLabel,
                 )
             }
 
-            XAxisLabels(
-                labels = data.categories.map { it.name },
-                verticalGridLines = verticalGridLines,
-                xAxisMarkerLayout = xAxisLabel,
-            )
+            selectedBar?.let { (position, data) ->
+                SelectedValueLabel(position, data, colors, overlayDataEntryLabel)
+            }
         }
     }
 }
@@ -151,5 +187,27 @@ private fun XAxisLabels(
                     }
                 }
             }
+    }
+}
+
+@Composable
+private fun BoxWithConstraintsScope.SelectedValueLabel(
+    position: PointF,
+    data: BarChartBar,
+    colors: BarChartColors,
+    overlayDataEntryLabel: @Composable (dataName: String, value: Any) -> Unit
+) {
+    OverlayInformation(
+        positionX = position.x,
+        containerSize = with(LocalDensity.current) {
+            Size(
+                maxWidth.toPx(),
+                maxHeight.toPx()
+            )
+        },
+        surfaceColor = colors.surface,
+        touchOffset = LocalDensity.current.run { position.y.toDp() },
+    ) {
+        overlayDataEntryLabel(data.data.x, data.data.y)
     }
 }

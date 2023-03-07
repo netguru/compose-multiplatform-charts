@@ -7,9 +7,11 @@ import com.netguru.multiplatform.charts.theme.ChartColors
 @Immutable
 data class BarChartColors(
     val grid: Color,
+    val surface: Color,
 )
 
 val ChartColors.barChartColors
     get() = BarChartColors(
-        grid = grid
+        grid = grid,
+        surface = surface,
     )

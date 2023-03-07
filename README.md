@@ -13,6 +13,9 @@ Currently supported platforms are <strong>Desktop</strong> and <strong>Android</
 </div>
 
 # Installation
+### Using local build
+Go to `charts` folder and run `assemble[Debug|Release]`. This results in an `aar` file which can then be copied/imported to your project as any other `aar` artifact.
+### Using maven dependency
 TBA
 
 # Usage
@@ -316,6 +319,8 @@ BarChart(
 )
 ```
 
+# Security Issues
+[Reporting Security Vulnerabilities](SECURITY.md)
 
 # Contributing
 [Contributing guidelines](CONTRIBUTING.md)

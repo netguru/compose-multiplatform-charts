@@ -17,6 +17,12 @@ fun DrawScope.drawChartGrid(grid: ChartGrid, color: Color) {
             strokeWidth = 1f
         )
     }
+    drawLine(
+        color = color,
+        start = Offset(0f, grid.zeroPosition.position),
+        end = Offset(size.width, grid.zeroPosition.position),
+        strokeWidth = 1f
+    )
     grid.verticalLines.forEach {
         drawLine(
             color = color,
@@ -35,8 +41,8 @@ fun DrawScope.measureChartGrid(
 
     val horizontalLines = measureHorizontalLines(
         axisScale = yAxisScale,
-        startPosition = size.height - horizontalLinesOffset.toPx(),
-        endPosition = horizontalLinesOffset.toPx()
+        startPosition = size.height,
+        endPosition = 0f
     )
 
     val verticalLines = measureVerticalLines(
@@ -45,9 +51,23 @@ fun DrawScope.measureChartGrid(
         endPosition = size.width
     )
 
+    val zero = when {
+        yAxisScale.min > 0 -> yAxisScale.min
+        yAxisScale.max < 0 -> yAxisScale.max
+        else -> 0f
+    }
     return ChartGrid(
         verticalLines = verticalLines,
-        horizontalLines = horizontalLines
+        horizontalLines = horizontalLines,
+        zeroPosition = LineParameters(
+            zero.mapValueToDifferentRange(
+                yAxisScale.min,
+                yAxisScale.max,
+                size.height,
+                0f
+            ),
+            zero
+        )
     )
 }
 
