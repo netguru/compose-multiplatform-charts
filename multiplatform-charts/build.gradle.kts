@@ -44,7 +44,7 @@ kotlin {
 }
 
 signing {
-     sign(publishing.publications)
+    sign(publishing.publications)
 }
 
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
