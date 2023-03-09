@@ -56,6 +56,7 @@ fun Project.publishingSetup() {
 
         publications.withType(MavenPublication::class.java) {
             pom {
+                name.set(libs.versions.project.name.get())
                 description.set(libs.versions.project.description.get())
                 url.set(libs.versions.project.url.get())
 
