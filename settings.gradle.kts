@@ -10,7 +10,7 @@ rootProject.name = "compose-multiplatform-charts"
 
 enableFeaturePreview("VERSION_CATALOGS")
 
-include(":charts")
+include(":multiplatform-charts")
 include(":example-app:application")
 include(":example-app:common")
 include(":example-app:android")
