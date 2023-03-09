@@ -44,6 +44,14 @@ kotlin {
 }
 
 signing {
+    if (project.extra.has("signing.secretKey") && project.extra.has("signing.password")) {
+        useInMemoryPgpKeys(
+            project.extra["signing.keyId"] as String,
+            project.extra["signing.secretKey"] as String,
+            project.extra["signing.password"] as String
+        )
+    }
+
     sign(publishing.publications)
 }
 

@@ -37,7 +37,7 @@ fun Project.publishingSetup() {
     } else {
         project.extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
         project.extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
-        project.extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
+        project.extra["signing.secretKey"] = System.getenv("SIGNING_SECRET_KEY")
         project.extra["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
         project.extra["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
     }
