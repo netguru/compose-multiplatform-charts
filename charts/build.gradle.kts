@@ -20,7 +20,9 @@ plugins {
 }
 
 kotlin {
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     jvm("desktop")
 
     sourceSets {
@@ -42,8 +44,7 @@ kotlin {
 }
 
 signing {
-    // Uncomment when the signing will be possible
-    // sign(publishing.publications)
+     sign(publishing.publications)
 }
 
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {

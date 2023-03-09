@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.the
+import java.util.*
 
 fun Project.publishingSetup() {
     val libs = project.the<LibrariesForLibs>()
@@ -20,11 +21,26 @@ fun Project.publishingSetup() {
     project.group = libs.versions.project.group.get()
     project.version = version
 
-    project.extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
-    project.extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
-    project.extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
-    project.extra["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-    project.extra["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+    val secretPropsFile = project.rootProject.file("local.properties")
+    if (secretPropsFile.exists()) {
+        secretPropsFile.reader().use {
+            Properties().apply {
+                load(it)
+            }
+        }.let { properties ->
+            project.extra["signing.keyId"] = properties.getProperty("signing.keyId")
+            project.extra["signing.password"] = properties.getProperty("signing.password")
+            project.extra["signing.secretKeyRingFile"] = properties.getProperty("signing.secretKeyRingFile")
+            project.extra["ossrhUsername"] = properties.getProperty("ossrhUsername")
+            project.extra["ossrhPassword"] = properties.getProperty("ossrhPassword")
+        }
+    } else {
+        project.extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+        project.extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
+        project.extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
+        project.extra["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
+        project.extra["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+    }
 
     publishing {
         repositories {
@@ -32,16 +48,14 @@ fun Project.publishingSetup() {
                 name = "sonatype"
                 setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
+                    username = project.extra["ossrhUsername"]?.toString()
+                    password = project.extra["ossrhPassword"]?.toString()
                 }
             }
         }
 
         publications.withType(MavenPublication::class.java) {
             pom {
-                artifactId = libs.versions.project.artifact.get()
-                name.set(libs.versions.project.name.get())
                 description.set(libs.versions.project.description.get())
                 url.set(libs.versions.project.url.get())
 
