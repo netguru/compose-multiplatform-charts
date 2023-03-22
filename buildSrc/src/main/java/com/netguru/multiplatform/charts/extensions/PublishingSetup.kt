@@ -21,21 +21,22 @@ fun Project.publishingSetup() {
     project.group = libs.versions.project.group.get()
     project.version = version
 
+    var properties: Properties? = null
     val secretPropsFile = project.rootProject.file("local.properties")
-    val properties = secretPropsFile.reader().use {
-        Properties().apply {
-            load(it)
+    if (secretPropsFile.exists()) {
+        secretPropsFile.reader().use {
+            properties = Properties().apply { load(it) }
         }
     }
-    project.extra["signing.keyId"] = properties.getProperty("signing.keyId") ?: System.getenv("SIGNING_KEY_ID")
-    project.extra["signing.password"] = properties.getProperty("signing.password") ?: System.getenv("SIGNING_PASSWORD")
-    project.extra["ossrhUsername"] = properties.getProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
-    project.extra["ossrhPassword"] = properties.getProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
 
-    if (properties.getProperty("signing.secretKeyRingFile") != null) {
-        project.extra["signing.secretKeyRingFile"] = properties.getProperty("signing.secretKeyRingFile")
+    project.extra["signing.keyId"] = properties?.getProperty("signing.keyId") ?: System.getenv("SIGNING_KEY_ID")
+    project.extra["signing.password"] = properties?.getProperty("signing.password") ?: System.getenv("SIGNING_PASSWORD")
+    project.extra["ossrhUsername"] = properties?.getProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+    project.extra["ossrhPassword"] = properties?.getProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+    if (properties?.getProperty("signing.secretKeyRingFile") != null) {
+        project.extra["signing.secretKeyRingFile"] = properties?.getProperty("signing.secretKeyRingFile")
     } else {
-        project.extra["signing.secretKey"] = System.getenv("SIGNING_SECRET_KEY")
+        project.extra["signing.secretKey"] = properties?.getProperty("signing.secretKey") ?: System.getenv("SIGNING_SECRET_KEY")
     }
 
     publishing {
