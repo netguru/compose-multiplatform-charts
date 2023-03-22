@@ -28,18 +28,17 @@ fun Project.publishingSetup() {
                 load(it)
             }
         }.let { properties ->
-            project.extra["signing.keyId"] = properties.getProperty("signing.keyId")
-            project.extra["signing.password"] = properties.getProperty("signing.password")
-            project.extra["signing.secretKeyRingFile"] = properties.getProperty("signing.secretKeyRingFile")
-            project.extra["ossrhUsername"] = properties.getProperty("ossrhUsername")
-            project.extra["ossrhPassword"] = properties.getProperty("ossrhPassword")
+            project.extra["signing.keyId"] = properties.getProperty("signing.keyId") ?: System.getenv("SIGNING_KEY_ID")
+            project.extra["signing.password"] = properties.getProperty("signing.password") ?: System.getenv("SIGNING_PASSWORD")
+            project.extra["ossrhUsername"] = properties.getProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+            project.extra["ossrhPassword"] = properties.getProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+
+            if (properties.getProperty("signing.secretKeyRingFile") != null) {
+                project.extra["signing.secretKeyRingFile"] = properties.getProperty("signing.secretKeyRingFile")
+            } else {
+                project.extra["signing.secretKey"] = System.getenv("SIGNING_SECRET_KEY")
+            }
         }
-    } else {
-        project.extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
-        project.extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
-        project.extra["signing.secretKey"] = System.getenv("SIGNING_SECRET_KEY")
-        project.extra["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-        project.extra["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
     }
 
     publishing {
