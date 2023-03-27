@@ -70,6 +70,14 @@ fun Project.publishingSetup() {
                         url.set("https://opensource.org/licenses/MIT")
                     }
                 }
+                developers {
+                    developer {
+                        name.set("Netguru Mobile")
+                        email.set("mobile@netguru.com")
+                        organization.set("Netguru")
+                        organizationUrl.set("https://www.netguru.com/")
+                    }
+                }
                 scm {
                     url.set(libs.versions.project.url.get())
                 }
