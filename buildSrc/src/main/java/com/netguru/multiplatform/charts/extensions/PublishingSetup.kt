@@ -3,6 +3,7 @@ package com.netguru.multiplatform.charts.extensions
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.the
 import java.util.*
@@ -39,6 +40,11 @@ fun Project.publishingSetup() {
         project.extra["signing.secretKey"] = properties?.getProperty("signing.secretKey") ?: System.getenv("SIGNING_SECRET_KEY")
     }
 
+    val javadocJar = tasks.register<Jar>("javadocJar", Jar::class.java) {
+        archiveClassifier.set("javadoc")
+        from(tasks.named("dokkaHtml"))
+    }
+
     publishing {
         repositories {
             maven {
@@ -52,6 +58,7 @@ fun Project.publishingSetup() {
         }
 
         publications.withType(MavenPublication::class.java) {
+            artifact(javadocJar)
             pom {
                 name.set(libs.versions.project.name.get())
                 description.set(libs.versions.project.description.get())

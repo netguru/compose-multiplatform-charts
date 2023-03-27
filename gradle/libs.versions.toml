@@ -36,7 +36,7 @@ shot = "5.14.1"
 ktlint = "10.2.1"
 
 # Project
-project-group = "com.netguru"
+project-group = "com.netguru.multiplatform-charts"
 project-artifact = "multiplatform-charts"
 project-version = "1.0.0"
 project-name = "Compose Multiplatform Charts"
