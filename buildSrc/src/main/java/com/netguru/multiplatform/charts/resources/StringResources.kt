@@ -26,7 +26,7 @@ class StringResources(packageName: String) : Resources {
     private fun createLanguageClass() = stringSets.map { createLanguageClass(it) }
 
     private fun createLanguageClass(language: Map.Entry<String, Map<String, String>>): TypeSpec {
-        val languageCode = language.key.toUpperCase()
+        val languageCode = language.key.uppercase()
         val languagesProperties = if (language.key == baseLanguageCode) {
             emptyList<PropertySpec>()
         } else {
@@ -52,14 +52,14 @@ class StringResources(packageName: String) : Resources {
     private fun createGetStringMethod() = FunSpec.builder("getString")
         .returns(stringResourceClass)
         .apply {
-            addStatement("val language = when(locale.toUpperCase()) {")
+            addStatement("val language = when(locale.uppercase()) {")
             stringSets
                 .filterNot { it.key.contains(baseLanguageCode) }
                 .forEach {
-                    val lang = it.key.substringAfterLast("_").toUpperCase()
+                    val lang = it.key.substringAfterLast("_").uppercase()
                     addStatement("\"${lang}\" -> $lang")
                 }
-            addStatement("else -> ${baseLanguageCode.toUpperCase()}")
+            addStatement("else -> ${baseLanguageCode.uppercase()}")
             addStatement("}")
             addStatement("return language")
         }.build()
