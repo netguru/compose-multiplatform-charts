@@ -1,15 +1,14 @@
 package com.netguru.multiplatform.charts.line
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +29,6 @@ import com.netguru.multiplatform.charts.ChartAnimation
 import com.netguru.multiplatform.charts.bar.BarChartConfig
 import com.netguru.multiplatform.charts.grid.GridDefaults
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChartLegend(
     legendData: List<LegendItemData>,
@@ -41,7 +39,7 @@ fun ChartLegend(
 ) {
     LazyVerticalGrid(
         modifier = modifier,
-        cells = GridCells.Adaptive(200.dp),
+        columns = GridCells.Adaptive(200.dp),
         contentPadding = PaddingValues(
             start = 12.dp,
             top = 16.dp,

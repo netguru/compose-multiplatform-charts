@@ -3,30 +3,29 @@ import com.netguru.multiplatform.charts.extensions.commonMain
 import com.netguru.multiplatform.charts.extensions.commonTest
 import com.netguru.multiplatform.charts.extensions.kotlin
 import com.netguru.multiplatform.charts.extensions.sourceSets
-import org.jetbrains.compose.compose
 import java.net.URL
 
 baseAndroidSetup()
 
 plugins {
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
     kotlin("multiplatform")
     id("com.android.library")
     alias(libs.plugins.dokka)
 }
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
 
     sourceSets {
         commonMain {
             dependencies {
-                api(compose.runtime)
-                api(compose.ui)
-                api(compose.foundation)
-                api(compose.material)
-                api(compose.materialIconsExtended)
+                api(libs.compose.runtime)
+                api(libs.compose.ui)
+                api(libs.compose.foundation)
+                api(libs.compose.material)
+                api(libs.compose.materialIconsExtended)
             }
         }
         commonTest {
@@ -35,6 +34,9 @@ kotlin {
             }
         }
     }
+}
+android {
+    namespace = "com.netguru.multiplatform.charts"
 }
 
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
