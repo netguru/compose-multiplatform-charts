@@ -2,7 +2,6 @@ import com.netguru.multiplatform.charts.extensions.androidMain
 import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
 import com.netguru.multiplatform.charts.extensions.baseTestSetup
 import com.netguru.multiplatform.charts.extensions.commonMain
-import org.jetbrains.compose.compose
 
 baseAndroidSetup()
 baseTestSetup()
@@ -11,11 +10,11 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     @Suppress("DSL_SCOPE_VIOLATION")
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
 
     sourceSets {
@@ -26,8 +25,11 @@ kotlin {
         }
         androidMain {
             dependencies {
-                api(compose.uiTooling)
+                api(libs.compose.uiTooling)
             }
         }
     }
+}
+android {
+    namespace = "com.netguru.multiplatform.charts.application"
 }

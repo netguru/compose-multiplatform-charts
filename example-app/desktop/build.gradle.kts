@@ -1,11 +1,11 @@
 import com.netguru.multiplatform.charts.extensions.jvmMain
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
     @Suppress("DSL_SCOPE_VIOLATION")
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.compose.desktop)
 }
 
 group = libs.versions.project.group.get()
