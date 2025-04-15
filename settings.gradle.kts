@@ -8,8 +8,6 @@ pluginManagement {
 }
 rootProject.name = "compose-multiplatform-charts"
 
-enableFeaturePreview("VERSION_CATALOGS")
-
 include(":charts")
 include(":example-app:application")
 include(":example-app:common")
