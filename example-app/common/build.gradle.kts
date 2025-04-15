@@ -3,7 +3,6 @@ import com.netguru.multiplatform.charts.extensions.baseAndroidSetup
 import com.netguru.multiplatform.charts.extensions.baseTestSetup
 import com.netguru.multiplatform.charts.extensions.sourceSets
 import org.gradle.kotlin.dsl.kotlin
-import org.jetbrains.compose.compose
 
 baseAndroidSetup()
 baseTestSetup()
@@ -11,23 +10,23 @@ baseTestSetup()
 plugins {
     kotlin("multiplatform")
     @Suppress("DSL_SCOPE_VIOLATION")
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
     id("com.android.library")
 }
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
 
     sourceSets {
         commonMain {
             kotlin.srcDir("${buildDir.absolutePath}/generated/resources")
             dependencies {
-                api(compose.runtime)
-                api(compose.ui)
-                api(compose.foundation)
-                api(compose.material)
-                api(compose.materialIconsExtended)
+                api(libs.compose.runtime)
+                api(libs.compose.ui)
+                api(libs.compose.foundation)
+                api(libs.compose.material)
+                api(libs.compose.materialIconsExtended)
                 api(libs.time.klock)
                 api(project(":charts"))
             }
@@ -45,6 +44,7 @@ android {
     sourceSets["main"].apply {
         res.srcDirs("src/androidMain/res", "src/commonMain/resources")
     }
+    namespace = "com.netguru.multiplatform.charts.common"
 }
 
 project.rootProject.tasks.apply {

@@ -13,7 +13,7 @@ fun Project.baseAndroidSetup() {
         if (project.plugins.hasPlugin("com.android.library")) {
             sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
-        if (project.plugins.hasPlugin(libs.plugins.compose.get().pluginId)) {
+        if (project.plugins.hasPlugin(libs.plugins.kotlin.compose.get().pluginId)) {
             buildFeatures.compose = true
         }
         defaultConfig {

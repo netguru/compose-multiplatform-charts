@@ -5,7 +5,7 @@ baseAndroidSetup()
 plugins {
     kotlin("android")
     @Suppress("DSL_SCOPE_VIOLATION")
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
     id("com.android.application")
     id("shot")
 }
@@ -15,8 +15,8 @@ version = libs.versions.project.version.get()
 
 dependencies {
     implementation(libs.androidx.compose)
-    debugImplementation(compose.uiTooling)
-    implementation(compose.preview)
+    debugImplementation(libs.compose.uiTooling)
+    implementation(libs.compose.preview)
     implementation(libs.androidx.window)
     implementation(project(":example-app:application"))
     androidTestImplementation(libs.test.junit)
@@ -41,6 +41,7 @@ android {
             "META-INF/LGPL2.1"
         )
     }
+    namespace = "com.netguru.multiplatform.charts.android"
 }
 
 shot {

@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,7 +51,7 @@ fun GasBottleChartScreen() {
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(),
-            cells = GridCells.Fixed(numberOfCols),
+            columns = GridCells.Fixed(numberOfCols),
             contentPadding = PaddingValues(AppTheme.dimens.grid_4),
         ) {
             item(span = { GridItemSpan(numberOfCols) }) {

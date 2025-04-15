@@ -23,6 +23,7 @@ class DrawableResources(packageName: String) : Resources {
     }
 
     private fun createGetDrawableMethod() = FunSpec.builder("getDrawableResources")
+        .returns(ClassName("com.netguru.multiplatform.charts.common", "DrawableResources"))
         .addStatement("return DrawableResources")
         .build()
 
