@@ -27,7 +27,6 @@ appcompat = "1.7.0"
 core-ktx = "1.16.0"
 junit = "4.13.2"
 window = "1.3.0"
-coroutines-test = "1.10.2"
 turbine = "0.7.0"
 klock = "2.4.13"
 kotlin-poet = "1.14.2"
@@ -63,7 +62,7 @@ androidx-window = { module = "androidx.window:window", version.ref = "window" }
 test-junit = { module = "junit:junit", version.ref = "junit" }
 test-ui-junit = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-test" }
 test-ui-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-test" }
-test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
+test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 test-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 time-klock = { module = "com.soywiz.korlibs.klock:klock", version.ref = "klock" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
