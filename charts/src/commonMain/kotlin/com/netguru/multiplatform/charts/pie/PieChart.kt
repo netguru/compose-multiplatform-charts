@@ -18,6 +18,9 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import com.netguru.multiplatform.charts.ChartAnimation
 import com.netguru.multiplatform.charts.StartAnimation
 import com.netguru.multiplatform.charts.mapValueToDifferentRange
@@ -26,6 +29,7 @@ import com.netguru.multiplatform.charts.pie.PieDefaults.START_ANGLE
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 data class PieChartData(val name: String, val value: Double, val color: Color)
@@ -79,6 +83,15 @@ fun PieChart(
             )
         )
     }
+    val textMeasurer = rememberTextMeasurer()
+    val textLayouts = sweepAngles.mapIndexed { index, _ ->
+        val percent = (data[index].value / sumOfData * 100).roundToInt()
+        val text = "$percent%"
+        val layoutResult = textMeasurer.measure(
+            text = AnnotatedString(text),
+        )
+        layoutResult
+    }
 
     Box(
         modifier = modifier
@@ -97,6 +110,23 @@ fun PieChart(
                             sweepAngle = sweepAngle.toFloat(),
                             config = config,
                         )
+                        val layoutResult = textLayouts[index]
+
+                        val midAngle = startAngle + sweepAngle / 2
+                        val angleRad = Math.toRadians(midAngle)
+                        val radius = size.minDimension / 2f * 0.65f
+
+                        val x = center.x + cos(angleRad).toFloat() * radius
+                        val y = center.y + sin(angleRad).toFloat() * radius
+
+                        drawText(
+                            textLayoutResult = layoutResult,
+                            topLeft = Offset(
+                                x - layoutResult.size.width / 2f,
+                                y - layoutResult.size.height / 2f
+                            )
+                        )
+
                         startAngle += sweepAngle
                     }
                 }
