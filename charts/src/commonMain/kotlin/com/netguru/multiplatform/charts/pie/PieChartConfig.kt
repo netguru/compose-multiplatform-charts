@@ -27,6 +27,7 @@ data class PieChartConfig(
     val legendIconSize: Dp = PieDefaults.LEGEND_ICON_SIZE,
     val legendOrientation: LegendOrientation = LegendOrientation.HORIZONTAL,
     val numberOfColsInLegend: Int = PieDefaults.NUMBER_OF_COLS_IN_LEGEND,
+    val showPercentages: Boolean = false
 )
 
 enum class LegendIcon {
