@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
@@ -144,6 +145,8 @@ private fun DrawScope.calculateClipPath(
     angles: List<Double>,
     config: PieChartConfig,
 ): Path {
+    if (!center.isSpecified || size.isEmpty()) return Path()
+
     val r = min(size.width, size.height) / 2f
     val gapWidth = config.gap.toPx()
     val chartPath = Path().apply { addRect(Rect(Offset.Zero, size)) }
